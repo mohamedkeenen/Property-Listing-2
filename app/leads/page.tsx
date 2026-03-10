@@ -19,8 +19,8 @@ export default function Leads() {
   ];
 
   return (
-    <div className="p-4 md:p-8 space-y-10">
-      <div className="flex flex-col gap-1">
+    <div className="flex flex-col h-full w-full min-w-0 overflow-hidden px-4 md:px-6 py-6">
+      <div className="flex flex-col gap-1 mb-10">
         <h1 className="text-3xl font-black text-foreground tracking-tight flex items-center gap-3">
           Leads Management
           <div className="h-2 w-2 rounded-full bg-primary animate-pulse" />
@@ -28,14 +28,14 @@ export default function Leads() {
         <p className="text-sm text-muted-foreground font-medium uppercase tracking-widest text-[10px]">Manage your property inquiry leads & conversions</p>
       </div>
 
-      <div className="space-y-6">
+      <div className="shrink-0 space-y-6 mb-10">
         <div className="flex items-center gap-3">
           <div className="p-2 rounded-xl bg-primary/10 text-primary relative">
             <Users className="h-5 w-5" />
           </div>
-          <h3 className="text-[10px] font-black text-foreground uppercase tracking-[0.2em]">Conversion Pipeline</h3>
+          <h3 className="text-[10px] font-black uppercase tracking-[0.2em]">Conversion Pipeline</h3>
           <div className="h-px flex-1 bg-border/50" />
-          <Info className="h-4 w-4 text-muted-foreground" />
+          <span className="text-muted-foreground"><Info className="h-4 w-4" /></span>
         </div>
         
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
@@ -62,16 +62,18 @@ export default function Leads() {
         </div>
       </div>
 
-      <div className="space-y-6">
+      <div className="flex-1 flex flex-col min-h-0 space-y-6 overflow-hidden">
         <div className="flex items-center gap-3">
           <div className="p-2 rounded-xl bg-orange-500/10 text-orange-500 relative">
             <List className="h-5 w-5" />
           </div>
-          <h3 className="text-[10px] font-black text-foreground uppercase tracking-[0.2em]">Lead Database</h3>
+          <h3 className="text-[10px] font-black uppercase tracking-[0.2em]">Lead Database</h3>
           <div className="h-px flex-1 bg-border/50" />
           <Search className="h-4 w-4 text-muted-foreground" />
         </div>
-        <LeadsTable />
+        <div className="flex-1 min-h-0 overflow-auto">
+          <LeadsTable />
+        </div>
       </div>
     </div>
   );

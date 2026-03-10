@@ -81,7 +81,7 @@ export function ListingsTable({ listings, onViewDetails, onEdit }: Props) {
   };
 
   return (
-    <div className="bg-card border border-border rounded-lg w-full overflow-hidden">
+    <div className="bg-card border border-border rounded-lg w-full overflow-hidden flex flex-col h-full">
       {/* Tabs */}
       <div className="flex items-center gap-1 p-3 border-b border-border overflow-x-auto">
         {statusTabs.map((tab) => (
@@ -112,8 +112,8 @@ export function ListingsTable({ listings, onViewDetails, onEdit }: Props) {
         </div>
       </div>
 
-      {/* Table with Scroll Indicators */}
-      <div className="relative group/table w-full">
+      {/* Table Section - Flex to fill and allow internal scroll */}
+      <div className="relative group/table w-full flex-1 flex flex-col min-h-0">
         {/* Left Scroll Indicator */}
         <button 
           onClick={() => scroll('left')}
@@ -127,10 +127,10 @@ export function ListingsTable({ listings, onViewDetails, onEdit }: Props) {
 
         <div 
           ref={scrollRef} 
-          className="overflow-x-auto w-full pb-4 scroll-smooth"
+          className="flex-1 overflow-auto w-full pb-4 scroll-smooth"
         >
-          <Table className="min-w-[1800px]">
-          <TableHeader>
+          <Table className="min-w-[1800px] relative">
+          <TableHeader className="sticky top-0 bg-card z-10 shadow-[0_1px_0_rgba(0,0,0,0.1)] dark:shadow-[0_1px_0_rgba(255,255,255,0.1)]">
             <TableRow>
               <TableHead className="w-[50px]"></TableHead>
               <TableHead>Portals</TableHead>

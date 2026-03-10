@@ -30,7 +30,7 @@ export function AppSidebar() {
 
   return (
     <Sidebar collapsible="icon">
-      <SidebarHeader className="border-b border-sidebar-border bg-sidebar px-0 pb-0">
+      <SidebarHeader className="border-b border-sidebar-border/40 bg-sidebar px-0 pb-0">
         <div className={cn(
           "flex flex-col gap-6",
           collapsed ? "p-3 pb-6 border-b border-sidebar-border/10" : "p-6"

@@ -40,8 +40,8 @@ export default function Dashboard() {
   }, [filters]);
 
   return (
-    <div className="p-4 md:p-8 space-y-10 w-full min-w-0">
-      <div className="flex flex-col gap-1">
+    <div className="flex flex-col flex-1 h-full min-w-0 overflow-hidden px-4 md:px-6 py-6">
+      <div className="flex flex-col gap-1 mb-10">
         <h1 className="text-3xl font-black text-foreground tracking-tight flex items-center gap-3">
           Dashboard
           <div className="h-2 w-2 rounded-full bg-primary animate-pulse" />
@@ -49,49 +49,54 @@ export default function Dashboard() {
         <p className="text-sm text-muted-foreground font-medium uppercase tracking-widest text-[10px]">Property listings overview & analytics</p>
       </div>
 
-      {/* Stats Section */}
-      <div className="space-y-6">
-        <div className="flex items-center gap-3">
-          <div className="p-2 rounded-xl bg-primary/10 text-primary relative">
-            <BarChart3 className="h-5 w-5" />
+      {/* Scrollable upper sections if needed, though you wanted it fixed */}
+      <div className="shrink-0 space-y-8 mb-10">
+        {/* Stats Section */}
+        <div className="space-y-6 text-card-foreground">
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-xl bg-primary/10 text-primary relative">
+              <BarChart3 className="h-5 w-5" />
+            </div>
+            <h3 className="text-[10px] font-black uppercase tracking-[0.2em]">Market Overview</h3>
+            <div className="h-px flex-1 bg-border/50" />
+            <Info className="h-4 w-4 text-muted-foreground" />
           </div>
-          <h3 className="text-[10px] font-black text-foreground uppercase tracking-[0.2em]">Market Overview</h3>
-          <div className="h-px flex-1 bg-border/50" />
-          <Info className="h-4 w-4 text-muted-foreground" />
+          <StatsCards />
         </div>
-        <StatsCards />
+
+        {/* Charts Section */}
+        <div className="space-y-6">
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-xl bg-purple-500/10 text-purple-500 relative">
+              <PieChart className="h-5 w-5" />
+            </div>
+            <h3 className="text-[10px] font-black uppercase tracking-[0.2em]">Performance Analytics</h3>
+            <div className="h-px flex-1 bg-border/50" />
+            <BarChart3 className="h-4 w-4 text-muted-foreground" />
+          </div>
+          <DashboardCharts />
+        </div>
       </div>
 
-      {/* Charts Section */}
-      <div className="space-y-6">
-        <div className="flex items-center gap-3">
-          <div className="p-2 rounded-xl bg-purple-500/10 text-purple-500 relative">
-            <PieChart className="h-5 w-5" />
-          </div>
-          <h3 className="text-[10px] font-black text-foreground uppercase tracking-[0.2em]">Performance Analytics</h3>
-          <div className="h-px flex-1 bg-border/50" />
-          <BarChart3 className="h-4 w-4 text-muted-foreground" />
-        </div>
-        <DashboardCharts />
-      </div>
-
-      {/* Table Section */}
-      <div className="space-y-6">
+      {/* Table Section - This will take all remaining height */}
+      <div className="flex-1 flex flex-col min-h-0 space-y-6 overflow-hidden">
         <div className="flex items-center gap-3">
           <div className="p-2 rounded-xl bg-orange-500/10 text-orange-500 relative">
             <List className="h-5 w-5" />
           </div>
-          <h3 className="text-[10px] font-black text-foreground uppercase tracking-[0.2em]">Inventory Management</h3>
+          <h3 className="text-[10px] font-black uppercase tracking-[0.2em]">Inventory Management</h3>
           <div className="h-px flex-1 bg-border/50" />
           <Search className="h-4 w-4 text-muted-foreground" />
         </div>
-        <div className="space-y-4 min-w-0">
+        <div className="flex-1 flex flex-col min-h-0 space-y-4">
           <ListingsFilters onApply={setFilters} />
-          <ListingsTable
-            listings={filtered}
-            onViewDetails={setSelectedListing}
-            onEdit={(l) => router.push("/create-listing")}
-          />
+          <div className="flex-1 min-h-0 overflow-auto">
+            <ListingsTable
+              listings={filtered}
+              onViewDetails={setSelectedListing}
+              onEdit={(l) => router.push("/create-listing")}
+            />
+          </div>
         </div>
       </div>
 

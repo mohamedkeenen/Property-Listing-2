@@ -65,7 +65,7 @@ export function LeadsTable() {
 
   return (
     <>
-      <div className="bg-card border border-border rounded-lg overflow-hidden">
+      <div className="bg-card border border-border rounded-lg overflow-hidden flex flex-col h-full">
         {/* Source tabs */}
         <div className="flex items-center gap-1 p-3 overflow-x-auto">
           {sourceTabs.map((tab) => (
@@ -102,10 +102,10 @@ export function LeadsTable() {
           </div>
         </div>
 
-        {/* Table */}
-        <div className="overflow-x-auto">
-          <Table>
-            <TableHeader>
+        {/* Table Area - Flex and scrollable */}
+        <div className="flex-1 overflow-auto w-full min-h-0">
+          <Table className="relative">
+            <TableHeader className="sticky top-0 bg-card z-10 shadow-[0_1px_0_rgba(0,0,0,0.1)]">
               <TableRow>
                 <TableHead className="w-[50px]"></TableHead>
                 <TableHead>Lead</TableHead>
