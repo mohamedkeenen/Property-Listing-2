@@ -65,9 +65,9 @@ export function LeadsTable() {
 
   return (
     <>
-      <div className="bg-card border border-border rounded-xl">
+      <div className="bg-card border border-border rounded-lg overflow-hidden">
         {/* Source tabs */}
-        <div className="flex items-center gap-1 p-3 border-b border-border overflow-x-auto">
+        <div className="flex items-center gap-1 p-3 overflow-x-auto">
           {sourceTabs.map((tab) => (
             <button
               key={tab}
@@ -95,7 +95,7 @@ export function LeadsTable() {
         </div>
 
         {/* Search */}
-        <div className="p-3 border-b border-border">
+        <div className="p-3">
           <div className="relative max-w-sm">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input placeholder="Search leads..." value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} className="pl-9 h-9 text-sm" />
@@ -118,7 +118,7 @@ export function LeadsTable() {
             </TableHeader>
             <TableBody>
               {paginated.length === 0 ? (
-                <TableRow>
+                <TableRow className="border-b-0">
                   <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">No leads found</TableCell>
                 </TableRow>
               ) : (
@@ -126,7 +126,7 @@ export function LeadsTable() {
                   const src = sourceIcon[l.source];
                   const prop = getProperty(l.property);
                   return (
-                    <TableRow key={l.id} className="hover:bg-muted/50">
+                    <TableRow key={l.id} className="hover:bg-muted/50 border-b-0">
                       <TableCell>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
@@ -197,7 +197,7 @@ export function LeadsTable() {
         </div>
 
         {/* Pagination */}
-        <div className="flex items-center justify-between p-3 border-t border-border">
+        <div className="flex items-center justify-between p-3">
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <span>Show</span>
             <Select value={String(perPage)} onValueChange={(v) => { setPerPage(Number(v)); setPage(1); }}>
