@@ -20,10 +20,10 @@ const sourceIcon: Record<string, { icon: typeof MessageCircle; color: string }> 
 };
 
 const statusColors: Record<string, string> = {
-  New: "bg-emerald-500/10 text-emerald-600 border-emerald-200",
-  Contacted: "bg-blue-500/10 text-blue-600 border-blue-200",
-  Qualified: "bg-purple-500/10 text-purple-600 border-purple-200",
-  Lost: "bg-red-500/10 text-red-500 border-red-200",
+  New: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/30",
+  Contacted: "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-500/30",
+  Qualified: "bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-500/30",
+  Lost: "bg-red-500/10 text-red-500 dark:text-red-400 border-red-200 dark:border-red-500/30",
 };
 
 const sourceTabs = ["All", "WhatsApp", "Email", "Call"];

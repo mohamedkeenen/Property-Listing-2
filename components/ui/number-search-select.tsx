@@ -48,7 +48,7 @@ const NumberSearchSelect = ({
           onClear={value ? () => onChange("") : undefined}
           readOnly
         >
-          <div className="text-sm font-semibold text-slate-700 h-full flex items-center pt-1">
+          <div className="text-sm font-semibold text-foreground h-full flex items-center pt-1">
             {value || " "}
           </div>
         </ModernField>
@@ -57,11 +57,11 @@ const NumberSearchSelect = ({
       {open && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-          <div className="absolute top-[52px] left-0 w-full bg-white border border-slate-200 rounded-xl shadow-xl z-50 p-2 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+          <div className="absolute top-[52px] left-0 w-full bg-popover border border-border rounded-xl shadow-xl z-50 p-2 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
             <div className="relative mb-2">
               <input 
                 autoFocus
-                className="w-full h-8 bg-slate-50 border border-slate-100 rounded-lg px-3 text-xs focus:ring-1 focus:ring-primary/20 outline-none transition-all dark:bg-slate-900/50 dark:border-slate-800"
+                className="w-full h-8 bg-muted border border-border/50 rounded-lg px-3 text-xs focus:ring-1 focus:ring-primary/20 outline-none transition-all text-foreground"
                 placeholder="Search..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
@@ -74,7 +74,7 @@ const NumberSearchSelect = ({
                   type="button"
                   className={cn(
                     "w-full text-left px-3 py-1.5 text-xs rounded-lg transition-all font-medium",
-                    value === opt ? "text-primary font-bold bg-primary/5" : "text-slate-600 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800"
+                    value === opt ? "text-primary font-bold bg-primary/5" : "text-muted-foreground hover:bg-muted hover:text-foreground"
                   )}
                   onClick={() => {
                     onChange(opt);
@@ -85,7 +85,7 @@ const NumberSearchSelect = ({
                   {opt}
                 </button>
               )) : (
-                <div className="p-4 text-center text-xs text-slate-400 font-medium italic">No results found</div>
+                <div className="p-4 text-center text-xs text-muted-foreground font-medium italic">No results found</div>
               )}
             </div>
           </div>

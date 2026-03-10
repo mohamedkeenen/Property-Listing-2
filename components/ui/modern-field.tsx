@@ -20,30 +20,32 @@ const ModernField = forwardRef<HTMLInputElement, ModernFieldProps>(
   ({ label, required, error, icon: Icon, isSelect, onClear, children, value, isFocused: externalFocused, ...props }, ref) => {
     const [internalFocused, setInternalFocused] = useState(false);
     const isFocused = externalFocused || internalFocused;
-    const isFilled = (value !== undefined && value !== "" && value !== null && value !== 0) || isFocused;
+    const isFilled = (value !== undefined && value !== "" && value !== null) || isFocused;
 
     return (
       <div className="relative w-full group">
         <div 
+          onFocusCapture={() => setInternalFocused(true)}
+          onBlurCapture={() => setInternalFocused(false)}
           className={cn(
-            "relative flex items-center h-12 w-full rounded-xl border transition-all duration-200 overflow-visible px-4 gap-3 bg-white",
-            isFocused ? "border-primary ring-2 ring-primary/5 shadow-sm" : "border-slate-200 hover:border-slate-300",
+            "relative flex items-start min-h-12 h-auto w-full rounded-xl border transition-all duration-300 overflow-visible px-4 gap-3 bg-background py-3",
+            isFocused ? "border-primary ring-4 ring-primary/5 shadow-sm" : "border-border hover:border-primary/20",
             error ? "border-destructive ring-destructive/10" : ""
           )}
         >
           {Icon && (
             <div className={cn(
-              "shrink-0 transition-colors duration-200",
-              isFocused ? "text-primary" : "text-slate-400"
+              "shrink-0 transition-all duration-300 mt-0.5",
+              isFocused ? "text-primary scale-110" : "text-muted-foreground"
             )}>
-              <Icon className="h-4 w-4" strokeWidth={2} />
+              <Icon className="h-4 w-4" strokeWidth={2.5} />
             </div>
           )}
 
-          <div className="flex-1 h-full flex items-center relative overflow-visible">
+          <div className="flex-1 h-full relative overflow-visible flex flex-col justify-start">
             {children ? (
-              <div className="w-full h-full flex items-center pt-2">
-                 {children}
+              <div className="w-full h-full flex items-start pt-1.5 min-h-6">
+                {children}
               </div>
             ) : (
               <input
@@ -57,35 +59,28 @@ const ModernField = forwardRef<HTMLInputElement, ModernFieldProps>(
                   setInternalFocused(false);
                   props.onBlur?.(e);
                 }}
-                className="w-full bg-transparent border-none focus:ring-0 text-sm font-semibold text-slate-700 placeholder:text-slate-300 outline-none h-full pt-1"
+                className="w-full bg-transparent border-none focus:ring-0 text-sm font-bold text-foreground outline-none h-full pt-1"
               />
             )}
 
             <label
               className={cn(
-                "absolute left-0 pointer-events-none transition-all duration-200 px-1 font-medium select-none z-10",
+                "absolute pointer-events-none transition-all duration-300 px-1 font-bold select-none z-10 uppercase tracking-widest",
+                props.dir === "rtl" ? "right-0" : "left-0",
                 isFilled 
-                  ? "-top-[10px] text-[10px] text-slate-500 bg-white" 
-                  : "top-1/2 -translate-y-1/2 text-sm text-slate-400"
+                  ? "-top-[22px] text-[9px] text-primary bg-background" 
+                  : "top-[2px] text-[11px] text-muted-foreground"
               )}
             >
               {label}{required && <span className="text-destructive ml-0.5">*</span>}
             </label>
           </div>
           
-          {isSelect && !onClear && (
-            <div className="shrink-0 text-slate-300 group-hover:text-slate-400 transition-colors">
-              <svg width="10" height="6" viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M1 1L5 5L9 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            </div>
-          )}
-
-          {onClear && isFilled && !isFocused && (
+          {onClear && (value !== undefined && value !== "" && value !== null) && (
             <button 
               type="button" 
               onClick={(e) => { e.stopPropagation(); onClear(); }}
-              className="shrink-0 text-slate-300 hover:text-slate-500 transition-colors p-1 rounded-full hover:bg-slate-100"
+              className="shrink-0 text-muted-foreground hover:text-foreground transition-all p-1.5 rounded-full hover:bg-muted/50 z-20 mt-0.5"
             >
               <X className="h-3 w-3" />
             </button>

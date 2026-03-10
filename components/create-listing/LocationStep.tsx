@@ -1,9 +1,9 @@
 import { UseFormReturn } from "react-hook-form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { filterOptions } from "@/data/mockData";
-import { MapPin, Building2, Globe } from "lucide-react";
+import { MapPin, Building2, Globe, Navigation } from "lucide-react";
 import { ModernField } from "@/components/ui/modern-field";
-import { ModernSearchSelect } from "@/components/ui/modern-search-select";
+import { ModernSelect } from "@/components/ui/modern-select";
 
 interface Props {
   form: UseFormReturn<any>;
@@ -17,38 +17,40 @@ export function LocationStep({ form }: Props) {
   const currentBayutCity = watch("bayutCity");
   const currentBayutCommunity = watch("bayutCommunity");
 
+  const fieldError = (name: string) => errors[name]?.message as string | undefined;
+
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-16">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Property Finder Section */}
-        <Card className="rounded-3xl border-border/50 shadow-xl overflow-hidden bg-white/50 backdrop-blur-sm">
-          <CardHeader className="bg-slate-50/50 border-b border-border/50 py-5">
-            <CardTitle className="text-sm font-bold flex items-center gap-2.5 text-slate-700">
-              <div className="p-1.5 rounded-lg bg-red-100/50">
-                <MapPin className="h-4 w-4 text-red-500" />
+        <Card className="rounded-[2.5rem] border-border shadow-2xl overflow-hidden bg-background/50 backdrop-blur-sm">
+          <CardHeader className="bg-red-500/5 border-b border-border py-6 px-8">
+            <CardTitle className="text-sm font-black flex items-center gap-3 text-foreground uppercase tracking-widest">
+              <div className="p-2 rounded-xl bg-red-100 dark:bg-red-900/30 text-red-500">
+                <MapPin className="h-5 w-5" />
               </div>
               Property Finder Location
             </CardTitle>
           </CardHeader>
-          <CardContent className="p-6 space-y-5">
-            <ModernSearchSelect 
+          <CardContent className="p-8 space-y-6">
+            <ModernSelect 
               label="City" 
               value={currentCity}
-              onChange={(v) => setValue("city", v)}
+              onValueChange={(v) => setValue("city", v, { shouldValidate: true })}
               options={filterOptions.cities}
               icon={Globe}
               required
-              error={errors.city?.message as string}
+              error={fieldError("city")}
             />
             
-            <ModernSearchSelect 
+            <ModernSelect 
               label="Community" 
               value={currentCommunity}
-              onChange={(v) => setValue("community", v)}
+              onValueChange={(v) => setValue("community", v, { shouldValidate: true })}
               options={filterOptions.communities}
-              icon={MapPin}
+              icon={Navigation}
               required
-              error={errors.community?.message as string}
+              error={fieldError("community")}
             />
 
             <ModernField 
@@ -56,6 +58,7 @@ export function LocationStep({ form }: Props) {
               {...register("subCommunity")}
               icon={MapPin}
               value={watch("subCommunity")}
+              onClear={() => setValue("subCommunity", "", { shouldValidate: true })}
             />
 
             <ModernField 
@@ -63,37 +66,38 @@ export function LocationStep({ form }: Props) {
               {...register("building")}
               icon={Building2}
               value={watch("building")}
+              onClear={() => setValue("building", "", { shouldValidate: true })}
             />
           </CardContent>
         </Card>
 
         {/* Bayut Section */}
-        <Card className="rounded-3xl border-border/50 shadow-xl overflow-hidden bg-white/50 backdrop-blur-sm">
-          <CardHeader className="bg-slate-50/50 border-b border-border/50 py-5">
-            <CardTitle className="text-sm font-bold flex items-center gap-2.5 text-slate-700">
-              <div className="p-1.5 rounded-lg bg-orange-100/50">
-                <MapPin className="h-4 w-4 text-orange-500" />
+        <Card className="rounded-[2.5rem] border-border shadow-2xl overflow-hidden bg-background/50 backdrop-blur-sm">
+          <CardHeader className="bg-orange-500/5 border-b border-border py-6 px-8">
+            <CardTitle className="text-sm font-black flex items-center gap-3 text-foreground uppercase tracking-widest">
+              <div className="p-2 rounded-xl bg-orange-100 dark:bg-orange-900/30 text-orange-500">
+                <MapPin className="h-5 w-5" />
               </div>
               Bayut & Dubizzle Location
             </CardTitle>
           </CardHeader>
-          <CardContent className="p-6 space-y-5">
-            <ModernSearchSelect 
+          <CardContent className="p-8 space-y-6">
+            <ModernSelect 
               label="City" 
               value={currentBayutCity}
-              onChange={(v) => setValue("bayutCity", v)}
+              onValueChange={(v) => setValue("bayutCity", v, { shouldValidate: true })}
               options={filterOptions.cities}
               icon={Globe}
-              error={errors.bayutCity?.message as string}
+              error={fieldError("bayutCity")}
             />
             
-            <ModernSearchSelect 
+            <ModernSelect 
               label="Community" 
               value={currentBayutCommunity}
-              onChange={(v) => setValue("bayutCommunity", v)}
+              onValueChange={(v) => setValue("bayutCommunity", v, { shouldValidate: true })}
               options={filterOptions.communities}
-              icon={MapPin}
-              error={errors.bayutCommunity?.message as string}
+              icon={Navigation}
+              error={fieldError("bayutCommunity")}
             />
 
             <ModernField 
@@ -101,6 +105,7 @@ export function LocationStep({ form }: Props) {
               {...register("bayutSubCommunity")}
               icon={MapPin}
               value={watch("bayutSubCommunity")}
+              onClear={() => setValue("bayutSubCommunity", "", { shouldValidate: true })}
             />
 
             <ModernField 
@@ -108,6 +113,7 @@ export function LocationStep({ form }: Props) {
               {...register("bayutBuilding")}
               icon={Building2}
               value={watch("bayutBuilding")}
+              onClear={() => setValue("bayutBuilding", "", { shouldValidate: true })}
             />
           </CardContent>
         </Card>

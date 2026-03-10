@@ -53,6 +53,10 @@ export const listingSchema = z.object({
   portalBayut: z.boolean().optional(),
   portalWebsite: z.boolean().optional(),
   notes: z.string().optional(),
+  titleAr: z.string().optional(),
+  descriptionAr: z.string().optional(),
+  images: z.array(z.string()).optional(),
+  documents: z.array(z.string()).optional(),
   publishStatus: z.string().optional(),
 });
 

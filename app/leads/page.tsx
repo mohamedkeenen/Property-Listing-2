@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
 import { LeadsTable } from "@/components/leads/LeadsTable";
 import { mockLeads } from "@/data/mockData";
-import { Users, UserPlus, UserCheck, UserX } from "lucide-react";
+import { Users, UserPlus, UserCheck, UserX, Info, List, Search } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export default function Leads() {
   const totalLeads = mockLeads.length;
@@ -12,34 +12,67 @@ export default function Leads() {
   const lostLeads = mockLeads.filter((l) => l.status === "Lost").length;
 
   const stats = [
-    { label: "Total Leads", value: totalLeads, icon: Users, color: "text-primary", bg: "bg-primary/10" },
-    { label: "New", value: newLeads, icon: UserPlus, color: "text-emerald-500", bg: "bg-emerald-500/10" },
-    { label: "Qualified", value: qualifiedLeads, icon: UserCheck, color: "text-purple-500", bg: "bg-purple-500/10" },
-    { label: "Lost", value: lostLeads, icon: UserX, color: "text-red-500", bg: "bg-red-500/10" },
+    { label: "Total Leads", value: totalLeads, icon: Users, color: "text-primary", bg: "bg-primary/10", border: "border-primary/20 hover:border-primary/40" },
+    { label: "New Inquiries", value: newLeads, icon: UserPlus, color: "text-emerald-500", bg: "bg-emerald-500/10", border: "border-emerald-500/20 hover:border-emerald-500/40" },
+    { label: "Qualified", value: qualifiedLeads, icon: UserCheck, color: "text-purple-500", bg: "bg-purple-500/10", border: "border-purple-500/20 hover:border-purple-500/40" },
+    { label: "Lost Leads", value: lostLeads, icon: UserX, color: "text-red-500", bg: "bg-red-500/10", border: "border-red-500/20 hover:border-red-500/40" },
   ];
 
   return (
-    <div className="p-4 md:p-6 space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-foreground">Leads</h1>
-        <p className="text-sm text-muted-foreground">Manage your property inquiry leads</p>
+    <div className="p-4 md:p-8 space-y-10">
+      <div className="flex flex-col gap-1">
+        <h1 className="text-3xl font-black text-foreground tracking-tight flex items-center gap-3">
+          Leads Management
+          <div className="h-2 w-2 rounded-full bg-primary animate-pulse" />
+        </h1>
+        <p className="text-sm text-muted-foreground font-medium uppercase tracking-widest text-[10px]">Manage your property inquiry leads & conversions</p>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        {stats.map((s) => (
-          <div key={s.label} className="bg-card border border-border rounded-xl p-4 flex items-center gap-3">
-            <div className={`h-10 w-10 rounded-lg ${s.bg} flex items-center justify-center`}>
-              <s.icon className={`h-5 w-5 ${s.color}`} />
-            </div>
-            <div>
-              <p className="text-xs text-muted-foreground">{s.label}</p>
-              <p className="text-xl font-bold text-foreground">{s.value}</p>
-            </div>
+      <div className="space-y-6">
+        <div className="flex items-center gap-3">
+          <div className="p-2 rounded-xl bg-primary/10 text-primary relative">
+            <Users className="h-5 w-5" />
           </div>
-        ))}
+          <h3 className="text-[10px] font-black text-foreground uppercase tracking-[0.2em]">Conversion Pipeline</h3>
+          <div className="h-px flex-1 bg-border/50" />
+          <Info className="h-4 w-4 text-muted-foreground" />
+        </div>
+        
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          {stats.map((s) => (
+            <div 
+              key={s.label} 
+              className={cn(
+                "group relative bg-card rounded-4xl border-2 transition-all duration-500 overflow-hidden hover:shadow-2xl hover:-translate-y-1 p-5",
+                s.border
+              )}
+            >
+              <div className="flex items-center justify-between mb-4">
+                <div className={cn("p-2.5 rounded-2xl flex items-center justify-center transition-all duration-500 shadow-md group-hover:scale-110", s.bg)}>
+                  <s.icon className={cn("h-5 w-5", s.color)} />
+                </div>
+                <div className={cn("h-2.5 w-2.5 rounded-full bg-current", s.color)} />
+              </div>
+              <div>
+                <div className="text-3xl font-black text-foreground tracking-tight">{s.value}</div>
+                <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest mt-1">{s.label}</p>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
 
-      <LeadsTable />
+      <div className="space-y-6">
+        <div className="flex items-center gap-3">
+          <div className="p-2 rounded-xl bg-orange-500/10 text-orange-500 relative">
+            <List className="h-5 w-5" />
+          </div>
+          <h3 className="text-[10px] font-black text-foreground uppercase tracking-[0.2em]">Lead Database</h3>
+          <div className="h-px flex-1 bg-border/50" />
+          <Search className="h-4 w-4 text-muted-foreground" />
+        </div>
+        <LeadsTable />
+      </div>
     </div>
   );
 }

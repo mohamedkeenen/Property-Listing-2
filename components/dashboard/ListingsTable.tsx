@@ -28,11 +28,11 @@ const statusTabs = [
 ];
 
 const statusColors: Record<string, string> = {
-  Live: "bg-emerald-500/10 text-emerald-600 border-emerald-200",
-  Draft: "bg-yellow-500/10 text-yellow-600 border-yellow-200",
-  Pending: "bg-blue-500/10 text-blue-600 border-blue-200",
-  Archived: "bg-gray-500/10 text-gray-500 border-gray-200",
-  Pocket: "bg-purple-500/10 text-purple-600 border-purple-200",
+  Live: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/30",
+  Draft: "bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 border-yellow-200 dark:border-yellow-500/30",
+  Pending: "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-500/30",
+  Archived: "bg-gray-500/10 text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-500/30",
+  Pocket: "bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-500/30",
 };
 
 export function ListingsTable({ listings, onViewDetails, onEdit }: Props) {
@@ -156,9 +156,9 @@ export function ListingsTable({ listings, onViewDetails, onEdit }: Props) {
                   </TableCell>
                   <TableCell>
                     <div className="flex gap-1">
-                      {l.portals.pf && <Badge variant="outline" className="text-[10px] px-1 py-0 bg-red-500/10 text-red-600 border-red-200">PF</Badge>}
-                      {l.portals.bayut && <Badge variant="outline" className="text-[10px] px-1 py-0 bg-orange-500/10 text-orange-600 border-orange-200">BY</Badge>}
-                      {l.portals.website && <Badge variant="outline" className="text-[10px] px-1 py-0 bg-blue-500/10 text-blue-600 border-blue-200">WB</Badge>}
+                      {l.portals.pf && <Badge variant="outline" className="text-[10px] px-1 py-0 bg-red-500/10 text-red-600 dark:text-red-400 border-red-200 dark:border-red-500/30">PF</Badge>}
+                      {l.portals.bayut && <Badge variant="outline" className="text-[10px] px-1 py-0 bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-200 dark:border-orange-500/30">BY</Badge>}
+                      {l.portals.website && <Badge variant="outline" className="text-[10px] px-1 py-0 bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-500/30">WB</Badge>}
                     </div>
                   </TableCell>
                   <TableCell className="font-mono text-xs">{l.reference}</TableCell>

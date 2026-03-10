@@ -17,8 +17,16 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Property Listing Portal",
-  description: "Manage your property listings across multiple portals",
+  title: "Keen Enterprises | Property Portal",
+  description: "Advanced property management for premium real estate",
+  icons: {
+    icon: [
+      { url: "/logo.jpg", sizes: "32x32", type: "image/jpeg" },
+      { url: "/logo.jpg", sizes: "192x192", type: "image/jpeg" },
+    ],
+    shortcut: "/logo.jpg",
+    apple: "/logo.jpg",
+  },
 };
 
 export default function RootLayout({

@@ -56,7 +56,7 @@ const ModernSearchSelect = ({
           onClear={value ? () => onChange("") : undefined}
           readOnly
         >
-          <div className="text-sm font-semibold text-slate-700 h-full flex items-center pt-1">
+          <div className="text-sm font-semibold text-foreground h-full flex items-center pt-1">
             {selectedOption?.label || " "}
           </div>
         </ModernField>
@@ -65,12 +65,12 @@ const ModernSearchSelect = ({
       {open && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-          <div className="absolute top-[52px] left-0 w-full bg-white border border-slate-200 rounded-xl shadow-xl z-50 p-2 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+          <div className="absolute top-[52px] left-0 w-full bg-popover border border-border rounded-xl shadow-xl z-50 p-2 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
             <div className="relative mb-2">
-              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
+              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
               <input 
                 autoFocus
-                className="w-full h-9 bg-slate-50 border border-slate-100 rounded-lg pl-8 pr-3 text-xs focus:ring-1 focus:ring-primary/20 outline-none transition-all"
+                className="w-full h-9 bg-muted border border-border/50 rounded-lg pl-8 pr-3 text-xs focus:ring-1 focus:ring-primary/20 outline-none transition-all text-foreground"
                 placeholder={placeholder}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
@@ -83,7 +83,7 @@ const ModernSearchSelect = ({
                   type="button"
                   className={cn(
                     "w-full text-left px-3 py-2 text-xs rounded-lg transition-all font-medium mb-0.5",
-                    value === opt.value ? "text-primary font-bold bg-primary/5" : "text-slate-600 hover:bg-slate-50"
+                    value === opt.value ? "text-primary font-bold bg-primary/5" : "text-muted-foreground hover:bg-muted hover:text-foreground"
                   )}
                   onClick={() => {
                     onChange(opt.value);
@@ -94,7 +94,7 @@ const ModernSearchSelect = ({
                   {opt.label}
                 </button>
               )) : (
-                <div className="p-8 text-center text-xs text-slate-400 font-medium italic">No results found</div>
+                <div className="p-8 text-center text-xs text-muted-foreground font-medium italic">No results found</div>
               )}
             </div>
           </div>

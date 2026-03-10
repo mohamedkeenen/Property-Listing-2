@@ -18,11 +18,11 @@ export function StatsCards() {
       commercial: sales.filter((l) => l.category === "Commercial").length,
       icon: Tag,
       color: "#ef4444", // Red
-      bgColor: "bg-red-50",
+      bgColor: "bg-red-500/10",
       iconColor: "text-red-500",
       dotColor: "bg-red-500",
       barColor: "bg-red-500",
-      barBg: "bg-red-100",
+      barBg: "bg-red-500/15",
       borderColor: "border-r-red-500",
     },
     {
@@ -32,11 +32,11 @@ export function StatsCards() {
       commercial: rents.filter((l) => l.category === "Commercial").length,
       icon: Key,
       color: "#3b82f6", // Blue
-      bgColor: "bg-blue-50",
+      bgColor: "bg-blue-500/10",
       iconColor: "text-blue-500",
       dotColor: "bg-blue-500",
       barColor: "bg-blue-600",
-      barBg: "bg-blue-100",
+      barBg: "bg-blue-500/15",
       borderColor: "border-r-blue-500",
     },
     {
@@ -46,11 +46,11 @@ export function StatsCards() {
       commercial: pf.filter((l) => l.category === "Commercial").length,
       image: "https://res.cloudinary.com/devht0mp5/image/upload/v1772105511/PF_ljkahc.png",
       color: "#f97316", // Orange
-      bgColor: "bg-orange-50",
+      bgColor: "bg-orange-500/10",
       iconColor: "text-orange-500",
       dotColor: "bg-orange-600",
       barColor: "bg-orange-600",
-      barBg: "bg-orange-100",
+      barBg: "bg-orange-500/15",
       borderColor: "border-r-orange-600",
     },
     {
@@ -60,11 +60,11 @@ export function StatsCards() {
       commercial: bayut.filter((l) => l.category === "Commercial").length,
       image: "https://res.cloudinary.com/devht0mp5/image/upload/v1772105511/bayut_gy4ev2.png",
       color: "#22c55e", // Green
-      bgColor: "bg-green-50",
+      bgColor: "bg-green-500/10",
       iconColor: "text-green-600",
       dotColor: "bg-green-600",
       barColor: "bg-green-600",
-      barBg: "bg-green-100",
+      barBg: "bg-green-500/15",
       borderColor: "border-r-green-600",
     },
     {
@@ -74,11 +74,11 @@ export function StatsCards() {
       commercial: web.filter((l) => l.category === "Commercial").length,
       icon: Globe,
       color: "#06b6d4", // Cyan/Teal
-      bgColor: "bg-cyan-50",
+      bgColor: "bg-cyan-500/10",
       iconColor: "text-cyan-600",
       dotColor: "bg-cyan-600",
       barColor: "bg-cyan-600",
-      barBg: "bg-cyan-100",
+      barBg: "bg-cyan-500/15",
       borderColor: "border-r-cyan-500",
     },
   ];

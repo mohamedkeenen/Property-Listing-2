@@ -8,6 +8,7 @@ import { ListingsFilters, FiltersState } from "@/components/dashboard/ListingsFi
 import { ListingsTable } from "@/components/dashboard/ListingsTable";
 import { PropertyDetailDialog } from "@/components/listings/PropertyDetailDialog";
 import { mockListings, PropertyListing } from "@/data/mockData";
+import { BarChart3, List, PieChart, Search, Info } from "lucide-react";
 
 export default function Dashboard() {
   const router = useRouter();
@@ -39,20 +40,60 @@ export default function Dashboard() {
   }, [filters]);
 
   return (
-    <div className="p-4 md:p-6 space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
-        <p className="text-sm text-muted-foreground">Property listings overview & analytics</p>
+    <div className="p-4 md:p-8 space-y-10">
+      <div className="flex flex-col gap-1">
+        <h1 className="text-3xl font-black text-foreground tracking-tight flex items-center gap-3">
+          Dashboard
+          <div className="h-2 w-2 rounded-full bg-primary animate-pulse" />
+        </h1>
+        <p className="text-sm text-muted-foreground font-medium uppercase tracking-widest text-[10px]">Property listings overview & analytics</p>
       </div>
 
-      <StatsCards />
-      <DashboardCharts />
-      <ListingsFilters onApply={setFilters} />
-      <ListingsTable
-        listings={filtered}
-        onViewDetails={setSelectedListing}
-        onEdit={(l) => router.push("/create-listing")}
-      />
+      {/* Stats Section */}
+      <div className="space-y-6">
+        <div className="flex items-center gap-3">
+          <div className="p-2 rounded-xl bg-primary/10 text-primary relative">
+            <BarChart3 className="h-5 w-5" />
+          </div>
+          <h3 className="text-[10px] font-black text-foreground uppercase tracking-[0.2em]">Market Overview</h3>
+          <div className="h-px flex-1 bg-border/50" />
+          <Info className="h-4 w-4 text-muted-foreground" />
+        </div>
+        <StatsCards />
+      </div>
+
+      {/* Charts Section */}
+      <div className="space-y-6">
+        <div className="flex items-center gap-3">
+          <div className="p-2 rounded-xl bg-purple-500/10 text-purple-500 relative">
+            <PieChart className="h-5 w-5" />
+          </div>
+          <h3 className="text-[10px] font-black text-foreground uppercase tracking-[0.2em]">Performance Analytics</h3>
+          <div className="h-px flex-1 bg-border/50" />
+          <BarChart3 className="h-4 w-4 text-muted-foreground" />
+        </div>
+        <DashboardCharts />
+      </div>
+
+      {/* Table Section */}
+      <div className="space-y-6">
+        <div className="flex items-center gap-3">
+          <div className="p-2 rounded-xl bg-orange-500/10 text-orange-500 relative">
+            <List className="h-5 w-5" />
+          </div>
+          <h3 className="text-[10px] font-black text-foreground uppercase tracking-[0.2em]">Inventory Management</h3>
+          <div className="h-px flex-1 bg-border/50" />
+          <Search className="h-4 w-4 text-muted-foreground" />
+        </div>
+        <div className="space-y-4">
+          <ListingsFilters onApply={setFilters} />
+          <ListingsTable
+            listings={filtered}
+            onViewDetails={setSelectedListing}
+            onEdit={(l) => router.push("/create-listing")}
+          />
+        </div>
+      </div>
 
       <PropertyDetailDialog
         listing={selectedListing}

@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { ChevronDown, ChevronUp, RotateCcw, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { filterOptions } from "@/data/mockData";
 
@@ -45,69 +44,125 @@ export function ListingsFilters({ onApply }: Props) {
   };
 
   return (
-    <div className="bg-card border border-border rounded-lg">
+    <div className="bg-card border-2 border-border rounded-[2.5rem] overflow-hidden shadow-sm transition-all hover:shadow-xl">
       <button
         onClick={() => setExpanded(!expanded)}
-        className="w-full flex items-center justify-between p-4 text-sm font-medium text-foreground hover:bg-muted/50 transition-colors rounded-lg"
+        className="w-full flex items-center justify-between p-5 text-sm font-black uppercase tracking-widest text-foreground hover:bg-muted/30 transition-all"
       >
-        <div className="flex items-center gap-2">
-          <Search className="h-4 w-4 text-primary" />
-          <span>Filters</span>
+        <div className="flex items-center gap-3">
+          <div className="p-2 rounded-xl bg-primary/10 text-primary group-hover:scale-110 transition-transform">
+            <Search className="h-4 w-4" />
+          </div>
+          <span>Advanced Search Filters</span>
         </div>
-        {expanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+        <div className="flex items-center gap-3">
+           <span className="text-[10px] text-muted-foreground font-bold">{expanded ? "Hide Options" : "Show Options"}</span>
+           {expanded ? <ChevronUp className="h-4 w-4 text-primary" /> : <ChevronDown className="h-4 w-4 text-primary" />}
+        </div>
       </button>
 
       {expanded && (
-        <div className="p-4 pt-0 space-y-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3">
-            <Input placeholder="Ref ID" value={filters.refId} onChange={(e) => update("refId", e.target.value)} className="h-9 text-sm" />
-            <Select value={filters.country} onValueChange={(v) => update("country", v)}>
-              <SelectTrigger className="h-9 text-sm"><SelectValue placeholder="Country" /></SelectTrigger>
-              <SelectContent>{filterOptions.countries.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
-            </Select>
-            <Select value={filters.city} onValueChange={(v) => update("city", v)}>
-              <SelectTrigger className="h-9 text-sm"><SelectValue placeholder="City" /></SelectTrigger>
-              <SelectContent>{filterOptions.cities.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
-            </Select>
-            <Select value={filters.community} onValueChange={(v) => update("community", v)}>
-              <SelectTrigger className="h-9 text-sm"><SelectValue placeholder="Community" /></SelectTrigger>
-              <SelectContent>{filterOptions.communities.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
-            </Select>
-            <Select value={filters.propertyType} onValueChange={(v) => update("propertyType", v)}>
-              <SelectTrigger className="h-9 text-sm"><SelectValue placeholder="Property Type" /></SelectTrigger>
-              <SelectContent>{filterOptions.propertyTypes.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
-            </Select>
-            <Select value={filters.category} onValueChange={(v) => update("category", v)}>
-              <SelectTrigger className="h-9 text-sm"><SelectValue placeholder="Category" /></SelectTrigger>
-              <SelectContent>{filterOptions.categories.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
-            </Select>
-            <Select value={filters.purpose} onValueChange={(v) => update("purpose", v)}>
-              <SelectTrigger className="h-9 text-sm"><SelectValue placeholder="Sale / Rent" /></SelectTrigger>
-              <SelectContent>{filterOptions.purposes.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
-            </Select>
-            <Select value={filters.agent} onValueChange={(v) => update("agent", v)}>
-              <SelectTrigger className="h-9 text-sm"><SelectValue placeholder="Listing Agent" /></SelectTrigger>
-              <SelectContent>{filterOptions.agents.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
-            </Select>
-            <Select value={filters.status} onValueChange={(v) => update("status", v)}>
-              <SelectTrigger className="h-9 text-sm"><SelectValue placeholder="Status" /></SelectTrigger>
-              <SelectContent>{filterOptions.statuses.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
-            </Select>
-            <Select value={filters.portal} onValueChange={(v) => update("portal", v)}>
-              <SelectTrigger className="h-9 text-sm"><SelectValue placeholder="Portal" /></SelectTrigger>
-              <SelectContent>{filterOptions.portals.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
-            </Select>
-            <Input placeholder="Bedrooms Min" type="number" value={filters.bedroomsMin} onChange={(e) => update("bedroomsMin", e.target.value)} className="h-9 text-sm" />
-            <Input placeholder="Bedrooms Max" type="number" value={filters.bedroomsMax} onChange={(e) => update("bedroomsMax", e.target.value)} className="h-9 text-sm" />
-            <Input placeholder="Price Min" type="number" value={filters.priceMin} onChange={(e) => update("priceMin", e.target.value)} className="h-9 text-sm" />
-            <Input placeholder="Price Max" type="number" value={filters.priceMax} onChange={(e) => update("priceMax", e.target.value)} className="h-9 text-sm" />
+        <div className="p-6 pt-0 space-y-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+            <div className="space-y-1.5">
+               <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Ref ID</label>
+               <input 
+                  placeholder="EX: KEEN-123" 
+                  value={filters.refId} 
+                  onChange={(e) => update("refId", e.target.value)} 
+                  className="w-full h-10 px-4 text-xs font-bold rounded-xl border border-border bg-background focus:ring-4 focus:ring-primary/5 transition-all outline-none" 
+               />
+            </div>
+            
+            <div className="space-y-1.5">
+               <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Country</label>
+               <Select value={filters.country} onValueChange={(v) => update("country", v)}>
+                 <SelectTrigger className="h-10 text-xs font-bold rounded-xl bg-background border-border"><SelectValue placeholder="All Countries" /></SelectTrigger>
+                 <SelectContent className="rounded-xl p-1">{filterOptions.countries.map((c) => <SelectItem key={c} value={c} className="rounded-lg">{c}</SelectItem>)}</SelectContent>
+               </Select>
+            </div>
+
+            <div className="space-y-1.5">
+               <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">City</label>
+               <Select value={filters.city} onValueChange={(v) => update("city", v)}>
+                 <SelectTrigger className="h-10 text-xs font-bold rounded-xl bg-background border-border"><SelectValue placeholder="All Cities" /></SelectTrigger>
+                 <SelectContent className="rounded-xl p-1">{filterOptions.cities.map((c) => <SelectItem key={c} value={c} className="rounded-lg">{c}</SelectItem>)}</SelectContent>
+               </Select>
+            </div>
+
+            <div className="space-y-1.5">
+               <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Community</label>
+               <Select value={filters.community} onValueChange={(v) => update("community", v)}>
+                 <SelectTrigger className="h-10 text-xs font-bold rounded-xl bg-background border-border"><SelectValue placeholder="All Communities" /></SelectTrigger>
+                 <SelectContent className="rounded-xl p-1">{filterOptions.communities.map((c) => <SelectItem key={c} value={c} className="rounded-lg">{c}</SelectItem>)}</SelectContent>
+               </Select>
+            </div>
+
+            <div className="space-y-1.5">
+               <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Type</label>
+               <Select value={filters.propertyType} onValueChange={(v) => update("propertyType", v)}>
+                 <SelectTrigger className="h-10 text-xs font-bold rounded-xl bg-background border-border"><SelectValue placeholder="All Types" /></SelectTrigger>
+                 <SelectContent className="rounded-xl p-1">{filterOptions.propertyTypes.map((c) => <SelectItem key={c} value={c} className="rounded-lg">{c}</SelectItem>)}</SelectContent>
+               </Select>
+            </div>
+
+            <div className="space-y-1.5">
+               <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Category</label>
+               <Select value={filters.category} onValueChange={(v) => update("category", v)}>
+                 <SelectTrigger className="h-10 text-xs font-bold rounded-xl bg-background border-border"><SelectValue placeholder="Resident / Comm." /></SelectTrigger>
+                 <SelectContent className="rounded-xl p-1">{filterOptions.categories.map((c) => <SelectItem key={c} value={c} className="rounded-lg">{c}</SelectItem>)}</SelectContent>
+               </Select>
+            </div>
+
+            <div className="space-y-1.5">
+               <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Purpose</label>
+               <Select value={filters.purpose} onValueChange={(v) => update("purpose", v)}>
+                 <SelectTrigger className="h-10 text-xs font-bold rounded-xl bg-background border-border"><SelectValue placeholder="Sale / Rent" /></SelectTrigger>
+                 <SelectContent className="rounded-xl p-1">{filterOptions.purposes.map((c) => <SelectItem key={c} value={c} className="rounded-lg">{c}</SelectItem>)}</SelectContent>
+               </Select>
+            </div>
+
+            <div className="space-y-1.5">
+               <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Agent</label>
+               <Select value={filters.agent} onValueChange={(v) => update("agent", v)}>
+                 <SelectTrigger className="h-10 text-xs font-bold rounded-xl bg-background border-border"><SelectValue placeholder="Select Agent" /></SelectTrigger>
+                 <SelectContent className="rounded-xl p-1">{filterOptions.agents.map((c) => <SelectItem key={c} value={c} className="rounded-lg">{c}</SelectItem>)}</SelectContent>
+               </Select>
+            </div>
+
+            <div className="space-y-1.5">
+               <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Status</label>
+               <Select value={filters.status} onValueChange={(v) => update("status", v)}>
+                 <SelectTrigger className="h-10 text-xs font-bold rounded-xl bg-background border-border"><SelectValue placeholder="Any Status" /></SelectTrigger>
+                 <SelectContent className="rounded-xl p-1">{filterOptions.statuses.map((c) => <SelectItem key={c} value={c} className="rounded-lg">{c}</SelectItem>)}</SelectContent>
+               </Select>
+            </div>
+
+            <div className="space-y-1.5">
+               <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Portal</label>
+               <Select value={filters.portal} onValueChange={(v) => update("portal", v)}>
+                 <SelectTrigger className="h-10 text-xs font-bold rounded-xl bg-background border-border"><SelectValue placeholder="Select Portal" /></SelectTrigger>
+                 <SelectContent className="rounded-xl p-1">{filterOptions.portals.map((c) => <SelectItem key={c} value={c} className="rounded-lg">{c}</SelectItem>)}</SelectContent>
+               </Select>
+            </div>
+
+            <div className="space-y-1.5">
+               <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Price Min</label>
+               <input placeholder="Min Price" type="number" value={filters.priceMin} onChange={(e) => update("priceMin", e.target.value)} className="w-full h-10 px-4 text-xs font-bold rounded-xl border border-border bg-background focus:ring-4 focus:ring-primary/5 transition-all outline-none" />
+            </div>
+
+            <div className="space-y-1.5">
+               <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Price Max</label>
+               <input placeholder="Max Price" type="number" value={filters.priceMax} onChange={(e) => update("priceMax", e.target.value)} className="w-full h-10 px-4 text-xs font-bold rounded-xl border border-border bg-background focus:ring-4 focus:ring-primary/5 transition-all outline-none" />
+            </div>
           </div>
-          <div className="flex items-center gap-2 justify-end">
-            <Button variant="outline" size="sm" onClick={reset} className="gap-1">
-              <RotateCcw className="h-3 w-3" /> Reset
+          
+          <div className="flex items-center gap-3 justify-end pt-2">
+            <Button variant="outline" onClick={reset} className="rounded-xl h-10 px-6 font-black uppercase tracking-widest text-[10px] gap-2">
+              <RotateCcw className="h-3.5 w-3.5" /> Reset All
             </Button>
-            <Button size="sm" onClick={() => onApply(filters)}>
-              Apply Filters
+            <Button onClick={() => onApply(filters)} className="rounded-xl h-10 px-8 font-black uppercase tracking-widest text-[10px] shadow-lg shadow-primary/20">
+              Search Inventory
             </Button>
           </div>
         </div>
