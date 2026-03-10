@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import NextImage from "next/image";
 import { useRouter } from "next/navigation";
-import { Eye, Pencil, Trash2, ChevronLeft, ChevronRight, Search, MoreHorizontal, FileDown } from "lucide-react";
+import { Eye, Pencil, Trash2, ChevronLeft, ChevronRight, Search, MoreHorizontal, FileDown, Bath, BedDouble, ArrowUpDown, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -37,6 +37,7 @@ const statusColors: Record<string, string> = {
 
 export function ListingsTable({ listings, onViewDetails, onEdit }: Props) {
   const router = useRouter();
+  const scrollRef = useRef<HTMLDivElement>(null);
   const [activeTab, setActiveTab] = useState("all");
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
@@ -69,8 +70,18 @@ export function ListingsTable({ listings, onViewDetails, onEdit }: Props) {
     }
   };
 
+  const scroll = (direction: 'left' | 'right') => {
+    if (scrollRef.current) {
+      const scrollAmount = direction === 'left' ? 0 : scrollRef.current.scrollWidth;
+      scrollRef.current.scrollTo({
+        left: scrollAmount,
+        behavior: 'smooth'
+      });
+    }
+  };
+
   return (
-    <div className="bg-card border border-border rounded-lg">
+    <div className="bg-card border border-border rounded-lg w-full overflow-hidden">
       {/* Tabs */}
       <div className="flex items-center gap-1 p-3 border-b border-border overflow-x-auto">
         {statusTabs.map((tab) => (
@@ -101,23 +112,67 @@ export function ListingsTable({ listings, onViewDetails, onEdit }: Props) {
         </div>
       </div>
 
-      {/* Table */}
-      <div className="overflow-x-auto w-full">
-        <Table className="min-w-[1000px]">
+      {/* Table with Scroll Indicators */}
+      <div className="relative group/table w-full">
+        {/* Left Scroll Indicator */}
+        <button 
+          onClick={() => scroll('left')}
+          className="absolute left-0 top-0 bottom-0 z-20 flex items-center justify-center transition-all opacity-0 group-hover/table:opacity-100 border-none"
+          title="Scroll to Start"
+        >
+          <div className="h-12 w-6 bg-sky-300 hover:bg-sky-400 rounded-r-lg flex items-center justify-center shadow-lg transition-transform hover:scale-110">
+            <ChevronLeft className="h-5 w-5 text-sky-950" />
+          </div>
+        </button>
+
+        <div 
+          ref={scrollRef} 
+          className="overflow-x-auto w-full pb-4 scroll-smooth"
+        >
+          <Table className="min-w-[1800px]">
           <TableHeader>
             <TableRow>
               <TableHead className="w-[50px]"></TableHead>
               <TableHead>Portals</TableHead>
               <TableHead>Reference</TableHead>
               <TableHead className="min-w-[250px]">Title</TableHead>
-              <TableHead>Layout</TableHead>
-              <TableHead>Type</TableHead>
-              <TableHead>Price</TableHead>
-              <TableHead>Updated</TableHead>
-              <TableHead>Status</TableHead>
+              <TableHead>
+                <div className="flex items-center gap-2">
+                  <ArrowUpDown className="h-3 w-3" /> Layout
+                </div>
+              </TableHead>
+              <TableHead>
+                <div className="flex items-center gap-2">
+                  Type
+                </div>
+              </TableHead>
+              <TableHead>
+                <div className="flex items-center gap-2">
+                  Price
+                </div>
+              </TableHead>
+              <TableHead>
+                <div className="flex items-center gap-2">
+                  <ArrowUpDown className="h-3 w-3" /> Updated
+                </div>
+              </TableHead>
+               <TableHead>Status</TableHead>
               <TableHead>Community</TableHead>
-              <TableHead>Agent</TableHead>
-              <TableHead>Owner</TableHead>
+              <TableHead>
+                <div className="flex items-center gap-2">
+                  <ArrowUpDown className="h-3 w-3" /> Listing Agent
+                </div>
+              </TableHead>
+              <TableHead>
+                <div className="flex items-center gap-2">
+                  <ArrowUpDown className="h-3 w-3" /> Owner
+                </div>
+              </TableHead>
+              <TableHead>
+                <div className="flex items-center gap-2">
+                  <ArrowUpDown className="h-3 w-3" /> Office
+                </div>
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -129,7 +184,7 @@ export function ListingsTable({ listings, onViewDetails, onEdit }: Props) {
               </TableRow>
             ) : (
               paginated.map((l) => (
-                <TableRow key={l.id} className="hover:bg-muted/50">
+                <TableRow key={l.id} className="hover:bg-muted/50 border-b-0">
                   <TableCell>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -173,30 +228,91 @@ export function ListingsTable({ listings, onViewDetails, onEdit }: Props) {
                       </div>
                     </div>
                   </TableCell>
-                  <TableCell className="text-xs">
-                    {l.bedrooms > 0 ? `${l.bedrooms} BR / ${l.bathrooms} BA` : "—"}
+                  <TableCell>
+                    <div className="flex flex-col gap-1 py-1">
+                      <span className="text-[13px] font-semibold text-foreground/80">{l.size} Sq. ft</span>
+                      <div className="flex items-center gap-3 text-muted-foreground/50">
+                         <div className="flex items-center gap-1.5">
+                            <Bath className="h-3.5 w-3.5" />
+                            <span className="text-[11px] font-black">{l.bathrooms}</span>
+                         </div>
+                         <div className="flex items-center gap-1.5">
+                            <BedDouble className="h-3.5 w-3.5" />
+                            <span className="text-[11px] font-black">{l.bedrooms}</span>
+                         </div>
+                      </div>
+                    </div>
                   </TableCell>
                   <TableCell>
-                    <Badge variant="secondary" className="text-xs">{l.type}</Badge>
+                    <div className="flex flex-col gap-1 py-1">
+                      <span className="text-[13px] font-semibold text-foreground/80">{l.type}</span>
+                      <span className="text-[11px] font-medium text-muted-foreground/50">{l.purpose}</span>
+                    </div>
                   </TableCell>
-                  <TableCell className="font-medium text-sm">
-                    AED {l.price.toLocaleString()}
-                    <span className="text-xs text-muted-foreground block">{l.purpose === "Rent" ? "/year" : ""}</span>
+                  <TableCell>
+                    <div className="flex flex-col gap-1 py-1">
+                      <span className="text-[13px] font-semibold text-foreground/80">
+                        {l.currency || "AED"} {l.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </span>
+                      <span className="text-[11px] font-medium text-muted-foreground/50">{l.category}</span>
+                    </div>
                   </TableCell>
-                  <TableCell className="text-xs text-muted-foreground">{l.updatedAt}</TableCell>
+                  <TableCell>
+                    <div className="flex flex-col gap-1 py-1">
+                      <span className="text-[13px] font-semibold text-foreground/80">3 days ago</span>
+                      <span className="text-[11px] font-medium text-muted-foreground/50">3 days ago</span>
+                    </div>
+                  </TableCell>
                   <TableCell>
                     <Badge variant="outline" className={`text-xs ${statusColors[l.status] || ""}`}>
                       {l.status}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-xs">{l.community}</TableCell>
-                  <TableCell className="text-xs">{l.listingAgent}</TableCell>
-                  <TableCell className="text-xs">{l.owner}</TableCell>
+                   <TableCell className="text-xs">{l.community}</TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-3 py-1">
+                       <div className="h-8 w-8 rounded-full bg-sky-100 flex items-center justify-center overflow-hidden shrink-0 border border-sky-200/50">
+                          {l.listingAgentAvatar ? (
+                            <NextImage src={l.listingAgentAvatar} alt={l.listingAgent} width={32} height={32} className="object-cover" />
+                          ) : (
+                            <User className="h-5 w-5 text-sky-500" />
+                          )}
+                       </div>
+                       <span className="text-[13px] font-semibold text-foreground/80 whitespace-nowrap">{l.listingAgent}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-3 py-1">
+                       <div className="h-8 w-8 rounded-full bg-sky-100 flex items-center justify-center overflow-hidden shrink-0 border border-sky-200/50">
+                          {l.ownerAvatar ? (
+                            <NextImage src={l.ownerAvatar} alt={l.owner} width={32} height={32} className="object-cover" />
+                          ) : (
+                            <User className="h-5 w-5 text-sky-500" />
+                          )}
+                       </div>
+                       <span className="text-[13px] font-semibold text-foreground/80 whitespace-nowrap">{l.owner}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <span className="text-[13px] font-semibold text-foreground/80 whitespace-nowrap">{l.office || "PRIME ZAM"}</span>
+                  </TableCell>
                 </TableRow>
               ))
-            )}
+             )}
           </TableBody>
         </Table>
+      </div>
+
+        {/* Right Scroll Indicator */}
+        <button 
+          onClick={() => scroll('right')}
+          className="absolute right-0 top-0 bottom-0 z-20 flex items-center justify-center transition-all opacity-0 group-hover/table:opacity-100 border-none"
+          title="Scroll to End"
+        >
+          <div className="h-12 w-6 bg-sky-300 hover:bg-sky-400 rounded-l-lg flex items-center justify-center shadow-lg transition-transform hover:scale-110">
+            <ChevronRight className="h-5 w-5 text-sky-950" />
+          </div>
+        </button>
       </div>
 
       {/* Pagination */}

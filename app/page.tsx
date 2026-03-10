@@ -40,7 +40,7 @@ export default function Dashboard() {
   }, [filters]);
 
   return (
-    <div className="p-4 md:p-8 space-y-10">
+    <div className="p-4 md:p-8 space-y-10 w-full min-w-0">
       <div className="flex flex-col gap-1">
         <h1 className="text-3xl font-black text-foreground tracking-tight flex items-center gap-3">
           Dashboard
@@ -85,7 +85,7 @@ export default function Dashboard() {
           <div className="h-px flex-1 bg-border/50" />
           <Search className="h-4 w-4 text-muted-foreground" />
         </div>
-        <div className="space-y-4">
+        <div className="space-y-4 min-w-0">
           <ListingsFilters onApply={setFilters} />
           <ListingsTable
             listings={filtered}

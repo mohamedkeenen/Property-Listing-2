@@ -155,12 +155,16 @@ body {
 }
 
 @keyframes infinite-scroll {
-  from {
-    transform: translateX(0);
-  }
-
   to {
     transform: translateX(-33.333%);
+  }
+}
+
+@utility no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
   }
 }
 

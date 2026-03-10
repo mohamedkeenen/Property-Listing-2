@@ -18,26 +18,19 @@ import { Button } from "@/components/ui/button";
 import { ModernField } from "@/components/ui/modern-field";
 import { ModernSelect } from "@/components/ui/modern-select";
 import { NumberSearchSelect } from "@/components/ui/number-search-select";
-import { CreditCard as CreditCardIcon } from "lucide-react";
+import { CreditCard as CreditCardIcon, Paintbrush } from "lucide-react";
 
 interface Props {
   form: UseFormReturn<any>;
 }
 
 
-const AMENITIES_LIST = [
-  "Pool", "Gym", "Parking", "Concierge",
-  "Balcony", "Garden", "Maid's Room", "BBQ Area",
-  "Kids Play Area", "Beach Access", "Sauna", "Jacuzzi",
-  "Security", "Central A/C", "Built-in Wardrobes", "Covered Parking",
-  "Pets Allowed", "Study Room", "Storage", "Laundry Room",
-  "Driver's Room", "Private Garden"
-];
-
 export function PropertyDetailsStep({ form }: Props) {
   const { register, setValue, watch, formState: { errors } } = form;
   const category = watch("category");
   const purpose = watch("purpose");
+
+  const AMENITIES_LIST = filterOptions.amenities;
   const pricePeriod = watch("pricePeriod");
   const availabilityStatus = watch("availabilityStatus");
   const licenseType = watch("licenseType");
@@ -84,7 +77,7 @@ export function PropertyDetailsStep({ form }: Props) {
                       "text-xl font-black tracking-tight transition-colors block",
                       category === "Residential" ? "text-primary dark:text-white" : "text-muted-foreground"
                     )}>Residential</span>
-                    <p className="text-[9px] uppercase tracking-[0.2em] font-black text-muted-foreground/50 mt-1">Villas, Apartments, etc.</p>
+                    <p className="text-[9px] uppercase tracking-[0.2em] font-black text-muted-foreground/50 mt-1">Villas, Apartments, & Lands</p>
                   </div>
                 </div>
                 {category === "Residential" && (
@@ -155,7 +148,7 @@ export function PropertyDetailsStep({ form }: Props) {
                       "text-xl font-black tracking-tight transition-colors block",
                       category === "Commercial" ? "text-orange-500" : "text-muted-foreground"
                     )}>Commercial</span>
-                    <p className="text-[9px] uppercase tracking-[0.2em] font-black text-muted-foreground/50 mt-1">Offices, Shops, etc.</p>
+                    <p className="text-[9px] uppercase tracking-[0.2em] font-black text-muted-foreground/50 mt-1">Offices, Shops, & Industrial</p>
                   </div>
                 </div>
                 {category === "Commercial" && (
@@ -233,8 +226,11 @@ export function PropertyDetailsStep({ form }: Props) {
               error={fieldError("type")}
             />
 
-            <ModernField label="Size (Total)" icon={Maximize} required type="number" {...register("size")} error={fieldError("size")} value={watch("size")} />
-            <ModernField label="Sq. ft (Built)" icon={Maximize} required type="number" {...register("sqft")} error={fieldError("sqft")} value={watch("sqft")} />
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 col-span-1 md:col-span-2">
+              <ModernField label="Size (Total)" icon={Maximize} required type="number" {...register("size")} error={fieldError("size")} value={watch("size")} />
+              <ModernField label="Sq. ft (Built)" icon={Maximize} required type="number" {...register("sqft")} error={fieldError("sqft")} value={watch("sqft")} />
+              <ModernField label="UNIT" icon={Maximize} value="SQ. FT" readOnly />
+            </div>
 
             <ModernField label="Unit No" icon={Hash} required {...register("unitNo")} error={fieldError("unitNo")} value={watch("unitNo")} />
             
@@ -277,7 +273,13 @@ export function PropertyDetailsStep({ form }: Props) {
             <ModernField label="Built-up Area" icon={Maximize} type="number" {...register("builtUpArea")} value={watch("builtUpArea")} />
             <ModernField label="Layout Type" icon={Sparkles} {...register("layoutType")} value={watch("layoutType")} />
 
-            <ModernField label="Project Name" icon={Building2} {...register("projectName")} value={watch("projectName")} />
+            <ModernSelect 
+              label="Project Name" 
+              icon={Building2} 
+              value={watch("projectName")} 
+              onValueChange={(v) => setValue("projectName", v, { shouldValidate: true })}
+              options={filterOptions.projectNames}
+            />
             
             <ModernSelect 
               label="Ownership" 
@@ -292,7 +294,7 @@ export function PropertyDetailsStep({ form }: Props) {
               icon={Building2} 
               value={watch("developers")} 
               onValueChange={(v) => setValue("developers", v, { shouldValidate: true })}
-              options={["Emaar", "Damac", "Nakheel", "Sobha"]}
+              options={filterOptions.developers}
             />
 
             <ModernField label="Build Year" icon={Calendar} type="number" {...register("buildYear")} value={watch("buildYear")} />
@@ -300,17 +302,17 @@ export function PropertyDetailsStep({ form }: Props) {
             <ModernSelect 
               label="Currency" 
               icon={DollarSign} 
-              value={watch("currency") || "AED"} 
+              value={watch("currency") || "Dirham"} 
               onValueChange={(v) => setValue("currency", v, { shouldValidate: true })}
-              options={["AED", "USD"]}
+              options={filterOptions.currencies}
             />
 
             <ModernSelect 
-              label="Listing Finished" 
-              icon={CalendarCheck} 
-              value={watch("listingFinished")} 
-              onValueChange={(v) => setValue("listingFinished", v, { shouldValidate: true })}
-              options={["Ready", "Off-plan"]}
+              label="Finishing Type" 
+              icon={Paintbrush} 
+              value={watch("finishingType")} 
+              onValueChange={(v) => setValue("finishingType", v, { shouldValidate: true })}
+              options={filterOptions.finishingTypes}
             />
           </div>
         </section>
@@ -318,12 +320,12 @@ export function PropertyDetailsStep({ form }: Props) {
         {/* Section 3: Pricing */}
         <section className="space-y-6">
           <div className="flex items-center gap-3">
-             <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-500">
+              <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-500">
                 <DollarSign className="h-4 w-4" />
-             </div>
-             <h3 className="text-[10px] font-black text-foreground uppercase tracking-[0.2em]">Structure & Pricing</h3>
-             <div className="h-px flex-1 bg-border/20" />
-             <Tag className="h-4 w-4 text-muted-foreground/30" />
+              </div>
+              <h3 className="text-[10px] font-black text-foreground uppercase tracking-[0.2em]">Structure & Pricing</h3>
+              <div className="h-px flex-1 bg-border/20" />
+              <Tag className="h-4 w-4 text-muted-foreground/30" />
           </div>
 
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -377,16 +379,18 @@ export function PropertyDetailsStep({ form }: Props) {
               icon={CreditCardIcon} 
               value={watch("paymentMethod")} 
               onValueChange={(v) => setValue("paymentMethod", v, { shouldValidate: true })}
-              options={["Cheque", "Cash", "Transfer"]}
+              options={filterOptions.paymentMethods}
             />
 
-            <ModernSelect 
-              label="Number Of cheques" 
-              icon={Hash} 
-              value={watch("cheques")} 
-              onValueChange={(v) => setValue("cheques", v, { shouldValidate: true })}
-              options={["1", "2", "4", "6", "12"]}
-            />
+            {watch("paymentMethod") !== "Cash" && (
+              <ModernSelect 
+                label="Number Of cheques" 
+                icon={Hash} 
+                value={watch("cheques")} 
+                onValueChange={(v) => setValue("cheques", v, { shouldValidate: true })}
+                options={["1", "2", "4", "6", "12"]}
+              />
+            )}
 
             <ModernField label="Service Charges" icon={FileText} {...register("serviceCharges")} value={watch("serviceCharges")} />
 

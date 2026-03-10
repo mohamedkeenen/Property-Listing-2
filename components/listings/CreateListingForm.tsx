@@ -75,9 +75,14 @@ export function CreateListingForm() {
       bayutCommunity: "",
       bayutSubCommunity: "",
       bayutBuilding: "",
-      portalPF: false,
-      portalBayut: false,
-      portalWebsite: false,
+      portals: {
+        propertyFinder: false,
+        bayutEnabled: false,
+        bayutSelection: false,
+        dubizzleSelection: false,
+        officeWebsite: false,
+        primeZamWebsite: false,
+      },
       notes: "",
       publishStatus: "publish",
     },
@@ -115,7 +120,7 @@ export function CreateListingForm() {
       const result = await submitListing(data);
       toast({ 
         title: "Listing Created!", 
-        description: `Property "${data.title}" (${result.reference}) has been published successfully.` 
+        description: `Property "${data.title}" (${(result as any).reference}) has been published successfully.` 
       });
       router.push("/");
     } catch (error) {
@@ -136,7 +141,7 @@ export function CreateListingForm() {
       case 2: return <LocationStep form={form} />;
       case 3: return <PublishingStep form={form} />;
       case 4: return <NotesStep form={form} />;
-      case 5: return <DocumentsStep />;
+      case 5: return <DocumentsStep form={form} />;
       case 6: return <CompletedStep form={form} />;
       default: return null;
     }
@@ -167,9 +172,9 @@ export function CreateListingForm() {
                variant="ghost" 
                onClick={onSave} 
                disabled={isSubmitting}
-               className="rounded-xl px-8 py-6 h-auto font-bold text-slate-400 hover:text-primary disabled:opacity-50"
+               className="rounded-full px-8 py-6 h-auto font-black text-[10px] tracking-widest text-slate-400 border border-slate-100 hover:bg-slate-50 hover:text-slate-600 uppercase transition-all duration-300"
              >
-                <Save className="h-4 w-4 mr-2" /> Save Draft
+                <Save className="h-3.5 w-3.5 mr-2.5 translate-y-[-0.5px]" /> SAVE DRAFT
              </Button>
              {currentStep < steps.length - 1 ? (
                <Button 

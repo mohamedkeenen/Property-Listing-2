@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { mockListings, mockLeads } from "@/data/mockData";
+import { cn } from "@/lib/utils";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, Legend,
@@ -89,9 +90,9 @@ export function DashboardCharts() {
   const labelClass = "text-[10px] font-black uppercase tracking-widest text-foreground flex items-center gap-2";
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 min-w-0">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <Card className={cardClass}>
+        <Card className={cn(cardClass, "lg:col-span-1 min-w-0")}>
           <CardHeader className="pb-4 pt-6 px-6 bg-muted/10 border-b border-border/20">
             <CardTitle className={labelClass}>
               <BarChart3 className="h-4 w-4 text-emerald-500" />
@@ -126,7 +127,7 @@ export function DashboardCharts() {
           </CardContent>
         </Card>
 
-        <Card className={cardClass}>
+        <Card className={cn(cardClass, "lg:col-span-1 min-w-0")}>
           <CardHeader className="pb-4 pt-6 px-6 bg-muted/10 border-b border-border/20">
             <CardTitle className={labelClass}>
               <Building2 className="h-4 w-4 text-blue-500" />
@@ -162,7 +163,7 @@ export function DashboardCharts() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <Card className={cardClass}>
+        <Card className={cn(cardClass, "min-w-0")}>
           <CardHeader className="pb-4 pt-6 px-6 bg-muted/10 border-b border-border/20">
             <CardTitle className={labelClass}>
               <TrendingUp className="h-4 w-4 text-primary" />
@@ -201,7 +202,7 @@ export function DashboardCharts() {
           </CardContent>
         </Card>
 
-        <Card className={cardClass}>
+        <Card className={cn(cardClass, "min-w-0")}>
           <CardHeader className="pb-4 pt-6 px-6 bg-muted/10 border-b border-border/20">
             <CardTitle className={labelClass}>
               <Building2 className="h-4 w-4 text-purple-500" />
@@ -239,7 +240,7 @@ export function DashboardCharts() {
           </CardContent>
         </Card>
 
-        <Card className={cardClass}>
+        <Card className={cn(cardClass, "min-w-0")}>
           <CardHeader className="pb-4 pt-6 px-6 bg-muted/10 border-b border-border/20">
             <CardTitle className={labelClass}>
               <Users className="h-4 w-4 text-orange-500" />
@@ -280,7 +281,7 @@ export function DashboardCharts() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <Card className={cardClass}>
+        <Card className={cn(cardClass, "min-w-0")}>
           <CardHeader className="pb-4 pt-6 px-6 bg-muted/10 border-b border-border/20">
             <CardTitle className={labelClass}>
               <TrendingUp className="h-4 w-4 text-emerald-500" />
@@ -320,7 +321,7 @@ export function DashboardCharts() {
           </CardContent>
         </Card>
 
-        <Card className={cardClass}>
+        <Card className={cn(cardClass, "min-w-0")}>
           <CardHeader className="pb-4 pt-6 px-6 bg-muted/10 border-b border-border/20">
             <CardTitle className={labelClass}>
               <Users className="h-4 w-4 text-blue-500" />
