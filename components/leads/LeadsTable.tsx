@@ -1,6 +1,6 @@
 import { useState } from "react";
 import NextImage from "next/image";
-import { Search, MessageCircle, Mail, Phone, MoreHorizontal, Eye, Pencil, Trash2, UserCheck, UserX, ChevronLeft, ChevronRight } from "lucide-react";
+import { Search, MessageCircle, Mail, Phone, MoreHorizontal, Eye, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -49,13 +49,7 @@ export function LeadsTable() {
 
   const getProperty = (ref: string) => mockListings.find((l) => l.reference === ref);
 
-  const handleMarkQualified = (lead: Lead) => {
-    toast({ title: "Lead Updated", description: `${lead.name} marked as Qualified.` });
-  };
 
-  const handleMarkLost = (lead: Lead) => {
-    toast({ title: "Lead Updated", description: `${lead.name} marked as Lost.` });
-  };
 
   const handleDelete = (lead: Lead) => {
     toast({ title: "Lead Deleted", description: `${lead.name} has been removed.` });
@@ -136,13 +130,7 @@ export function LeadsTable() {
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="start" className="w-48">
                             <DropdownMenuItem onClick={() => setSelectedLead(l)}>
-                              <Eye className="h-4 w-4 mr-2" /> View Details
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => handleMarkQualified(l)}>
-                              <UserCheck className="h-4 w-4 mr-2" /> Mark Qualified
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => handleMarkLost(l)}>
-                              <UserX className="h-4 w-4 mr-2" /> Mark Lost
+                              <Eye className="h-4 w-4 mr-2" /> Review
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem onClick={() => handleDelete(l)} className="text-destructive focus:text-destructive">
