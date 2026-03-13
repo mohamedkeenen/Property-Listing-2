@@ -42,7 +42,8 @@ export interface Lead {
   name: string;
   email: string;
   phone: string;
-  source: "WhatsApp" | "Email" | "Call";
+  source: "Property Finder" | "Bayut" | "Website";
+  subSource: "WhatsApp" | "Email" | "Call";
   property: string;
   status: "New" | "Contacted" | "Qualified" | "Lost";
   date: string;
@@ -129,18 +130,18 @@ export const mockListings: PropertyListing[] = [
 ];
 
 export const mockLeads: Lead[] = [
-  { id: "L1", name: "John Smith", email: "john@email.com", phone: "+971501234567", source: "WhatsApp", property: "KE-1001", status: "New", date: "2026-03-08", avatar: "JS" },
-  { id: "L2", name: "Maria Garcia", email: "maria@email.com", phone: "+971502345678", source: "Email", property: "KE-1002", status: "Contacted", date: "2026-03-07", avatar: "MG" },
-  { id: "L3", name: "Ali Al Mansoori", email: "ali@email.com", phone: "+971503456789", source: "Call", property: "KE-1006", status: "Qualified", date: "2026-03-07", avatar: "AA" },
-  { id: "L4", name: "Sophie Chen", email: "sophie@email.com", phone: "+971504567890", source: "WhatsApp", property: "KE-1010", status: "New", date: "2026-03-06", avatar: "SC" },
-  { id: "L5", name: "David Johnson", email: "david@email.com", phone: "+971505678901", source: "Email", property: "KE-1004", status: "Contacted", date: "2026-03-06", avatar: "DJ" },
-  { id: "L6", name: "Fatima Al Zahra", email: "fatima@email.com", phone: "+971506789012", source: "Call", property: "KE-1008", status: "New", date: "2026-03-05", avatar: "FA" },
-  { id: "L7", name: "Robert Williams", email: "robert@email.com", phone: "+971507890123", source: "WhatsApp", property: "KE-1001", status: "Lost", date: "2026-03-04", avatar: "RW" },
-  { id: "L8", name: "Aisha Mohammed", email: "aisha@email.com", phone: "+971508901234", source: "Email", property: "KE-1014", status: "Qualified", date: "2026-03-04", avatar: "AM" },
-  { id: "L9", name: "Tom Anderson", email: "tom@email.com", phone: "+971509012345", source: "Call", property: "KE-1003", status: "Contacted", date: "2026-03-03", avatar: "TA" },
-  { id: "L10", name: "Noura Al Hashimi", email: "noura@email.com", phone: "+971500123456", source: "WhatsApp", property: "KE-1011", status: "New", date: "2026-03-03", avatar: "NA" },
-  { id: "L11", name: "James Brown", email: "james@email.com", phone: "+971501112233", source: "Email", property: "KE-1005", status: "New", date: "2026-03-02", avatar: "JB" },
-  { id: "L12", name: "Layla Hassan", email: "layla@email.com", phone: "+971502223344", source: "WhatsApp", property: "KE-1006", status: "Contacted", date: "2026-03-01", avatar: "LH" },
+  { id: "L1", name: "John Smith", email: "john@email.com", phone: "+971501234567", source: "Property Finder", subSource: "WhatsApp", property: "KE-1001", status: "New", date: "2026-03-08", avatar: "JS" },
+  { id: "L2", name: "Maria Garcia", email: "maria@email.com", phone: "+971502345678", source: "Bayut", subSource: "Email", property: "KE-1002", status: "Contacted", date: "2026-03-07", avatar: "MG" },
+  { id: "L3", name: "Ali Al Mansoori", email: "ali@email.com", phone: "+971503456789", source: "Website", subSource: "Call", property: "KE-1006", status: "Qualified", date: "2026-03-07", avatar: "AA" },
+  { id: "L4", name: "Sophie Chen", email: "sophie@email.com", phone: "+971504567890", source: "Bayut", subSource: "WhatsApp", property: "KE-1010", status: "New", date: "2026-03-06", avatar: "SC" },
+  { id: "L5", name: "David Johnson", email: "david@email.com", phone: "+971505678901", source: "Property Finder", subSource: "Email", property: "KE-1004", status: "Contacted", date: "2026-03-06", avatar: "DJ" },
+  { id: "L6", name: "Fatima Al Zahra", email: "fatima@email.com", phone: "+971506789012", source: "Website", subSource: "WhatsApp", property: "KE-1008", status: "New", date: "2026-03-05", avatar: "FA" },
+  { id: "L7", name: "Robert Williams", email: "robert@email.com", phone: "+971507890123", source: "Property Finder", subSource: "Call", property: "KE-1001", status: "Lost", date: "2026-03-04", avatar: "RW" },
+  { id: "L8", name: "Aisha Mohammed", email: "aisha@email.com", phone: "+971508901234", source: "Bayut", subSource: "Call", property: "KE-1014", status: "Qualified", date: "2026-03-04", avatar: "AM" },
+  { id: "L9", name: "Tom Anderson", email: "tom@email.com", phone: "+971509012345", source: "Website", subSource: "Email", property: "KE-1003", status: "Contacted", date: "2026-03-03", avatar: "TA" },
+  { id: "L10", name: "Noura Al Hashimi", email: "noura@email.com", phone: "+971500123456", source: "Property Finder", subSource: "WhatsApp", property: "KE-1011", status: "New", date: "2026-03-03", avatar: "NA" },
+  { id: "L11", name: "James Brown", email: "james@email.com", phone: "+971501112233", source: "Bayut", subSource: "Email", property: "KE-1005", status: "New", date: "2026-03-02", avatar: "JB" },
+  { id: "L12", name: "Layla Hassan", email: "layla@email.com", phone: "+971502223344", source: "Website", subSource: "WhatsApp", property: "KE-1006", status: "Contacted", date: "2026-03-01", avatar: "LH" },
 ];
 
 export const filterOptions = {

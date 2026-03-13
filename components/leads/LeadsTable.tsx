@@ -1,6 +1,6 @@
 import { useState } from "react";
 import NextImage from "next/image";
-import { Search, MessageCircle, Mail, Phone, MoreHorizontal, Eye, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
+import { Search, MessageCircle, Mail, Phone, MoreHorizontal, Eye, Trash2, ChevronLeft, ChevronRight, Globe } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -12,11 +12,17 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Separator } from "@/components/ui/separator";
 import { mockLeads, mockListings, Lead } from "@/data/mockData";
 import { toast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
 
-const sourceIcon: Record<string, { icon: typeof MessageCircle; color: string }> = {
+const subSourceIcon: Record<string, { icon: typeof MessageCircle; color: string }> = {
   WhatsApp: { icon: MessageCircle, color: "text-green-500" },
   Email: { icon: Mail, color: "text-blue-500" },
   Call: { icon: Phone, color: "text-orange-500" },
+};
+
+const portalLogos: Record<string, string> = {
+  "Property Finder": "https://res.cloudinary.com/devht0mp5/image/upload/v1772105511/PF_ljkahc.png",
+  "Bayut": "https://res.cloudinary.com/devht0mp5/image/upload/v1772105511/bayut_gy4ev2.png",
 };
 
 const statusColors: Record<string, string> = {
@@ -26,7 +32,7 @@ const statusColors: Record<string, string> = {
   Lost: "bg-red-500/10 text-red-500 dark:text-red-400 border-red-200 dark:border-red-500/30",
 };
 
-const sourceTabs = ["All", "WhatsApp", "Email", "Call"];
+const sourceTabs = ["All", "Property Finder", "Bayut", "Website"];
 const statusTabs = ["All Statuses", "New", "Contacted", "Qualified", "Lost"];
 
 export function LeadsTable() {
@@ -105,6 +111,7 @@ export function LeadsTable() {
                 <TableHead>Lead</TableHead>
                 <TableHead>Contact</TableHead>
                 <TableHead>Source</TableHead>
+                <TableHead>Sub-Source</TableHead>
                 <TableHead>Property</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Date</TableHead>
@@ -117,7 +124,6 @@ export function LeadsTable() {
                 </TableRow>
               ) : (
                 paginated.map((l) => {
-                  const src = sourceIcon[l.source];
                   const prop = getProperty(l.property);
                   return (
                     <TableRow key={l.id} className="hover:bg-muted/50 border-b-0">
@@ -152,9 +158,30 @@ export function LeadsTable() {
                       </TableCell>
                       <TableCell className="text-sm text-foreground">{l.phone}</TableCell>
                       <TableCell>
+                        <div className="flex items-center">
+                          <div className="w-12 flex items-center justify-center shrink-0">
+                            {portalLogos[l.source] ? (
+                              <div className="relative h-4 w-full">
+                                <NextImage src={portalLogos[l.source]} alt={l.source} fill className="object-contain" />
+                              </div>
+                            ) : l.source === "Website" ? (
+                              <Globe className="h-4 w-4 text-cyan-500" />
+                            ) : null}
+                          </div>
+                          <span className={cn(
+                            "text-xs font-semibold",
+                            l.source === "Website" ? "text-cyan-500" : "text-foreground/80"
+                          )}>
+                            {l.source}
+                          </span>
+                        </div>
+                      </TableCell>
+                      <TableCell>
                         <div className="flex items-center gap-1.5">
-                          <src.icon className={`h-4 w-4 ${src.color}`} />
-                          <span className="text-xs font-medium">{l.source}</span>
+                          {(() => {
+                            const sub = subSourceIcon[l.subSource];
+                            return <><sub.icon className={`h-4 w-4 ${sub.color}`} /><span className="text-xs font-medium">{l.subSource}</span></>;
+                          })()}
                         </div>
                       </TableCell>
                       <TableCell>
@@ -241,11 +268,31 @@ export function LeadsTable() {
                   <p className="text-foreground font-medium">{selectedLead.phone}</p>
                 </div>
                 <div className="space-y-1">
-                  <p className="text-muted-foreground text-xs">Source</p>
+                  <p className="text-muted-foreground text-xs font-medium">Source</p>
+                  <div className="flex items-center gap-3">
+                    <div className="w-16 flex items-center justify-center shrink-0 bg-white/5 rounded-md p-1.5 h-10">
+                      {portalLogos[selectedLead.source] ? (
+                        <div className="relative h-6 w-full">
+                          <NextImage src={portalLogos[selectedLead.source]} alt={selectedLead.source} fill className="object-contain" />
+                        </div>
+                      ) : selectedLead.source === "Website" ? (
+                        <Globe className="h-6 w-6 text-cyan-500" />
+                      ) : null}
+                    </div>
+                    <span className={cn(
+                      "text-sm font-bold",
+                      selectedLead.source === "Website" ? "text-cyan-500" : "text-foreground"
+                    )}>
+                      {selectedLead.source}
+                    </span>
+                  </div>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-muted-foreground text-xs">Sub-Source</p>
                   <div className="flex items-center gap-1.5">
                     {(() => {
-                      const src = sourceIcon[selectedLead.source];
-                      return <><src.icon className={`h-4 w-4 ${src.color}`} /><span className="font-medium">{selectedLead.source}</span></>;
+                      const sub = subSourceIcon[selectedLead.subSource];
+                      return <><sub.icon className={`h-4 w-4 ${sub.color}`} /><span className="font-medium text-xs">{selectedLead.subSource}</span></>;
                     })()}
                   </div>
                 </div>

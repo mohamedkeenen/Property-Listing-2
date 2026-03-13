@@ -6,15 +6,16 @@ import {
   PieChart, Pie, Cell, Legend,
   AreaChart, Area,
 } from "recharts";
-import { TrendingUp, Users, Building2, BarChart3 } from "lucide-react";
+import { TrendingUp, Users, Building2, BarChart3, MessageCircle, Mail, Phone, Globe } from "lucide-react";
+import NextImage from "next/image";
 
 const COLORS = {
   blue: "#3b82f6",
-  emerald: "#10b981",
-  orange: "#f59e0b",
+  emerald: "#28b16d", // Bayut green
+  orange: "#ea3934", // PF red-orange
   purple: "#8b5cf6",
   red: "#ef4444",
-  cyan: "#06b6d4",
+  cyan: "#06b6d4", // Website cyan
   amber: "#f59e0b",
   green: "#22c55e",
 };
@@ -30,12 +31,36 @@ export function DashboardCharts() {
   const communityData = Object.entries(communityMap)
     .sort((a, b) => b[1] - a[1])
     .slice(0, 6)
-    .map(([name, count]) => ({ name: name.length > 15 ? name.slice(0, 15) + "…" : name, count }));
+    .map(([name, count]) => ({ name, count }));
 
   const portalData = [
-    { name: "Property Finder", value: mockListings.filter((l) => l.portals.pf).length, color: COLORS.green },
-    { name: "Bayut", value: mockListings.filter((l) => l.portals.bayut).length, color: COLORS.orange },
-    { name: "Website", value: mockListings.filter((l) => l.portals.website).length, color: COLORS.purple },
+    { 
+      name: "Property Finder", 
+      value: mockListings.filter((l) => l.portals.pf).length, 
+      color: COLORS.orange,
+      breakdown: ["Apartment", "Villa", "Office", "Townhouse"].map(t => ({
+        name: t,
+        value: mockListings.filter(l => l.portals.pf && l.type === t).length
+      })).filter(i => i.value > 0)
+    },
+    { 
+      name: "Bayut", 
+      value: mockListings.filter((l) => l.portals.bayut).length, 
+      color: COLORS.emerald,
+      breakdown: ["Apartment", "Villa", "Office", "Townhouse"].map(t => ({
+        name: t,
+        value: mockListings.filter(l => l.portals.bayut && l.type === t).length
+      })).filter(i => i.value > 0)
+    },
+    { 
+      name: "Website", 
+      value: mockListings.filter((l) => l.portals.website).length, 
+      color: COLORS.cyan,
+      breakdown: ["Apartment", "Villa", "Office", "Townhouse"].map(t => ({
+        name: t,
+        value: mockListings.filter(l => l.portals.website && l.type === t).length
+      })).filter(i => i.value > 0)
+    },
   ];
 
   const typeMap: Record<string, number> = {};
@@ -52,9 +77,33 @@ export function DashboardCharts() {
   ];
 
   const leadsSourceData = [
-    { name: "WhatsApp", value: mockLeads.filter((l) => l.source === "WhatsApp").length, color: COLORS.green },
-    { name: "Email", value: mockLeads.filter((l) => l.source === "Email").length, color: COLORS.blue },
-    { name: "Call", value: mockLeads.filter((l) => l.source === "Call").length, color: COLORS.orange },
+    { 
+      name: "WhatsApp", 
+      value: mockLeads.filter((l) => l.subSource === "WhatsApp").length, 
+      color: COLORS.green,
+      breakdown: ["Property Finder", "Bayut", "Website"].map(p => ({
+        name: p,
+        value: mockLeads.filter(l => l.subSource === "WhatsApp" && l.source === p).length
+      })).filter(i => i.value > 0)
+    },
+    { 
+      name: "Email", 
+      value: mockLeads.filter((l) => l.subSource === "Email").length, 
+      color: COLORS.blue,
+      breakdown: ["Property Finder", "Bayut", "Website"].map(p => ({
+        name: p,
+        value: mockLeads.filter(l => l.subSource === "Email" && l.source === p).length
+      })).filter(i => i.value > 0)
+    },
+    { 
+      name: "Call", 
+      value: mockLeads.filter((l) => l.subSource === "Call").length, 
+      color: COLORS.orange,
+      breakdown: ["Property Finder", "Bayut", "Website"].map(p => ({
+        name: p,
+        value: mockLeads.filter(l => l.subSource === "Call" && l.source === p).length
+      })).filter(i => i.value > 0)
+    },
   ];
 
   const agentMap: Record<string, { total: number; live: number }> = {};
@@ -69,35 +118,110 @@ export function DashboardCharts() {
     live: d.live,
   }));
 
-  const tooltipStyle = {
-    contentStyle: {
-      background: "var(--card)",
-      border: "1px solid var(--border)",
-      borderRadius: "16px",
-      fontSize: "10px",
-      fontWeight: "900",
-      textTransform: "uppercase",
-      letterSpacing: "0.1em",
-      color: "var(--foreground)",
-      boxShadow: "0 20px 25px -5px rgb(0 0 0 / 0.5)",
-    },
-    itemStyle: {
-      color: "var(--foreground)",
+  const portalLogos: Record<string, string> = {
+    "Property Finder": "https://res.cloudinary.com/devht0mp5/image/upload/v1772105511/PF_ljkahc.png",
+    "Bayut": "https://res.cloudinary.com/devht0mp5/image/upload/v1772105511/bayut_gy4ev2.png",
+  };
+
+  const channelIcons: Record<string, any> = {
+    "WhatsApp": MessageCircle,
+    "Email": Mail,
+    "Call": Phone,
+  };
+
+  const CustomTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+      const data = payload[0].payload;
+      const isPie = !label;
+      const name = isPie ? data.name : label;
+      const breakdown = data.breakdown;
+      
+      return (
+        <div className="bg-slate-950/95 backdrop-blur-xl border border-white/10 p-4 rounded-2xl shadow-2xl flex flex-col gap-3 min-w-[160px]">
+          <div className="flex items-center gap-4">
+            {portalLogos[name] ? (
+              <div className="relative h-7 w-20 shrink-0 bg-white/5 rounded-lg p-1 transition-colors">
+                 <NextImage 
+                   src={portalLogos[name]} 
+                   alt={name} 
+                   fill 
+                   className="object-contain p-0.5" 
+                   priority
+                 />
+              </div>
+            ) : channelIcons[name] ? (
+              (() => {
+                const Icon = channelIcons[name];
+                return <div className="p-2 bg-primary/10 rounded-lg"><Icon className="h-5 w-5 text-primary" /></div>;
+              })()
+            ) : name === "Website" ? (
+              <div className="p-2 bg-cyan-500/10 rounded-lg"><Globe className="h-5 w-5 text-cyan-500" /></div>
+            ) : (
+              <div className="h-3 w-3 rounded-full shadow-sm ring-2 ring-white/10" style={{ backgroundColor: payload[0].color || payload[0].fill }} />
+            )}
+            
+            <div className="flex flex-col">
+              <span className="text-[10px] text-slate-400 font-medium uppercase tracking-wider">{name}</span>
+              <span className="text-sm font-bold text-white">
+                {typeof payload[0].value === 'number' ? payload[0].value.toLocaleString() : payload[0].value}
+              </span>
+            </div>
+          </div>
+
+          {breakdown && breakdown.length > 0 && (
+            <div className="border-t border-white/5 pt-3 mt-1 space-y-2">
+              <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest pl-1">Detailed Breakdown</p>
+              <div className="grid grid-cols-1 gap-1.5">
+                {breakdown.map((item: any, i: number) => (
+                  <div key={i} className="flex items-center justify-between gap-4 px-2 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
+                    <div className="flex items-center gap-2">
+                       {portalLogos[item.name] ? (
+                         <div className="relative h-3.5 w-10 shrink-0 opacity-90">
+                            <NextImage src={portalLogos[item.name]} alt={item.name} fill className="object-contain" />
+                         </div>
+                       ) : item.name === "Website" ? (
+                         <div className="w-10 flex justify-center shrink-0">
+                           <Globe className="h-3.5 w-3.5 text-cyan-500" />
+                         </div>
+                       ) : (
+                         <div className="w-10 flex justify-center shrink-0">
+                           <div className="h-1.5 w-1.5 rounded-full bg-slate-500" />
+                         </div>
+                       )}
+                       <span className="text-[10px] font-medium text-slate-200">{item.name}</span>
+                    </div>
+                    <span className="text-xs font-bold text-white">{item.value}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      );
     }
+    return null;
+  };
+
+  const tooltipStyle = {
+    content: <CustomTooltip />,
+    cursor: { fill: 'var(--muted)', opacity: 0.1 }
   };
 
   const cardClass = "bg-card border border-border/40 rounded-[2rem] overflow-hidden shadow-sm transition-all hover:shadow-lg hover:border-primary/20";
-  const labelClass = "text-[10px] font-black uppercase tracking-widest text-foreground flex items-center gap-2";
+  const labelClass = "text-base font-bold text-foreground flex items-center gap-2 capitalize tracking-tight";
 
   return (
     <div className="space-y-8 min-w-0">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <Card className={cn(cardClass, "lg:col-span-1 min-w-0")}>
-          <CardHeader className="pb-4 pt-6 px-6 bg-muted/10 border-b border-border/20">
+          <CardHeader className="flex flex-row items-center justify-between pb-4 pt-6 px-6 bg-muted/10 border-b border-border/20 space-y-0">
             <CardTitle className={labelClass}>
               <BarChart3 className="h-4 w-4 text-emerald-500" />
               Inventory Status Distribution
             </CardTitle>
+            <div className="text-[10px] font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-500 px-2 py-1 rounded-md">
+              {mockListings.length} Total
+            </div>
           </CardHeader>
           <CardContent className="pt-8 pb-6 px-6">
             <ResponsiveContainer width="100%" height={280}>
@@ -119,7 +243,7 @@ export function DashboardCharts() {
                 <Tooltip {...tooltipStyle} cursor={{ fill: 'var(--muted)', opacity: 0.1 }} />
                 <Bar dataKey="count" radius={[8, 8, 2, 2]}>
                   {statusData.map((_, i) => (
-                    <Cell key={i} fill={[COLORS.emerald, COLORS.orange, COLORS.blue, COLORS.red, COLORS.purple][i]} />
+                    <Cell key={i} fill={[COLORS.emerald, COLORS.amber, COLORS.blue, COLORS.red, COLORS.purple][i]} />
                   ))}
                 </Bar>
               </BarChart>
@@ -128,11 +252,14 @@ export function DashboardCharts() {
         </Card>
 
         <Card className={cn(cardClass, "lg:col-span-1 min-w-0")}>
-          <CardHeader className="pb-4 pt-6 px-6 bg-muted/10 border-b border-border/20">
+          <CardHeader className="flex flex-row items-center justify-between pb-4 pt-6 px-6 bg-muted/10 border-b border-border/20 space-y-0">
             <CardTitle className={labelClass}>
               <Building2 className="h-4 w-4 text-blue-500" />
-              Market Density by Community
+              Market Design By Community
             </CardTitle>
+            <div className="text-[10px] font-bold uppercase tracking-wider bg-blue-500/10 text-blue-500 px-2 py-1 rounded-md">
+              {mockListings.length} Total
+            </div>
           </CardHeader>
           <CardContent className="pt-8 pb-6 px-6">
             <ResponsiveContainer width="100%" height={280}>
@@ -150,8 +277,8 @@ export function DashboardCharts() {
                   type="category" 
                   axisLine={false}
                   tickLine={false}
-                  tick={{ fontSize: 9, fill: "var(--foreground)", fontWeight: "900", letterSpacing: "0.02em" }} 
-                  width={100} 
+                  tick={{ fontSize: 11, fill: "var(--foreground)", fontWeight: "500" }} 
+                  width={110} 
                   dx={-5}
                 />
                 <Tooltip {...tooltipStyle} cursor={{ fill: 'var(--muted)', opacity: 0.1 }} />
@@ -164,11 +291,14 @@ export function DashboardCharts() {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         <Card className={cn(cardClass, "min-w-0")}>
-          <CardHeader className="pb-4 pt-6 px-6 bg-muted/10 border-b border-border/20">
+          <CardHeader className="flex flex-row items-center justify-between pb-4 pt-6 px-6 bg-muted/10 border-b border-border/20 space-y-0">
             <CardTitle className={labelClass}>
               <TrendingUp className="h-4 w-4 text-primary" />
               Listing Portals
             </CardTitle>
+            <div className="text-[10px] font-bold uppercase tracking-wider bg-primary/10 text-primary px-2 py-1 rounded-md">
+              {portalData.reduce((acc, curr) => acc + curr.value, 0)} Total
+            </div>
           </CardHeader>
           <CardContent className="pt-6 pb-6 px-6">
             <ResponsiveContainer width="100%" height={240}>
@@ -194,8 +324,12 @@ export function DashboardCharts() {
                   layout="horizontal"
                   verticalAlign="bottom"
                   align="center"
-                  formatter={(value) => <span style={{ color: "var(--foreground)" }}>{value}</span>}
-                  wrapperStyle={{ fontSize: "9px", fontWeight: "900", textTransform: "uppercase", letterSpacing: "0.1em", paddingTop: "20px" }} 
+                  formatter={(value) => (
+                    <span style={{ color: "var(--foreground)" }}>
+                      {value}
+                    </span>
+                  )}
+                  wrapperStyle={{ fontSize: "11px", fontWeight: "600", paddingTop: "20px" }} 
                 />
               </PieChart>
             </ResponsiveContainer>
@@ -203,11 +337,14 @@ export function DashboardCharts() {
         </Card>
 
         <Card className={cn(cardClass, "min-w-0")}>
-          <CardHeader className="pb-4 pt-6 px-6 bg-muted/10 border-b border-border/20">
+          <CardHeader className="flex flex-row items-center justify-between pb-4 pt-6 px-6 bg-muted/10 border-b border-border/20 space-y-0">
             <CardTitle className={labelClass}>
               <Building2 className="h-4 w-4 text-purple-500" />
               Structure Types
             </CardTitle>
+            <div className="text-[10px] font-bold uppercase tracking-wider bg-purple-500/10 text-purple-500 px-2 py-1 rounded-md">
+              {mockListings.length} Total
+            </div>
           </CardHeader>
           <CardContent className="pt-6 pb-6 px-6">
             <ResponsiveContainer width="100%" height={240}>
@@ -233,7 +370,7 @@ export function DashboardCharts() {
                   verticalAlign="bottom"
                   align="center"
                   formatter={(value) => <span style={{ color: "var(--foreground)" }}>{value}</span>}
-                  wrapperStyle={{ fontSize: "9px", fontWeight: "900", textTransform: "uppercase", letterSpacing: "0.1em", paddingTop: "20px" }} 
+                  wrapperStyle={{ fontSize: "11px", fontWeight: "600", paddingTop: "20px" }} 
                 />
               </PieChart>
             </ResponsiveContainer>
@@ -241,11 +378,14 @@ export function DashboardCharts() {
         </Card>
 
         <Card className={cn(cardClass, "min-w-0")}>
-          <CardHeader className="pb-4 pt-6 px-6 bg-muted/10 border-b border-border/20">
+          <CardHeader className="flex flex-row items-center justify-between pb-4 pt-6 px-6 bg-muted/10 border-b border-border/20 space-y-0">
             <CardTitle className={labelClass}>
               <Users className="h-4 w-4 text-orange-500" />
               Inquiry Sources
             </CardTitle>
+            <div className="text-[10px] font-bold uppercase tracking-wider bg-orange-500/10 text-orange-500 px-2 py-1 rounded-md">
+              {mockLeads.length} Total
+            </div>
           </CardHeader>
           <CardContent className="pt-6 pb-6 px-6">
             <ResponsiveContainer width="100%" height={240}>
@@ -271,8 +411,12 @@ export function DashboardCharts() {
                   layout="horizontal"
                   verticalAlign="bottom"
                   align="center"
-                  formatter={(value) => <span style={{ color: "var(--foreground)" }}>{value}</span>}
-                  wrapperStyle={{ fontSize: "9px", fontWeight: "900", textTransform: "uppercase", letterSpacing: "0.1em", paddingTop: "20px" }} 
+                  formatter={(value) => (
+                    <span style={{ color: "var(--foreground)" }}>
+                      {value}
+                    </span>
+                  )}
+                  wrapperStyle={{ fontSize: "11px", fontWeight: "600", paddingTop: "20px" }} 
                 />
               </PieChart>
             </ResponsiveContainer>
@@ -282,11 +426,14 @@ export function DashboardCharts() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <Card className={cn(cardClass, "min-w-0")}>
-          <CardHeader className="pb-4 pt-6 px-6 bg-muted/10 border-b border-border/20">
+          <CardHeader className="flex flex-row items-center justify-between pb-4 pt-6 px-6 bg-muted/10 border-b border-border/20 space-y-0">
             <CardTitle className={labelClass}>
               <TrendingUp className="h-4 w-4 text-emerald-500" />
               Pricing Dynamics
             </CardTitle>
+            <div className="text-[10px] font-bold uppercase tracking-wider bg-blue-500/10 text-blue-500 px-2 py-1 rounded-md">
+              {mockListings.length} Total
+            </div>
           </CardHeader>
           <CardContent className="pt-8 pb-6 px-6">
             <ResponsiveContainer width="100%" height={280}>
@@ -312,21 +459,24 @@ export function DashboardCharts() {
                   iconType="circle" 
                   iconSize={8} 
                   formatter={(value) => <span style={{ color: "var(--foreground)" }}>{value}</span>}
-                  wrapperStyle={{ fontSize: "10px", fontWeight: "900", textTransform: "uppercase", letterSpacing: "0.1em", paddingBottom: "20px" }} 
+                  wrapperStyle={{ fontSize: "11px", fontWeight: "600", paddingBottom: "20px" }} 
                 />
-                <Area type="monotone" dataKey="rent" name="Leasing" stroke={COLORS.blue} fill={COLORS.blue} fillOpacity={0.15} strokeWidth={3} />
-                <Area type="monotone" dataKey="sale" name="Acquisition" stroke={COLORS.emerald} fill={COLORS.emerald} fillOpacity={0.15} strokeWidth={3} />
+                <Area type="monotone" dataKey="sale" name="Sale" stroke={COLORS.red} fill={COLORS.red} fillOpacity={0.15} strokeWidth={3} />
+                <Area type="monotone" dataKey="rent" name="Rent" stroke={COLORS.blue} fill={COLORS.blue} fillOpacity={0.15} strokeWidth={3} />
               </AreaChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
 
         <Card className={cn(cardClass, "min-w-0")}>
-          <CardHeader className="pb-4 pt-6 px-6 bg-muted/10 border-b border-border/20">
+          <CardHeader className="flex flex-row items-center justify-between pb-4 pt-6 px-6 bg-muted/10 border-b border-border/20 space-y-0">
             <CardTitle className={labelClass}>
               <Users className="h-4 w-4 text-blue-500" />
               Team Performance
             </CardTitle>
+            <div className="text-[10px] font-bold uppercase tracking-wider bg-blue-500/10 text-blue-500 px-2 py-1 rounded-md">
+              {mockListings.length} Total
+            </div>
           </CardHeader>
           <CardContent className="pt-8 pb-6 px-6">
             <ResponsiveContainer width="100%" height={280}>
@@ -352,10 +502,10 @@ export function DashboardCharts() {
                    iconType="circle" 
                    iconSize={8} 
                    formatter={(value) => <span style={{ color: "var(--foreground)" }}>{value}</span>}
-                   wrapperStyle={{ fontSize: "10px", fontWeight: "900", textTransform: "uppercase", letterSpacing: "0.1em", paddingBottom: "20px" }} 
+                   wrapperStyle={{ fontSize: "11px", fontWeight: "600", paddingBottom: "20px" }} 
                 />
                 <Bar dataKey="total" name="Total" fill={COLORS.blue} radius={[6, 6, 2, 2]} />
-                <Bar dataKey="live" name="Active" fill={COLORS.emerald} radius={[6, 6, 2, 2]} />
+                <Bar dataKey="live" name="Live" fill={COLORS.emerald} radius={[6, 6, 2, 2]} />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>

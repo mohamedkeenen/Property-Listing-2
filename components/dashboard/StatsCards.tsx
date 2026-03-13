@@ -45,13 +45,13 @@ export function StatsCards() {
       residential: pf.filter((l) => l.category === "Residential").length,
       commercial: pf.filter((l) => l.category === "Commercial").length,
       image: "https://res.cloudinary.com/devht0mp5/image/upload/v1772105511/PF_ljkahc.png",
-      color: "#f97316", // Orange
-      bgColor: "bg-orange-500/10",
-      iconColor: "text-orange-500",
-      dotColor: "bg-orange-600",
-      barColor: "bg-orange-600",
-      barBg: "bg-orange-500/15",
-      borderColor: "border-r-orange-600",
+      color: "#ea3934", // PF red-orange
+      bgColor: "bg-[#ea3934]/10",
+      iconColor: "text-[#ea3934]",
+      dotColor: "bg-[#ea3934]",
+      barColor: "bg-[#ea3934]",
+      barBg: "bg-[#ea3934]/15",
+      borderColor: "border-r-[#ea3934]",
     },
     {
       label: "Bayut & Dubizzle",
@@ -59,13 +59,13 @@ export function StatsCards() {
       residential: bayut.filter((l) => l.category === "Residential").length,
       commercial: bayut.filter((l) => l.category === "Commercial").length,
       image: "https://res.cloudinary.com/devht0mp5/image/upload/v1772105511/bayut_gy4ev2.png",
-      color: "#22c55e", // Green
-      bgColor: "bg-green-500/10",
-      iconColor: "text-green-600",
-      dotColor: "bg-green-600",
-      barColor: "bg-green-600",
-      barBg: "bg-green-500/15",
-      borderColor: "border-r-green-600",
+      color: "#28b16d", // Bayut green
+      bgColor: "bg-[#28b16d]/10",
+      iconColor: "text-[#28b16d]",
+      dotColor: "bg-[#28b16d]",
+      barColor: "bg-[#28b16d]",
+      barBg: "bg-[#28b16d]/15",
+      borderColor: "border-r-[#28b16d]",
     },
     {
       label: "Website",

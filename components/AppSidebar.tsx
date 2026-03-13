@@ -37,34 +37,32 @@ export function AppSidebar() {
           collapsed ? "p-3 pb-6 border-b border-sidebar-border/10" : "p-6"
         )}>
           <div className={cn(
-            "flex items-center gap-4 transition-all duration-500",
-            collapsed ? "justify-center" : ""
+            "flex transition-all duration-500",
+            collapsed ? "justify-center items-center h-12" : "flex-col items-center justify-center text-center gap-3 w-full"
           )}>
-            <div className="relative group/brand shrink-0">
-              <div className={cn(
-                "relative overflow-hidden ring-1 ring-primary/20 shadow-2xl transition-all duration-700 group-hover/brand:scale-110",
-                collapsed ? "h-11 w-11 rounded-xl" : "h-14 w-14 rounded-2xl"
-              )}>
-                <Image
-  src="/logo.jpg"
-  alt="Keen Enterprises"
-  fill
-  className="object-cover"
-/>
-                <div className="absolute inset-x-0 bottom-0 h-1/2 bg-linear-to-t from-black/40 to-transparent opacity-0 group-hover/brand:opacity-100 transition-opacity" />
-              </div>
-              
-              <div className="absolute -inset-2 bg-primary/5 blur-xl rounded-full opacity-0 group-hover/brand:opacity-100 transition-opacity animate-pulse" />
-              <div className="absolute -bottom-1 -right-1 h-4 w-4 rounded-full bg-emerald-500 border-2 border-sidebar shadow-lg ring-2 ring-emerald-500/10" />
-            </div>
-
-            {!collapsed && (
-              <div className="flex flex-col transition-all duration-500 delay-100 animate-in fade-in slide-in-from-left-2">
-                <span className="text-sm font-black text-sidebar-foreground uppercase tracking-[0.2em] leading-none mb-1">
-                  Keen
-                </span>
-                <span className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-[0.3em] leading-none">
-                  Enterprises
+            {!collapsed ? (
+              <>
+                <div className="relative w-full h-20 group/brand">
+                  <Image
+                    src="/logo.jpg"
+                    alt="Keen Enterprises"
+                    fill
+                    className="object-contain transition-transform duration-700 group-hover/brand:scale-105"
+                  />
+                </div>
+                <div className="flex flex-col transition-all duration-500 delay-100 animate-in fade-in slide-in-from-bottom-2">
+                  <span className="text-sm font-black text-sidebar-foreground uppercase tracking-[0.2em] leading-none mb-1">
+                    Keen
+                  </span>
+                  <span className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-[0.3em] leading-none">
+                    Enterprises
+                  </span>
+                </div>
+              </>
+            ) : (
+              <div className="flex items-center justify-center h-10 w-full rounded-xl ring-1 ring-primary/20 shadow-md bg-transparent">
+                <span className="text-xs font-black text-sidebar-foreground uppercase tracking-widest leading-none">
+                  KEEN
                 </span>
               </div>
             )}
