@@ -4,7 +4,7 @@ import { forwardRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { X } from "lucide-react";
 
-export interface ModernFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
+interface ModernFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label: string;
   required?: boolean;
   error?: string;

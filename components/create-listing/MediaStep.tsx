@@ -11,7 +11,6 @@ interface Props {
   form: UseFormReturn<any>;
 }
 
-// Helper to watermark images with logo
 const applyWatermark = (base64Image: string, logoUrl: string): Promise<string> => {
   return new Promise((resolve) => {
     const img = new Image();
@@ -23,14 +22,11 @@ const applyWatermark = (base64Image: string, logoUrl: string): Promise<string> =
       const ctx = canvas.getContext("2d");
       if (!ctx) return resolve(base64Image);
       
-      // Draw main image
       ctx.drawImage(img, 0, 0);
       
-      // Load logo
       const logo = new Image();
       logo.crossOrigin = "anonymous";
       logo.onload = () => {
-        // Logo size (28% of image width)
         const logoTargetWidth = canvas.width * 0.28;
         const logoTargetHeight = (logo.height / logo.width) * logoTargetWidth;
         const x = (canvas.width - logoTargetWidth) / 2;
@@ -39,8 +35,10 @@ const applyWatermark = (base64Image: string, logoUrl: string): Promise<string> =
         ctx.drawImage(logo, x, y, logoTargetWidth, logoTargetHeight);
         resolve(canvas.toDataURL("image/jpeg", 0.95));
       };
+      logo.onerror = () => resolve(base64Image);
       logo.src = logoUrl;
     };
+    img.onerror = () => resolve(base64Image);
     img.src = base64Image;
   });
 };

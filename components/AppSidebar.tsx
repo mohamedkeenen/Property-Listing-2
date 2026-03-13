@@ -1,6 +1,6 @@
 "use client";
 
-import { LayoutDashboard, Plus, Users, Building } from "lucide-react";
+import { LayoutDashboard, Plus, Users } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { usePathname } from "next/navigation";
 import {
@@ -16,6 +16,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 
 const navItems = [
   { title: "Dashboard", url: "/", icon: LayoutDashboard },
@@ -44,11 +45,12 @@ export function AppSidebar() {
                 "relative overflow-hidden ring-1 ring-primary/20 shadow-2xl transition-all duration-700 group-hover/brand:scale-110",
                 collapsed ? "h-11 w-11 rounded-xl" : "h-14 w-14 rounded-2xl"
               )}>
-                <img
-                  src="/logo.jpg"
-                  alt="Keen Enterprises"
-                  className="w-full h-full object-cover transition-transform duration-1000 group-hover/brand:scale-125"
-                />
+                <Image
+  src="/logo.jpg"
+  alt="Keen Enterprises"
+  fill
+  className="object-cover"
+/>
                 <div className="absolute inset-x-0 bottom-0 h-1/2 bg-linear-to-t from-black/40 to-transparent opacity-0 group-hover/brand:opacity-100 transition-opacity" />
               </div>
               
