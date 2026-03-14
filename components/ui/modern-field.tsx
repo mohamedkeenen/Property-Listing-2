@@ -51,6 +51,13 @@ const ModernField = forwardRef<HTMLInputElement, ModernFieldProps>(
               <input
                 {...props}
                 ref={ref}
+                min={props.type === "number" ? (props.min ?? 0) : props.min}
+                onKeyDown={(e) => {
+                  if (props.type === "number" && (e.key === "-" || e.key === "e")) {
+                    e.preventDefault();
+                  }
+                  props.onKeyDown?.(e);
+                }}
                 onFocus={(e) => {
                   setInternalFocused(true);
                   props.onFocus?.(e);

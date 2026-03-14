@@ -16,6 +16,13 @@ const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<"input">>(
           "disabled:cursor-not-allowed disabled:opacity-50",
           className,
         )}
+        min={type === "number" ? (props.min ?? 0) : props.min}
+        onKeyDown={(e) => {
+          if (type === "number" && (e.key === "-" || e.key === "e")) {
+            e.preventDefault();
+          }
+          props.onKeyDown?.(e);
+        }}
         ref={ref}
         {...props}
       />

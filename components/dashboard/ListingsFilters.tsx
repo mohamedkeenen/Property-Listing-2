@@ -200,12 +200,32 @@ export function ListingsFilters({ onApply }: Props) {
 
             <div className="space-y-1.5">
                <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Price Min</label>
-               <input placeholder="Min Price" type="number" value={filters.priceMin} onChange={(e) => update("priceMin", e.target.value)} className="w-full h-10 px-4 text-xs font-bold rounded-xl border border-border bg-background focus:ring-4 focus:ring-primary/5 transition-all outline-none" />
+               <input 
+                 placeholder="Min Price" 
+                 type="number" 
+                 min="0"
+                 onKeyDown={(e) => {
+                   if (e.key === "-" || e.key === "e") e.preventDefault();
+                 }}
+                 value={filters.priceMin} 
+                 onChange={(e) => update("priceMin", e.target.value)} 
+                 className="w-full h-10 px-4 text-xs font-bold rounded-xl border border-border bg-background focus:ring-4 focus:ring-primary/5 transition-all outline-none" 
+               />
             </div>
 
             <div className="space-y-1.5">
                <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Price Max</label>
-               <input placeholder="Max Price" type="number" value={filters.priceMax} onChange={(e) => update("priceMax", e.target.value)} className="w-full h-10 px-4 text-xs font-bold rounded-xl border border-border bg-background focus:ring-4 focus:ring-primary/5 transition-all outline-none" />
+               <input 
+                 placeholder="Max Price" 
+                 type="number" 
+                 min="0"
+                 onKeyDown={(e) => {
+                   if (e.key === "-" || e.key === "e") e.preventDefault();
+                 }}
+                 value={filters.priceMax} 
+                 onChange={(e) => update("priceMax", e.target.value)} 
+                 className="w-full h-10 px-4 text-xs font-bold rounded-xl border border-border bg-background focus:ring-4 focus:ring-primary/5 transition-all outline-none" 
+               />
             </div>
           </div>
           

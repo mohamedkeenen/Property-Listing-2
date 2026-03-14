@@ -273,18 +273,13 @@ export function PropertyDetailsStep({ form }: Props) {
             <ModernField label="Built-up Area" icon={Maximize} type="number" {...register("builtUpArea")} value={watch("builtUpArea")} />
             <ModernField label="Layout Type" icon={Sparkles} {...register("layoutType")} value={watch("layoutType")} />
 
-            <div className="space-y-4">
-              <ModernSelect 
-                label="Project Name" 
-                icon={Building2} 
-                value={watch("projectName")} 
-                onValueChange={(v) => setValue("projectName", v, { shouldValidate: true })}
-                options={filterOptions.projectNames}
-              />
-              <Button type="button" variant="outline" className="w-full h-10 border-indigo-500/40 text-indigo-500 hover:bg-indigo-500 hover:text-white rounded-xl text-[10px] font-black uppercase tracking-widest gap-2 transition-all shadow-sm">
-                <PlusCircle className="h-3.5 w-3.5" /> Manage Projects
-              </Button>
-            </div>
+            <ModernSelect 
+              label="Project Name" 
+              icon={Building2} 
+              value={watch("projectName")} 
+              onValueChange={(v) => setValue("projectName", v, { shouldValidate: true })}
+              options={filterOptions.projectNames}
+            />
             
             <ModernSelect 
               label="Ownership" 
@@ -294,25 +289,20 @@ export function PropertyDetailsStep({ form }: Props) {
               options={["Freehold", "Leasehold"]}
             />
 
-            <div className="space-y-4">
-              <ModernSelect 
-                label="Developers" 
-                icon={Building2} 
-                value={watch("developers")} 
-                onValueChange={(v) => setValue("developers", v, { shouldValidate: true })}
-                options={filterOptions.developers}
-              />
-              <Button type="button" variant="outline" className="w-full h-10 border-primary/40 text-primary hover:bg-primary hover:text-white rounded-xl text-[10px] font-black uppercase tracking-widest gap-2 transition-all shadow-sm">
-                <PlusCircle className="h-3.5 w-3.5" /> Manage Developers
-              </Button>
-            </div>
+            <ModernSelect 
+              label="Developers" 
+              icon={Building2} 
+              value={watch("developers")} 
+              onValueChange={(v) => setValue("developers", v, { shouldValidate: true })}
+              options={filterOptions.developers}
+            />
 
             <ModernField label="Build Year" icon={Calendar} type="number" {...register("buildYear")} value={watch("buildYear")} />
 
             <ModernSelect 
               label="Currency" 
               icon={DollarSign} 
-              value={watch("currency") || "Dirham"} 
+              value={watch("currency")} 
               onValueChange={(v) => setValue("currency", v, { shouldValidate: true })}
               options={filterOptions.currencies}
             />
@@ -363,19 +353,23 @@ export function PropertyDetailsStep({ form }: Props) {
                   </div>
                   <div className="relative group/price flex items-baseline gap-1.5">
                      <span className={cn("text-[10px] font-black tracking-widest", active ? "text-primary" : "text-muted-foreground/50")}>AED</span>
-                     <input 
-                        type="number" 
-                        placeholder="0.00"
-                        value={active ? (watch("price") || "") : ""}
-                        onChange={(e) => {
-                          if (active) {
-                            const val = e.target.value === "" ? undefined : Number(e.target.value);
-                            setValue("price", val, { shouldValidate: true });
-                          }
-                        }}
-                        onFocus={() => setValue("pricePeriod", period, { shouldValidate: true })}
-                        className="w-full bg-transparent border-none focus:ring-0 text-lg font-black placeholder:text-muted-foreground/20 text-foreground dark:text-white py-0 h-6 outline-none"
-                      />
+                      <input 
+                         type="number" 
+                         min="0"
+                         onKeyDown={(e) => {
+                           if (e.key === "-" || e.key === "e") e.preventDefault();
+                         }}
+                         placeholder="0.00"
+                         value={active ? (watch("price") || "") : ""}
+                         onChange={(e) => {
+                           if (active) {
+                             const val = e.target.value === "" ? undefined : Number(e.target.value);
+                             setValue("price", val, { shouldValidate: true });
+                           }
+                         }}
+                         onFocus={() => setValue("pricePeriod", period, { shouldValidate: true })}
+                         className="w-full bg-transparent border-none focus:ring-0 text-lg font-black placeholder:text-muted-foreground/20 text-foreground dark:text-white py-0 h-6 outline-none"
+                       />
                   </div>
                   {active && <div className="absolute top-0 right-0 p-3"><Tag className="h-3 w-3 text-primary/40" /></div>}
                 </div>
@@ -600,20 +594,15 @@ export function PropertyDetailsStep({ form }: Props) {
               error={fieldError("listingOwner")}
             />
 
-            <div className="space-y-4">
-              <ModernSelect 
-                label="Select Landlord" 
-                icon={User} 
-                required 
-                value={watch("landlord")} 
-                onValueChange={(v) => setValue("landlord", v, { shouldValidate: true })}
-                options={["John Miller"]}
-                error={fieldError("landlord")}
-              />
-              <Button type="button" variant="outline" className="w-full h-10 border-primary/40 text-primary hover:bg-primary hover:text-foreground rounded-xl text-[10px] font-black uppercase tracking-widest gap-2 transition-all shadow-sm">
-                <PlusCircle className="h-3.5 w-3.5" /> Add New Landlord
-              </Button>
-            </div>
+            <ModernSelect 
+              label="Select Landlord" 
+              icon={User} 
+              required 
+              value={watch("landlord")} 
+              onValueChange={(v) => setValue("landlord", v, { shouldValidate: true })}
+              options={["John Miller"]}
+              error={fieldError("landlord")}
+            />
           </CardContent>
         </Card>
 

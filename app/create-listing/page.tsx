@@ -38,7 +38,7 @@ export default function CreateListingPage() {
     defaultValues: {
       category: "Residential",
       purpose: "Rent",
-      type: "Apartment",
+      type: "",
       title: "",
       size: undefined,
       sqft: undefined,
@@ -48,10 +48,10 @@ export default function CreateListingPage() {
       unitNo: "",
       price: undefined,
       pricePeriod: "Yearly",
-      currency: "AED",
+      currency: "",
       listingAgent: "",
-      availabilityStatus: "Available",
-      licenseType: "Rera",
+      availabilityStatus: "",
+      licenseType: "",
       portals: {
         propertyFinder: false,
         bayutEnabled: false,
