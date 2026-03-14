@@ -9,6 +9,7 @@ export function StatsCards() {
   const pf = mockListings.filter((l) => l.portals.pf);
   const bayut = mockListings.filter((l) => l.portals.bayut);
   const web = mockListings.filter((l) => l.portals.website);
+  const skyloov = mockListings.filter((l) => l.portals.skyloov && false); // Force 0 for now as it's inactive
 
   const stats = [
     {
@@ -81,18 +82,40 @@ export function StatsCards() {
       barBg: "bg-cyan-500/15",
       borderColor: "border-r-cyan-500",
     },
+    {
+      label: "Skyloov",
+      total: skyloov.length,
+      residential: skyloov.filter((l) => l.category === "Residential").length,
+      commercial: skyloov.filter((l) => l.category === "Commercial").length,
+      image: "https://res.cloudinary.com/devht0mp5/image/upload/v1773486432/Logo-rebrand-blue_dwxrba.svg",
+      color: "#006bec",
+      bgColor: "bg-[#006bec]/10",
+      iconColor: "text-[#006bec]",
+      dotColor: "bg-[#006bec]",
+      barColor: "bg-[#006bec]",
+      barBg: "bg-[#006bec]/15",
+      borderColor: "border-r-[#006bec]",
+    },
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4">
       {stats.map((s) => (
         <div 
           key={s.label} 
           className={cn(
             "relative bg-card rounded-xl shadow-sm border border-border border-r-[3px] overflow-hidden transition-all hover:shadow-md",
-            s.borderColor
+            s.borderColor,
+            s.label === "Skyloov" && "opacity-60 grayscale-[0.5]"
           )}
         >
+          {s.label === "Skyloov" && (
+            <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/20 backdrop-blur-[1px] group">
+              <span className="bg-primary/90 text-white text-[8px] font-black uppercase tracking-[0.2em] px-2 py-1 rounded shadow-lg transform -rotate-12 transition-transform group-hover:rotate-0">
+                Coming Soon
+              </span>
+            </div>
+          )}
           <div className="p-4 px-5">
             {/* Header */}
             <div className="flex items-center justify-between mb-2">

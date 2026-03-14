@@ -70,6 +70,24 @@ export function PortalSelectionStep() {
   return (
     <div className="space-y-10 py-4 animate-in fade-in slide-in-from-bottom-6 duration-700">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {/* Skyloov Card */}
+        <PortalCard
+          id="skyloov"
+          title="Skyloov"
+          logoBg="bg-white"
+          logoContent={
+            <div className="relative w-full h-full flex items-center justify-center p-2">
+               <img src="https://res.cloudinary.com/devht0mp5/image/upload/v1773486432/Logo-rebrand-blue_dwxrba.svg" alt="Skyloov" className="w-full h-full object-contain" />
+            </div>
+          }
+          enabled={false}
+          onEnabledChange={() => {}}
+        >
+          <div className="px-2 py-0.5 rounded bg-primary/10 text-primary text-[8px] font-black tracking-widest uppercase">
+            Coming Soon
+          </div>
+        </PortalCard>
+
         {/* Property Finder Card */}
         <PortalCard
           id="pf"

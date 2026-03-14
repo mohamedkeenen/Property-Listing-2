@@ -1,4 +1,6 @@
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { mockListings, mockLeads } from "@/data/mockData";
 import { cn } from "@/lib/utils";
 import {
@@ -18,6 +20,7 @@ const COLORS = {
   cyan: "#06b6d4", // Website cyan
   amber: "#f59e0b",
   green: "#22c55e",
+  skyloov: "#006bec",
 };
 
 export function DashboardCharts() {
@@ -28,9 +31,12 @@ export function DashboardCharts() {
 
   const communityMap: Record<string, number> = {};
   mockListings.forEach((l) => { communityMap[l.community] = (communityMap[l.community] || 0) + 1; });
-  const communityData = Object.entries(communityMap)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 6)
+  const allCommunities = Object.entries(communityMap).sort((a, b) => b[1] - a[1]);
+
+  const [showAllCommunities, setShowAllCommunities] = useState(false);
+  
+  const communityData = allCommunities
+    .slice(0, showAllCommunities ? 20 : 6)
     .map(([name, count]) => ({ name, count }));
 
   const portalData = [
@@ -60,6 +66,12 @@ export function DashboardCharts() {
         name: t,
         value: mockListings.filter(l => l.portals.website && l.type === t).length
       })).filter(i => i.value > 0)
+    },
+    { 
+      name: "Skyloov", 
+      value: mockListings.filter((l) => l.portals.skyloov && false).length, // Forced 0 as inactive
+      color: COLORS.skyloov,
+      breakdown: []
     },
   ];
 
@@ -99,7 +111,7 @@ export function DashboardCharts() {
       name: "Call", 
       value: mockLeads.filter((l) => l.subSource === "Call").length, 
       color: COLORS.orange,
-      breakdown: ["Property Finder", "Bayut", "Website"].map(p => ({
+      breakdown: ["Property Finder", "Bayut", "Skyloov", "Website"].map(p => ({
         name: p,
         value: mockLeads.filter(l => l.subSource === "Call" && l.source === p).length
       })).filter(i => i.value > 0)
@@ -121,6 +133,7 @@ export function DashboardCharts() {
   const portalLogos: Record<string, string> = {
     "Property Finder": "https://res.cloudinary.com/devht0mp5/image/upload/v1772105511/PF_ljkahc.png",
     "Bayut": "https://res.cloudinary.com/devht0mp5/image/upload/v1772105511/bayut_gy4ev2.png",
+    "Skyloov": "https://res.cloudinary.com/devht0mp5/image/upload/v1773486432/Logo-rebrand-blue_dwxrba.svg",
   };
 
   const channelIcons: Record<string, any> = {
@@ -208,7 +221,7 @@ export function DashboardCharts() {
   };
 
   const cardClass = "bg-card border border-border/40 rounded-[2rem] overflow-hidden shadow-sm transition-all hover:shadow-lg hover:border-primary/20";
-  const labelClass = "text-base font-bold text-foreground flex items-center gap-2 capitalize tracking-tight";
+  const labelClass = "text-lg font-black text-foreground flex items-center gap-3 capitalize tracking-tight";
 
   return (
     <div className="space-y-8 min-w-0">
@@ -257,13 +270,21 @@ export function DashboardCharts() {
               <Building2 className="h-4 w-4 text-blue-500" />
               Market Design By Community
             </CardTitle>
-            <div className="text-[10px] font-bold uppercase tracking-wider bg-blue-500/10 text-blue-500 px-2 py-1 rounded-md">
-              {mockListings.length} Total
+            <div className="flex items-center gap-3">
+              <button 
+                onClick={() => setShowAllCommunities(!showAllCommunities)}
+                className="text-[10px] font-bold uppercase tracking-wider bg-primary/10 text-primary px-3 py-1 rounded-md hover:bg-primary/20 transition-colors"
+              >
+                {showAllCommunities ? "Show Less" : "See All"}
+              </button>
+              <div className="text-[10px] font-bold uppercase tracking-wider bg-blue-500/10 text-blue-500 px-2 py-1 rounded-md">
+                {mockListings.length} Total
+              </div>
             </div>
           </CardHeader>
           <CardContent className="pt-8 pb-6 px-6">
-            <ResponsiveContainer width="100%" height={280}>
-              <BarChart data={communityData} layout="vertical" barSize={20} margin={{ left: 20 }}>
+            <ResponsiveContainer width="100%" height={showAllCommunities ? 600 : 280}>
+              <BarChart data={communityData} layout="vertical" barSize={20} margin={{ left: 40, right: 20 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" horizontal={false} />
                 <XAxis 
                   type="number" 
@@ -277,9 +298,9 @@ export function DashboardCharts() {
                   type="category" 
                   axisLine={false}
                   tickLine={false}
-                  tick={{ fontSize: 11, fill: "var(--foreground)", fontWeight: "500" }} 
-                  width={110} 
-                  dx={-5}
+                  tick={{ fontSize: 11, fill: "var(--foreground)", fontWeight: "600" }} 
+                  width={160} 
+                  dx={-10}
                 />
                 <Tooltip {...tooltipStyle} cursor={{ fill: 'var(--muted)', opacity: 0.1 }} />
                 <Bar dataKey="count" radius={[2, 8, 8, 2]} fill={COLORS.blue} />
@@ -325,8 +346,11 @@ export function DashboardCharts() {
                   verticalAlign="bottom"
                   align="center"
                   formatter={(value) => (
-                    <span style={{ color: "var(--foreground)" }}>
-                      {value}
+                    <span 
+                      style={{ color: "var(--foreground)" }} 
+                      className={cn("transition-opacity", value === "Skyloov" && "opacity-40")}
+                    >
+                      {value} {value === "Skyloov" && <span className="text-[8px] font-black bg-primary/20 px-1 rounded ml-1">SOON</span>}
                     </span>
                   )}
                   wrapperStyle={{ fontSize: "11px", fontWeight: "600", paddingTop: "20px" }} 
@@ -411,11 +435,14 @@ export function DashboardCharts() {
                   layout="horizontal"
                   verticalAlign="bottom"
                   align="center"
-                  formatter={(value) => (
-                    <span style={{ color: "var(--foreground)" }}>
-                      {value}
-                    </span>
-                  )}
+                  formatter={(value, entry: any) => {
+                    const data = entry.payload;
+                    return (
+                      <span style={{ color: "var(--foreground)" }} className="text-[10px] font-bold">
+                        {value} ({data.value})
+                      </span>
+                    );
+                  }}
                   wrapperStyle={{ fontSize: "11px", fontWeight: "600", paddingTop: "20px" }} 
                 />
               </PieChart>
@@ -429,7 +456,7 @@ export function DashboardCharts() {
           <CardHeader className="flex flex-row items-center justify-between pb-4 pt-6 px-6 bg-muted/10 border-b border-border/20 space-y-0">
             <CardTitle className={labelClass}>
               <TrendingUp className="h-4 w-4 text-emerald-500" />
-              Pricing Dynamics
+              Rent & Sale
             </CardTitle>
             <div className="text-[10px] font-bold uppercase tracking-wider bg-blue-500/10 text-blue-500 px-2 py-1 rounded-md">
               {mockListings.length} Total
@@ -504,13 +531,14 @@ export function DashboardCharts() {
                    formatter={(value) => <span style={{ color: "var(--foreground)" }}>{value}</span>}
                    wrapperStyle={{ fontSize: "11px", fontWeight: "600", paddingBottom: "20px" }} 
                 />
-                <Bar dataKey="total" name="Total" fill={COLORS.blue} radius={[6, 6, 2, 2]} />
                 <Bar dataKey="live" name="Live" fill={COLORS.emerald} radius={[6, 6, 2, 2]} />
+                <Bar dataKey="total" name="Total" fill={COLORS.blue} radius={[6, 6, 2, 2]} />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
       </div>
+
     </div>
   );
 }

@@ -46,7 +46,7 @@ export function PropertyDetailsStep({ form }: Props) {
             <div className="p-2 rounded-xl bg-primary/10 text-primary">
                <Building2 className="h-4 w-4" />
             </div>
-            <h3 className="text-[10px] font-black text-foreground uppercase tracking-[0.2em]">Property Categorization</h3>
+            <h3 className="text-sm font-bold text-foreground">Property Categorization</h3>
             <div className="h-px flex-1 bg-border/20" />
             <Info className="h-4 w-4 text-muted-foreground/30" />
           </div>
@@ -102,7 +102,7 @@ export function PropertyDetailsStep({ form }: Props) {
                       : "text-muted-foreground hover:text-foreground"
                   )}
                 >
-                  <Tag className="h-3.5 w-3.5" /> FOR RENT
+                  <Tag className="h-3.5 w-3.5" /> For Rent
                 </button>
                 <button
                   type="button"
@@ -118,7 +118,7 @@ export function PropertyDetailsStep({ form }: Props) {
                       : "text-muted-foreground hover:text-foreground"
                   )}
                 >
-                  <DollarSign className="h-3.5 w-3.5" /> FOR SALE
+                  <DollarSign className="h-3.5 w-3.5" /> For Sale
                 </button>
               </div>
             </div>
@@ -170,10 +170,10 @@ export function PropertyDetailsStep({ form }: Props) {
                     "flex-1 py-3 rounded-xl text-[10px] font-black tracking-widest transition-all flex items-center justify-center gap-2",
                     (category === "Commercial" && purpose === "Rent") 
                       ? "bg-white text-orange-600 shadow-xl" 
-                      : "text-muted-foreground hover:text-white"
+                      : "text-muted-foreground hover:text-foreground"
                   )}
                 >
-                  <Tag className="h-3.5 w-3.5" /> FOR RENT
+                  <Tag className="h-3.5 w-3.5" /> For Rent
                 </button>
                 <button
                   type="button"
@@ -186,10 +186,10 @@ export function PropertyDetailsStep({ form }: Props) {
                     "flex-1 py-3 rounded-xl text-[10px] font-black tracking-widest transition-all flex items-center justify-center gap-2",
                     (category === "Commercial" && purpose === "Sale") 
                       ? "bg-white text-orange-600 shadow-xl" 
-                      : "text-muted-foreground hover:text-white"
+                      : "text-muted-foreground hover:text-foreground"
                   )}
                 >
-                  <DollarSign className="h-3.5 w-3.5" /> FOR SALE
+                  <DollarSign className="h-3.5 w-3.5" /> For Sale
                 </button>
               </div>
             </div>
@@ -202,7 +202,7 @@ export function PropertyDetailsStep({ form }: Props) {
              <div className="p-2 rounded-xl bg-purple-500/10 text-purple-500">
                 <FileText className="h-4 w-4" />
              </div>
-             <h3 className="text-[10px] font-black text-foreground uppercase tracking-[0.2em]">Listing Specifications</h3>
+             <h3 className="text-sm font-bold text-foreground">Listing Specifications</h3>
              <div className="h-px flex-1 bg-border/20" />
              <Maximize className="h-4 w-4 text-muted-foreground/30" />
           </div>
@@ -273,13 +273,18 @@ export function PropertyDetailsStep({ form }: Props) {
             <ModernField label="Built-up Area" icon={Maximize} type="number" {...register("builtUpArea")} value={watch("builtUpArea")} />
             <ModernField label="Layout Type" icon={Sparkles} {...register("layoutType")} value={watch("layoutType")} />
 
-            <ModernSelect 
-              label="Project Name" 
-              icon={Building2} 
-              value={watch("projectName")} 
-              onValueChange={(v) => setValue("projectName", v, { shouldValidate: true })}
-              options={filterOptions.projectNames}
-            />
+            <div className="space-y-4">
+              <ModernSelect 
+                label="Project Name" 
+                icon={Building2} 
+                value={watch("projectName")} 
+                onValueChange={(v) => setValue("projectName", v, { shouldValidate: true })}
+                options={filterOptions.projectNames}
+              />
+              <Button type="button" variant="outline" className="w-full h-10 border-indigo-500/40 text-indigo-500 hover:bg-indigo-500 hover:text-white rounded-xl text-[10px] font-black uppercase tracking-widest gap-2 transition-all shadow-sm">
+                <PlusCircle className="h-3.5 w-3.5" /> Manage Projects
+              </Button>
+            </div>
             
             <ModernSelect 
               label="Ownership" 
@@ -289,13 +294,18 @@ export function PropertyDetailsStep({ form }: Props) {
               options={["Freehold", "Leasehold"]}
             />
 
-            <ModernSelect 
-              label="Developers" 
-              icon={Building2} 
-              value={watch("developers")} 
-              onValueChange={(v) => setValue("developers", v, { shouldValidate: true })}
-              options={filterOptions.developers}
-            />
+            <div className="space-y-4">
+              <ModernSelect 
+                label="Developers" 
+                icon={Building2} 
+                value={watch("developers")} 
+                onValueChange={(v) => setValue("developers", v, { shouldValidate: true })}
+                options={filterOptions.developers}
+              />
+              <Button type="button" variant="outline" className="w-full h-10 border-primary/40 text-primary hover:bg-primary hover:text-white rounded-xl text-[10px] font-black uppercase tracking-widest gap-2 transition-all shadow-sm">
+                <PlusCircle className="h-3.5 w-3.5" /> Manage Developers
+              </Button>
+            </div>
 
             <ModernField label="Build Year" icon={Calendar} type="number" {...register("buildYear")} value={watch("buildYear")} />
 
@@ -323,7 +333,7 @@ export function PropertyDetailsStep({ form }: Props) {
               <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-500">
                 <DollarSign className="h-4 w-4" />
               </div>
-              <h3 className="text-[10px] font-black text-foreground uppercase tracking-[0.2em]">Structure & Pricing</h3>
+              <h3 className="text-sm font-bold text-foreground">Structure & Pricing</h3>
               <div className="h-px flex-1 bg-border/20" />
               <Tag className="h-4 w-4 text-muted-foreground/30" />
           </div>
@@ -410,7 +420,7 @@ export function PropertyDetailsStep({ form }: Props) {
              <div className="p-2 rounded-xl bg-blue-500/10 text-blue-500">
                 <Sparkles className="h-4 w-4" />
              </div>
-             <h3 className="text-[10px] font-black text-foreground uppercase tracking-[0.2em]">Listing Narrative</h3>
+             <h3 className="text-sm font-bold text-foreground">Listing Narrative</h3>
              <div className="h-px flex-1 bg-border/20" />
              <FileText className="h-4 w-4 text-muted-foreground/30" />
           </div>
@@ -486,7 +496,7 @@ export function PropertyDetailsStep({ form }: Props) {
              <div className="p-2 rounded-xl bg-orange-500/10 text-orange-500">
                 <PlusCircle className="h-4 w-4" />
              </div>
-             <h3 className="text-[10px] font-black text-foreground uppercase tracking-[0.2em]">Select Amenities</h3>
+             <h3 className="text-sm font-bold text-foreground">Select Amenities</h3>
              <div className="h-px flex-1 bg-border/20" />
              <PlusCircle className="h-4 w-4 text-muted-foreground/30" />
           </div>
@@ -535,7 +545,7 @@ export function PropertyDetailsStep({ form }: Props) {
         {/* Draft Property Card */}
         <Card className="rounded-4xl border-border/40 shadow-sm overflow-hidden bg-card transition-all hover:shadow-xl group">
           <CardHeader className="bg-muted/5 border-b border-border/20 py-4 px-6">
-            <CardTitle className="text-[10px] font-black text-foreground uppercase tracking-[0.2em] flex items-center gap-2">
+            <CardTitle className="text-xs font-bold text-foreground flex items-center gap-2">
               <Sparkles className="h-3.5 w-3.5 text-amber-500 animate-pulse" />
               Draft Details
             </CardTitle>
@@ -600,48 +610,17 @@ export function PropertyDetailsStep({ form }: Props) {
                 options={["John Miller"]}
                 error={fieldError("landlord")}
               />
-              <Button type="button" variant="outline" className="w-full h-10 border-primary/40 text-primary hover:bg-primary hover:text-white rounded-xl text-[10px] font-black uppercase tracking-widest gap-2 transition-all shadow-sm">
+              <Button type="button" variant="outline" className="w-full h-10 border-primary/40 text-primary hover:bg-primary hover:text-foreground rounded-xl text-[10px] font-black uppercase tracking-widest gap-2 transition-all shadow-sm">
                 <PlusCircle className="h-3.5 w-3.5" /> Add New Landlord
               </Button>
             </div>
           </CardContent>
         </Card>
 
-        {/* Availability Card */}
-        <Card className="rounded-4xl border-border/40 shadow-sm overflow-hidden bg-card transition-all hover:shadow-xl">
-          <CardHeader className="bg-muted/5 border-b border-border/20 py-4 px-6">
-            <CardTitle className="text-[10px] font-black text-foreground uppercase tracking-[0.2em] flex items-center gap-2">
-              <CalendarCheck className="h-3.5 w-3.5 text-emerald-500" />
-              Availability
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-6 space-y-6">
-            <div className="grid grid-cols-2 gap-2">
-              {["Available", "Under Offer", "Reserved", "Rented", "Sold"].map((status) => (
-                <button
-                  key={status}
-                  type="button"
-                  onClick={() => setValue("availabilityStatus", status, { shouldValidate: true })}
-                  className={cn(
-                    "px-3 py-2.5 rounded-xl text-[9px] font-black uppercase tracking-tight transition-all border",
-                    availabilityStatus === status 
-                      ? "bg-primary text-white border-primary shadow-lg shadow-primary/20" 
-                      : "bg-muted/20 border-border/40 text-muted-foreground hover:border-primary/40"
-                  )}
-                >
-                  {status}
-                </button>
-              ))}
-            </div>
-
-            <ModernField label="Available From" icon={Calendar} {...register("availableFrom")} value={watch("availableFrom")} />
-          </CardContent>
-        </Card>
-
         {/* Property Permit Card */}
         <Card className="rounded-4xl border-border/40 shadow-sm overflow-hidden bg-card transition-all hover:shadow-xl">
           <CardHeader className="bg-muted/5 border-b border-border/20 py-4 px-6">
-            <CardTitle className="text-[10px] font-black text-foreground uppercase tracking-[0.2em] flex items-center gap-2">
+            <CardTitle className="text-sm font-bold text-foreground flex items-center gap-2">
               <FileText className="h-3.5 w-3.5 text-orange-500" />
               Permits & License
             </CardTitle>

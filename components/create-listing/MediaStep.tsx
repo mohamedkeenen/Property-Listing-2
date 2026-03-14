@@ -27,12 +27,21 @@ const applyWatermark = (base64Image: string, logoUrl: string): Promise<string> =
       const logo = new Image();
       logo.crossOrigin = "anonymous";
       logo.onload = () => {
-        const logoTargetWidth = canvas.width * 0.28;
+        const logoTargetWidth = canvas.width * 0.34;
         const logoTargetHeight = (logo.height / logo.width) * logoTargetWidth;
         const x = (canvas.width - logoTargetWidth) / 2;
         const y = (canvas.height - logoTargetHeight) / 2;
         
+        ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
+        ctx.globalAlpha = 0.9;
+        ctx.beginPath();
+        const padding = 16;
+        ctx.roundRect(x - padding, y - padding, logoTargetWidth + (padding * 2), logoTargetHeight + (padding * 2), 24);
+        ctx.fill();
+
+        ctx.globalAlpha = 1.0;
         ctx.drawImage(logo, x, y, logoTargetWidth, logoTargetHeight);
+        ctx.globalAlpha = 1.0;
         resolve(canvas.toDataURL("image/jpeg", 0.95));
       };
       logo.onerror = () => resolve(base64Image);

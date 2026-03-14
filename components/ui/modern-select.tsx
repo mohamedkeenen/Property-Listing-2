@@ -34,7 +34,14 @@ export function ModernSelect({
   const [search, setSearch] = useState("");
 
   const formattedOptions = useMemo(() => {
-    return options.map(opt => typeof opt === 'string' ? { label: opt, value: opt } : opt);
+    const all = options.map(opt => typeof opt === 'string' ? { label: opt, value: opt } : opt);
+    // Remove duplicates to prevent duplicate key errors
+    const seen = new Set();
+    return all.filter(opt => {
+      if (seen.has(opt.value)) return false;
+      seen.add(opt.value);
+      return true;
+    });
   }, [options]);
 
   const filteredOptions = useMemo(() => {

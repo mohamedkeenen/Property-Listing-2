@@ -23,6 +23,7 @@ const subSourceIcon: Record<string, { icon: typeof MessageCircle; color: string 
 const portalLogos: Record<string, string> = {
   "Property Finder": "https://res.cloudinary.com/devht0mp5/image/upload/v1772105511/PF_ljkahc.png",
   "Bayut": "https://res.cloudinary.com/devht0mp5/image/upload/v1772105511/bayut_gy4ev2.png",
+  "Skyloov": "https://res.cloudinary.com/devht0mp5/image/upload/v1773486432/Logo-rebrand-blue_dwxrba.svg",
 };
 
 const statusColors: Record<string, string> = {
@@ -32,12 +33,13 @@ const statusColors: Record<string, string> = {
   Lost: "bg-red-500/10 text-red-500 dark:text-red-400 border-red-200 dark:border-red-500/30",
 };
 
-const sourceTabs = ["All", "Property Finder", "Bayut", "Website"];
+const sourceTabs = ["All", "Property Finder", "Bayut", "Skyloov", "Website"];
 const statusTabs = ["All Statuses", "New", "Contacted", "Qualified", "Lost"];
 
 export function LeadsTable() {
   const [search, setSearch] = useState("");
   const [sourceFilter, setSourceFilter] = useState("All");
+  const [subSourceFilter, setSubSourceFilter] = useState("All");
   const [statusFilter, setStatusFilter] = useState("All Statuses");
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
   const [page, setPage] = useState(1);
@@ -45,9 +47,10 @@ export function LeadsTable() {
 
   const filtered = mockLeads.filter((l) => {
     const matchSource = sourceFilter === "All" || l.source === sourceFilter;
+    const matchSubSource = subSourceFilter === "All" || l.subSource === subSourceFilter;
     const matchStatus = statusFilter === "All Statuses" || l.status === statusFilter;
     const matchSearch = !search || l.name.toLowerCase().includes(search.toLowerCase()) || l.email.toLowerCase().includes(search.toLowerCase()) || l.property.toLowerCase().includes(search.toLowerCase());
-    return matchSource && matchStatus && matchSearch;
+    return matchSource && matchSubSource && matchStatus && matchSearch;
   });
 
   const totalPages = Math.ceil(filtered.length / perPage);
@@ -66,31 +69,65 @@ export function LeadsTable() {
   return (
     <>
       <div className="bg-card border border-border rounded-lg overflow-hidden flex flex-col h-full">
-        {/* Source tabs */}
-        <div className="flex items-center gap-1 p-3 overflow-x-auto">
-          {sourceTabs.map((tab) => (
-            <button
-              key={tab}
-              onClick={() => { setSourceFilter(tab); setPage(1); }}
-              className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors whitespace-nowrap ${
-                sourceFilter === tab ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted"
-              }`}
-            >
-              {tab} ({tab === "All" ? mockLeads.length : mockLeads.filter((l) => l.source === tab).length})
-            </button>
-          ))}
-          <div className="ml-auto flex items-center gap-1">
-            {statusTabs.map((tab) => (
+        {/* Tabs and Filters */}
+        <div className="flex flex-col gap-1 p-3 border-b border-border/10">
+          <div className="flex items-center gap-1 overflow-x-auto no-scrollbar pb-2">
+            <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mr-2 shrink-0">Portal:</span>
+            {sourceTabs.map((tab) => (
               <button
                 key={tab}
-                onClick={() => { setStatusFilter(tab); setPage(1); }}
-                className={`px-2.5 py-1.5 text-xs font-medium rounded-md transition-colors whitespace-nowrap ${
-                  statusFilter === tab ? "bg-muted text-foreground" : "text-muted-foreground hover:bg-muted/50"
-                }`}
+                onClick={() => { 
+                  if (tab === "Skyloov") return;
+                  setSourceFilter(tab); 
+                  setPage(1); 
+                }}
+                className={cn(
+                  "px-3 py-1.5 text-xs font-medium rounded-md transition-all whitespace-nowrap relative group",
+                  sourceFilter === tab 
+                    ? "bg-primary text-primary-foreground" 
+                    : "text-muted-foreground hover:bg-muted",
+                  tab === "Skyloov" && "opacity-40 cursor-not-allowed grayscale pointer-events-none"
+                )}
               >
                 {tab}
+                {tab === "Skyloov" && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[6px] font-black px-1 py-0.5 rounded shadow-sm opacity-100 uppercase transform rotate-2 animate-pulse">
+                    Soon
+                  </span>
+                )}
               </button>
             ))}
+          </div>
+
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1 overflow-x-auto no-scrollbar">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mr-2 shrink-0">Channel:</span>
+              {["All", "WhatsApp", "Email", "Call"].map((tab) => (
+                <button
+                  key={tab}
+                  onClick={() => { setSubSourceFilter(tab); setPage(1); }}
+                  className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors whitespace-nowrap ${
+                    subSourceFilter === tab ? "bg-primary/10 text-primary border border-primary/20" : "text-muted-foreground hover:bg-muted"
+                  }`}
+                >
+                  {tab}
+                </button>
+              ))}
+            </div>
+            
+            <div className="ml-auto flex items-center gap-1">
+              {statusTabs.map((tab) => (
+                <button
+                  key={tab}
+                  onClick={() => { setStatusFilter(tab); setPage(1); }}
+                  className={`px-2.5 py-1.5 text-xs font-medium rounded-md transition-colors whitespace-nowrap ${
+                    statusFilter === tab ? "bg-muted text-foreground" : "text-muted-foreground hover:bg-muted/50"
+                  }`}
+                >
+                  {tab}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 

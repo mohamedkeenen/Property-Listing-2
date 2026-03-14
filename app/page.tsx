@@ -46,7 +46,7 @@ export default function Dashboard() {
           Dashboard
           <div className="h-2 w-2 rounded-full bg-primary animate-pulse" />
         </h1>
-        <p className="text-sm text-muted-foreground font-medium uppercase tracking-widest text-[10px]">Property listings overview & analytics</p>
+        <p className="text-xs text-muted-foreground font-medium">Property listings overview & analytics</p>
       </div>
 
       {/* Scrollable upper sections if needed, though you wanted it fixed */}
@@ -57,7 +57,7 @@ export default function Dashboard() {
             <div className="p-2 rounded-xl bg-primary/10 text-primary relative">
               <BarChart3 className="h-5 w-5" />
             </div>
-            <h3 className="text-[10px] font-black uppercase tracking-[0.2em]">Market Overview</h3>
+            <h3 className="text-sm font-bold text-foreground">Market Overview</h3>
             <div className="h-px flex-1 bg-border/50" />
             <Info className="h-4 w-4 text-muted-foreground" />
           </div>
@@ -70,7 +70,7 @@ export default function Dashboard() {
             <div className="p-2 rounded-xl bg-purple-500/10 text-purple-500 relative">
               <PieChart className="h-5 w-5" />
             </div>
-            <h3 className="text-[10px] font-black uppercase tracking-[0.2em]">Performance Analytics</h3>
+            <h3 className="text-sm font-bold text-foreground">Performance Analytics</h3>
             <div className="h-px flex-1 bg-border/50" />
             <BarChart3 className="h-4 w-4 text-muted-foreground" />
           </div>
@@ -84,7 +84,7 @@ export default function Dashboard() {
           <div className="p-2 rounded-xl bg-orange-500/10 text-orange-500 relative">
             <List className="h-5 w-5" />
           </div>
-          <h3 className="text-[10px] font-black uppercase tracking-[0.2em]">Inventory Management</h3>
+          <h3 className="text-sm font-bold text-foreground">Inventory Management</h3>
           <div className="h-px flex-1 bg-border/50" />
           <Search className="h-4 w-4 text-muted-foreground" />
         </div>
