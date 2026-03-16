@@ -2,10 +2,10 @@ import { ResetPasswordForm } from "@/components/auth/ResetPasswordForm";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Reset Password | Keen Enterprises",
+  title: "Forgot Password | Keen Enterprises",
   description: "Recover your account access",
 };
 
-export default function ResetPasswordPage() {
+export default function ForgotPasswordPage() {
   return <ResetPasswordForm />;
 }

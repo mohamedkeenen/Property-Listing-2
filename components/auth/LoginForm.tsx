@@ -6,20 +6,47 @@ import { Button } from "@/components/ui/button";
 import { ModernField } from "@/components/ui/modern-field";
 import Link from "next/link";
 import Image from "next/image";
+import { useLoginMutation } from "@/api/redux/services/authApi";
+import { useDispatch } from "react-redux";
+import { setCredentials } from "@/api/redux/slices/authSlice";
+import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { loginSchema, LoginValues } from "@/validation/authSchema";
 
 export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [login, { isLoading }] = useLoginMutation();
+  const dispatch = useDispatch();
+  const router = useRouter();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    // Mimic login delay
-    setTimeout(() => {
-      localStorage.setItem("auth_session", "true");
-      setIsLoading(false);
-      window.location.href = "/";
-    }, 1500);
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm<LoginValues>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
+
+  const onSubmit = async (data: LoginValues) => {
+    try {
+      const result = await login(data).unwrap();
+      dispatch(setCredentials({ 
+        user: result.data.user, 
+        token: result.data.token 
+      }));
+      toast.success("Welcome back!");
+      router.push("/");
+    } catch (error: any) {
+      const message = error?.data?.message || "Login failed. Please check your credentials.";
+      toast.error(message);
+    }
   };
 
   return (
@@ -29,11 +56,11 @@ export function LoginForm() {
         <Image 
           src="https://res.cloudinary.com/devht0mp5/image/upload/v1771906074/logoo_hsovz7.jpg"
           alt="Keen Enterprises"
-          width={64}
-          height={64}
+          width={120}
+          height={120}
           className="object-contain"
         />
-        <h2 className="text-2xl font-black text-foreground uppercase tracking-tight">Keen Enterprises</h2>
+        <h2 className="text-3xl font-black text-foreground uppercase tracking-tight">Keen Enterprises</h2>
       </div>
 
       <div className="space-y-2 text-center">
@@ -41,7 +68,7 @@ export function LoginForm() {
         <p className="text-muted-foreground font-medium pt-4">Enter your credentials to access your dashboard</p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <div className="space-y-4">
           <ModernField
             label="Email Address"
@@ -49,6 +76,9 @@ export function LoginForm() {
             placeholder="name@company.com"
             icon={Mail}
             required
+            {...register("email")}
+            value={watch("email")}
+            error={errors.email?.message}
           />
 
           <div className="relative">
@@ -58,17 +88,20 @@ export function LoginForm() {
               placeholder="••••••••"
               icon={Lock}
               required
+              {...register("password")}
+              value={watch("password")}
+              error={errors.password?.message}
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-4 top-[50%] -translate-y-[50%] text-muted-foreground hover:text-primary transition-colors p-1"
+              className="absolute right-4 top-[24px] -translate-y-1/2 text-muted-foreground hover:text-primary transition-colors p-1"
             >
               {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
             </button>
             <div className="flex justify-end mt-2">
               <Link 
-                href="/reset-password" 
+                href="/forgot-password" 
                 className="text-xs font-bold text-primary hover:underline hover:text-primary/80 transition-all"
               >
                 Forgot Password?

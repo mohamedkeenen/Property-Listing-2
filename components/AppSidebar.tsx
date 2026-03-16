@@ -2,7 +2,10 @@
 
 import { LayoutDashboard, Plus, Users, Settings, LogOut, User, ChevronUp } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useDispatch, useSelector } from "react-redux";
+import { logout, selectCurrentUser } from "@/api/redux/slices/authSlice";
+import { useLogoutMutation } from "@/api/redux/services/authApi";
 import {
   Sidebar,
   SidebarContent,
@@ -25,6 +28,7 @@ import {
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
 
 const navItems = [
   { title: "Dashboard", url: "/", icon: LayoutDashboard },
@@ -37,9 +41,28 @@ export function AppSidebar() {
   const collapsed = state === "collapsed";
   const pathname = usePathname();
 
-  const handleLogout = () => {
-    localStorage.removeItem("auth_session");
-    window.location.href = "/login";
+  const dispatch = useDispatch();
+  const router = useRouter();
+  const user = useSelector(selectCurrentUser);
+  const [imgError, setImgError] = useState(false);
+  const [logoutMutation] = useLogoutMutation();
+
+  const handleLogout = async () => {
+    try {
+      await logoutMutation({}).unwrap();
+    } catch (error) {
+      console.error("Logout failed:", error);
+    } finally {
+      dispatch(logout());
+      router.push("/login");
+    }
+  };
+
+  const getPhotoUrl = (photo: string) => {
+    if (!photo) return "";
+    if (photo.startsWith('http') || photo.startsWith('data:image')) return photo;
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+    return `${apiUrl}/${photo}`;
   };
 
   return (
@@ -61,6 +84,7 @@ export function AppSidebar() {
                     alt="Keen Enterprises"
                     fill
                     className="object-contain transition-transform duration-700 group-hover/brand:scale-110"
+                    priority
                   />
                 </div>
                 <div className="flex flex-col transition-all duration-500 delay-100 animate-in fade-in slide-in-from-bottom-2">
@@ -115,10 +139,19 @@ export function AppSidebar() {
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton className="w-full h-12 justify-between rounded-xl px-3 hover:bg-sidebar-accent/50 transition-all group-hover:scale-[1.02] active:scale-[0.98]">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary group-data-[state=open]:ring-2 group-data-[state=open]:ring-primary/20 transition-all">
-                      <User className="h-4 w-4" />
+                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary group-data-[state=open]:ring-2 group-data-[state=open]:ring-primary/20 transition-all overflow-hidden relative">
+                      {user?.photo ? (
+                        <img 
+                          src={getPhotoUrl(user.photo)} 
+                          alt={user?.name}
+                          className="object-cover"
+                          onError={() => setImgError(true)}
+                        />
+                      ) : (
+                        <User className="h-4 w-4" />
+                      )}
                     </div>
-                    {!collapsed && <span className="font-black text-sm tracking-tight">Account</span>}
+                    {!collapsed && <span className="font-black text-sm tracking-tight capitalize">{user?.name || "Account"}</span>}
                   </div>
                   {!collapsed && <ChevronUp className="h-4 w-4 text-muted-foreground transition-transform duration-300 group-data-[state=open]:rotate-180" />}
                 </SidebarMenuButton>

@@ -5,20 +5,49 @@ import { Lock, Eye, EyeOff, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ModernField } from "@/components/ui/modern-field";
 import Image from "next/image";
+import { useResetPasswordMutation } from "@/api/redux/services/authApi";
+import toast from "react-hot-toast";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { resetPasswordSchema, ResetPasswordValues } from "@/validation/authSchema";
 
 export function NewPasswordForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  
+  const [resetPassword, { isLoading }] = useResetPasswordMutation();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const email = searchParams.get("email") || "";
+  const token = searchParams.get("token") || "";
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    // Mimic update delay
-    setTimeout(() => {
-      setIsLoading(false);
-      window.location.href = "/login";
-    }, 1500);
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm<ResetPasswordValues>({
+    resolver: zodResolver(resetPasswordSchema),
+    defaultValues: {
+      password: "",
+      password_confirmation: "",
+    },
+  });
+
+  const onSubmit = async (data: ResetPasswordValues) => {
+    try {
+      await resetPassword({ 
+        email, 
+        otp: token, 
+        ...data 
+      }).unwrap();
+      toast.success("Password updated successfully!");
+      router.push("/login");
+    } catch (error: any) {
+      const message = error?.data?.message || "Failed to update password. Please try again.";
+      toast.error(message);
+    }
   };
 
   return (
@@ -28,11 +57,11 @@ export function NewPasswordForm() {
         <Image 
           src="https://res.cloudinary.com/devht0mp5/image/upload/v1771906074/logoo_hsovz7.jpg"
           alt="Keen Enterprises"
-          width={64}
-          height={64}
+          width={120}
+          height={120}
           className="object-contain"
         />
-        <h2 className="text-2xl font-black text-foreground uppercase tracking-tight">Keen Enterprises</h2>
+        <h2 className="text-3xl font-black text-foreground uppercase tracking-tight">Keen Enterprises</h2>
       </div>
 
       <div className="space-y-2 text-center">
@@ -40,7 +69,7 @@ export function NewPasswordForm() {
         <p className="text-muted-foreground font-medium pt-4">Set a secure password for your account</p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <div className="space-y-4">
           <div className="relative">
             <ModernField
@@ -49,11 +78,14 @@ export function NewPasswordForm() {
               placeholder="••••••••"
               icon={Lock}
               required
+              {...register("password")}
+              value={watch("password")}
+              error={errors.password?.message}
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-4 top-[50%] -translate-y-[50%] text-muted-foreground hover:text-primary transition-colors p-1"
+              className="absolute right-4 top-[24px] -translate-y-1/2 text-muted-foreground hover:text-primary transition-colors p-1"
             >
               {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
             </button>
@@ -66,11 +98,14 @@ export function NewPasswordForm() {
               placeholder="••••••••"
               icon={Lock}
               required
+              {...register("password_confirmation")}
+              value={watch("password_confirmation")}
+              error={errors.password_confirmation?.message}
             />
             <button
               type="button"
               onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-              className="absolute right-4 top-[50%] -translate-y-[50%] text-muted-foreground hover:text-primary transition-colors p-1"
+              className="absolute right-4 top-[24px] -translate-y-1/2 text-muted-foreground hover:text-primary transition-colors p-1"
             >
               {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
             </button>

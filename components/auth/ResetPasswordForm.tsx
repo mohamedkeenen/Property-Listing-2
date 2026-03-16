@@ -1,22 +1,42 @@
 "use client";
 
-import { useState } from "react";
-import { Mail, ArrowLeft, Send, CheckCircle2 } from "lucide-react";
+import { Mail, ArrowLeft, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ModernField } from "@/components/ui/modern-field";
 import Link from "next/link";
 import Image from "next/image";
+import { useForgotPasswordMutation } from "@/api/redux/services/authApi";
+import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { forgotPasswordSchema, ForgotPasswordValues } from "@/validation/authSchema";
 
 export function ResetPasswordForm() {
-  const [isLoading, setIsLoading] = useState(false);
+  const [forgotPassword, { isLoading }] = useForgotPasswordMutation();
+  const router = useRouter();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-      window.location.href = "/otp";
-    }, 1500);
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm<ForgotPasswordValues>({
+    resolver: zodResolver(forgotPasswordSchema),
+    defaultValues: {
+      email: "",
+    },
+  });
+
+  const onSubmit = async (data: ForgotPasswordValues) => {
+    try {
+      await forgotPassword(data).unwrap();
+      toast.success("OTP code sent to your email!");
+      router.push(`/otp?email=${data.email}`);
+    } catch (error: any) {
+      const message = error?.data?.message || "Something went wrong. Please try again.";
+      toast.error(message);
+    }
   };
 
   return (
@@ -25,11 +45,11 @@ export function ResetPasswordForm() {
         <Image 
           src="https://res.cloudinary.com/devht0mp5/image/upload/v1771906074/logoo_hsovz7.jpg"
           alt="Keen Enterprises"
-          width={64}
-          height={64}
+          width={120}
+          height={120}
           className="object-contain"
         />
-        <h2 className="text-2xl font-black text-foreground uppercase tracking-tight">Keen Enterprises</h2>
+        <h2 className="text-3xl font-black text-foreground uppercase tracking-tight">Keen Enterprises</h2>
       </div>
 
       <div className="space-y-4 text-center">
@@ -46,13 +66,16 @@ export function ResetPasswordForm() {
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <ModernField
           label="Email Address"
           type="email"
           placeholder="name@company.com"
           icon={Mail}
           required
+          {...register("email")}
+          value={watch("email")}
+          error={errors.email?.message}
         />
 
         <Button 
