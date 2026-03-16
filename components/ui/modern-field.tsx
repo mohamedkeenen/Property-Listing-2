@@ -23,7 +23,7 @@ const ModernField = forwardRef<HTMLInputElement, ModernFieldProps>(
     const [hasInternalValue, setHasInternalValue] = useState(false);
     
     const isFocused = externalFocused || internalFocused;
-    const isFilled = (value !== undefined && value !== "" && value !== null) || isFocused || hasInternalValue;
+    const isFilled = (value !== undefined && value !== "" && value !== null) || (props.defaultValue !== undefined && props.defaultValue !== "" && props.defaultValue !== null) || isFocused || hasInternalValue;
 
     return (
       <div className="relative w-full group">
