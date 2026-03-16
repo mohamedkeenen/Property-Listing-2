@@ -5,6 +5,7 @@ import { NavLink } from "@/components/NavLink";
 import { usePathname, useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { logout, selectCurrentUser } from "@/api/redux/slices/authSlice";
+import { selectCompanyName, selectCompanyLogo } from "@/api/redux/slices/settingsSlice";
 import { useLogoutMutation } from "@/api/redux/services/authApi";
 import {
   Sidebar,
@@ -44,6 +45,8 @@ export function AppSidebar() {
   const dispatch = useDispatch();
   const router = useRouter();
   const user = useSelector(selectCurrentUser);
+  const companyName = useSelector(selectCompanyName);
+  const companyLogo = useSelector(selectCompanyLogo);
   const [imgError, setImgError] = useState(false);
   const [logoutMutation] = useLogoutMutation();
 
@@ -61,9 +64,20 @@ export function AppSidebar() {
   const getPhotoUrl = (photo: string) => {
     if (!photo) return "";
     if (photo.startsWith('http') || photo.startsWith('data:image')) return photo;
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL;
     return `${apiUrl}/${photo}`;
   };
+
+  const getLogoUrl = (logo: string) => {
+    if (!logo) return "";
+    if (logo.startsWith('http') || logo.startsWith('data:image')) return logo;
+    const apiUrl = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api').replace('/api', '');
+    return `${apiUrl}/storage/${logo}`;
+  };
+
+  const nameParts = companyName.split(' ');
+  const firstPart = nameParts[0];
+  const secondPart = nameParts.slice(1).join(' ');
 
   return (
     <Sidebar collapsible="icon">
@@ -79,27 +93,27 @@ export function AppSidebar() {
             {!collapsed ? (
               <>
                 <div className="relative w-full h-24 group/brand">
-                  <Image
-                    src="https://res.cloudinary.com/devht0mp5/image/upload/v1771906074/logoo_hsovz7.jpg"
-                    alt="Keen Enterprises"
-                    fill
-                    className="object-contain transition-transform duration-700 group-hover/brand:scale-110"
-                    priority
+                  <img
+                    src={getLogoUrl(companyLogo)}
+                    alt={companyName}
+                    className="object-contain transition-transform duration-700 group-hover/brand:scale-105 w-120 h-20"
                   />
                 </div>
                 <div className="flex flex-col transition-all duration-500 delay-100 animate-in fade-in slide-in-from-bottom-2">
                   <span className="text-md font-black text-sidebar-foreground uppercase tracking-[0.25em] leading-none mb-1">
-                    Keen
+                    {firstPart}
                   </span>
-                  <span className="text-[11px] font-bold text-muted-foreground/70 uppercase tracking-[0.35em] leading-none">
-                    Enterprises
-                  </span>
+                  {secondPart && (
+                    <span className="text-[11px] font-bold text-muted-foreground/70 uppercase tracking-[0.35em] leading-none">
+                      {secondPart}
+                    </span>
+                  )}
                 </div>
               </>
             ) : (
               <div className="flex items-center justify-center h-12 w-full rounded-2xl ring-2 ring-primary/10 shadow-lg bg-primary/5 transition-all hover:ring-primary/30">
                 <span className="text-[10px] font-black text-primary uppercase tracking-widest leading-none">
-                  KEEN
+                  {firstPart.substring(0, 4)}
                 </span>
               </div>
             )}

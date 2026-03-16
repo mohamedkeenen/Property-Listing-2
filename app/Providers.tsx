@@ -8,6 +8,7 @@ import { Provider, useDispatch } from "react-redux";
 import { store } from "@/api/redux/store";
 import { useEffect } from "react";
 import { initialize } from "@/api/redux/slices/authSlice";
+import { SettingsManager } from "@/components/SettingsManager";
 
 function HydrationWrapper({ children }: { children: React.ReactNode }) {
   const dispatch = useDispatch();
@@ -27,7 +28,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
       <HydrationWrapper>
         <QueryClientProvider client={queryClient}>
           <TooltipProvider>
-            {children}
+            <SettingsManager>
+              {children}
+            </SettingsManager>
             <Toaster 
               position="top-center" 
               toastOptions={{

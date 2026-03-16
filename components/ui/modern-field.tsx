@@ -58,6 +58,7 @@ const ModernField = forwardRef<HTMLInputElement, ModernFieldProps>(
             <input
                 {...props}
                 ref={ref}
+                value={value}
                 placeholder={isFocused ? props.placeholder : ""}
                 min={props.type === "number" ? (props.min ?? 0) : props.min}
                 onInput={(e) => {

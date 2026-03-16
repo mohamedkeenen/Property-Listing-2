@@ -7,8 +7,9 @@ import { ModernField } from "@/components/ui/modern-field";
 import Link from "next/link";
 import Image from "next/image";
 import { useLoginMutation } from "@/api/redux/services/authApi";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setCredentials } from "@/api/redux/slices/authSlice";
+import { selectCompanyName, selectCompanyLogo } from "@/api/redux/slices/settingsSlice";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -20,6 +21,15 @@ export function LoginForm() {
   const [login, { isLoading }] = useLoginMutation();
   const dispatch = useDispatch();
   const router = useRouter();
+  const companyName = useSelector(selectCompanyName);
+  const companyLogo = useSelector(selectCompanyLogo);
+
+  const getLogoUrl = (logo: string) => {
+    if (!logo) return "";
+    if (logo.startsWith('http') || logo.startsWith('data:image')) return logo;
+    const apiUrl = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api').replace('/api', '');
+    return `${apiUrl}/storage/${logo}`;
+  };
 
   const {
     register,
@@ -54,13 +64,14 @@ export function LoginForm() {
       {/* Mobile Logo (Visible only on mobile) */}
       <div className="lg:hidden flex flex-col items-center gap-4 mb-8">
         <Image 
-          src="https://res.cloudinary.com/devht0mp5/image/upload/v1771906074/logoo_hsovz7.jpg"
-          alt="Keen Enterprises"
+          src={getLogoUrl(companyLogo)}
+          alt={companyName}
           width={120}
           height={120}
           className="object-contain"
+          unoptimized={companyLogo.startsWith('data:image')}
         />
-        <h2 className="text-3xl font-black text-foreground uppercase tracking-tight">Keen Enterprises</h2>
+        <h2 className="text-3xl font-black text-foreground uppercase tracking-tight text-center">{companyName}</h2>
       </div>
 
       <div className="space-y-2 text-center">
