@@ -5,7 +5,7 @@ import { NavLink } from "@/components/NavLink";
 import { usePathname, useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { logout, selectCurrentUser } from "@/api/redux/slices/authSlice";
-import { selectCompanyName, selectCompanyLogo } from "@/api/redux/slices/settingsSlice";
+import { selectCompanyName, selectCompanyLogo, selectSettingsLastUpdated } from "@/api/redux/slices/settingsSlice";
 import { useLogoutMutation } from "@/api/redux/services/authApi";
 import {
   Sidebar,
@@ -47,6 +47,7 @@ export function AppSidebar() {
   const user = useSelector(selectCurrentUser);
   const companyName = useSelector(selectCompanyName);
   const companyLogo = useSelector(selectCompanyLogo);
+  const settingsLastUpdated = useSelector(selectSettingsLastUpdated);
   const [imgError, setImgError] = useState(false);
   const [logoutMutation] = useLogoutMutation();
 
@@ -72,7 +73,7 @@ export function AppSidebar() {
     if (!logo) return "";
     if (logo.startsWith('http') || logo.startsWith('data:image')) return logo;
     const apiUrl = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api').replace('/api', '');
-    return `${apiUrl}/storage/${logo}`;
+    return `${apiUrl}/storage/${logo}?v=${settingsLastUpdated}`;
   };
 
   const nameParts = companyName.split(' ');

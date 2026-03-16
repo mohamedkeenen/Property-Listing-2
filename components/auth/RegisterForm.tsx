@@ -45,7 +45,6 @@ export function RegisterForm() {
       full_name: "",
       email: "",
       phone: "",
-      company_name: "",
       password: "",
       password_confirmation: "",
     },
@@ -183,14 +182,6 @@ export function RegisterForm() {
               value={watch("phone")}
               error={errors.phone?.message}
               flag={getFlagFromPhone(phone)}
-            />
-            <ModernField 
-              label="Company Name" 
-              icon={Building2} 
-              placeholder="Keen Enterprises" 
-              {...registerField("company_name")}
-              value={watch("company_name")}
-              error={errors.company_name?.message}
             />
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">

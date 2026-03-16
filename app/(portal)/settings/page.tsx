@@ -11,7 +11,7 @@ import { ModernField } from "@/components/ui/modern-field";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import Image from "next/image";
 import { useDispatch, useSelector } from "react-redux";
-import { selectCompanyName, selectCompanyLogo, setCompanySettings } from "@/api/redux/slices/settingsSlice";
+import { selectCompanyName, selectCompanyLogo, selectSettingsLastUpdated, setCompanySettings } from "@/api/redux/slices/settingsSlice";
 import { selectCurrentUser } from "@/api/redux/slices/authSlice";
 import { useUpdateCompanySettingsMutation } from "@/api/redux/services/settingsApi";
 import { toast } from "react-hot-toast";
@@ -22,6 +22,7 @@ export default function SettingsPage() {
   const dispatch = useDispatch();
   const reduxCompanyName = useSelector(selectCompanyName);
   const reduxLogo = useSelector(selectCompanyLogo);
+  const settingsLastUpdated = useSelector(selectSettingsLastUpdated);
   const user = useSelector(selectCurrentUser);
   const isAdmin = user?.role === 'admin';
   
@@ -39,7 +40,7 @@ export default function SettingsPage() {
     if (!logoStr) return "";
     if (logoStr.startsWith('http') || logoStr.startsWith('data:image')) return logoStr;
     const apiUrl = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api').replace('/api', '');
-    return `${apiUrl}/storage/${logoStr}`;
+    return `${apiUrl}/storage/${logoStr}?v=${settingsLastUpdated}`;
   };
 
   const handleSave = async (e: React.FormEvent) => {
