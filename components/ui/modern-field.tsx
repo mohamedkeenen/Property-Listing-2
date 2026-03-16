@@ -9,6 +9,7 @@ interface ModernFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
   required?: boolean;
   error?: string;
   icon?: any;
+  flag?: string | null;
   isSelect?: boolean;
   onClear?: () => void;
   children?: React.ReactNode;
@@ -17,7 +18,7 @@ interface ModernFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
 }
 
 const ModernField = forwardRef<HTMLInputElement, ModernFieldProps>(
-  ({ label, required, error, icon: Icon, isSelect, onClear, children, value, isFocused: externalFocused, ...props }, ref) => {
+  ({ label, required, error, icon: Icon, flag, isSelect, onClear, children, value, isFocused: externalFocused, ...props }, ref) => {
     const [internalFocused, setInternalFocused] = useState(false);
     const isFocused = externalFocused || internalFocused;
     const isFilled = (value !== undefined && value !== "" && value !== null) || isFocused;
@@ -33,7 +34,11 @@ const ModernField = forwardRef<HTMLInputElement, ModernFieldProps>(
             error ? "border-destructive ring-destructive/10" : ""
           )}
         >
-          {Icon && (
+          {flag ? (
+            <div className="shrink-0 transition-all duration-300 mt-0.5 text-lg flex items-center justify-center w-4 h-4">
+              {flag}
+            </div>
+          ) : Icon && (
             <div className={cn(
               "shrink-0 transition-all duration-300 mt-0.5",
               isFocused ? "text-primary scale-110" : "text-muted-foreground"
@@ -48,9 +53,10 @@ const ModernField = forwardRef<HTMLInputElement, ModernFieldProps>(
                 {children}
               </div>
             ) : (
-              <input
+            <input
                 {...props}
                 ref={ref}
+                placeholder={isFocused ? props.placeholder : ""}
                 min={props.type === "number" ? (props.min ?? 0) : props.min}
                 onKeyDown={(e) => {
                   if (props.type === "number" && (e.key === "-" || e.key === "e")) {
@@ -66,7 +72,7 @@ const ModernField = forwardRef<HTMLInputElement, ModernFieldProps>(
                   setInternalFocused(false);
                   props.onBlur?.(e);
                 }}
-                className="w-full bg-transparent border-none focus:ring-0 text-sm font-bold text-foreground outline-none h-full pt-1"
+                className="w-full bg-transparent border-none focus:ring-0 text-sm font-bold text-foreground outline-none h-full pt-1.5"
               />
             )}
 
@@ -76,7 +82,7 @@ const ModernField = forwardRef<HTMLInputElement, ModernFieldProps>(
                 props.dir === "rtl" ? "right-0" : "left-0",
                 isFilled 
                   ? "-top-[22px] text-[9px] text-primary bg-background" 
-                  : "top-[2px] text-[11px] text-muted-foreground"
+                  : "top-[1px] text-[11px] text-muted-foreground"
               )}
             >
               {label}{required && <span className="text-destructive ml-0.5">*</span>}

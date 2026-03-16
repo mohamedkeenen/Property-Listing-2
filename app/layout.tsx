@@ -1,10 +1,7 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Cairo } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./Providers";
-import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/components/AppSidebar";
-import { ThemeToggle } from "@/components/ThemeToggle";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -14,6 +11,11 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+});
+
+const cairo = Cairo({
+  variable: "--font-arabic",
+  subsets: ["arabic", "latin"],
 });
 
 export const metadata: Metadata = {
@@ -36,20 +38,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`} suppressHydrationWarning>
+      <body className={`${geistSans.variable} ${geistMono.variable} ${cairo.variable} antialiased font-sans`} suppressHydrationWarning>
         <Providers>
-          <SidebarProvider>
-            <AppSidebar />
-            <SidebarInset className="min-h-0 h-full overflow-hidden">
-              <header className="h-14 flex items-center justify-between border-b border-border/40 px-4 bg-background sticky top-0 z-20 shrink-0">
-                <SidebarTrigger />
-                <ThemeToggle />
-              </header>
-              <main className="flex-1 overflow-hidden flex flex-col min-h-0 min-w-0">
-                {children}
-              </main>
-            </SidebarInset>
-          </SidebarProvider>
+          {children}
         </Providers>
       </body>
     </html>
