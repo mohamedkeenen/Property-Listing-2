@@ -9,6 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { PropertyListing } from "@/data/mockData";
+import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
 import { generatePropertyPDF } from "@/lib/generatePDF";
 
@@ -83,20 +84,41 @@ export function ListingsTable({ listings, onViewDetails, onEdit }: Props) {
   return (
     <div className="bg-card border border-border rounded-lg w-full overflow-hidden flex flex-col h-full">
       {/* Tabs */}
-      <div className="flex items-center gap-1 p-3 border-b border-border overflow-x-auto">
-        {statusTabs.map((tab) => (
-          <button
-            key={tab.value}
-            onClick={() => { setActiveTab(tab.value); setPage(1); }}
-            className={`px-3 py-1.5 text-xs font-medium rounded-md whitespace-nowrap transition-colors ${
-              activeTab === tab.value
-                ? "bg-primary text-primary-foreground"
-                : "text-muted-foreground hover:bg-muted"
-            }`}
-          >
-            {tab.label} ({tabCounts(tab.value)})
-          </button>
-        ))}
+      <div className="flex items-center gap-1 p-3 border-b border-border overflow-x-auto overflow-y-hidden no-scrollbar">
+        {statusTabs.map((tab) => {
+          const tabStyles: Record<string, string> = {
+            all: "hover:bg-primary/10 hover:text-primary",
+            Live: "hover:bg-primary/10 hover:text-primary",
+            Draft: "hover:bg-yellow-500/10 hover:text-yellow-600",
+            Pending: "hover:bg-sky-500/10 hover:text-sky-600",
+            Archived: "hover:bg-gray-500/10 hover:text-gray-600",
+            Pocket: "hover:bg-purple-500/10 hover:text-purple-600",
+          };
+
+          const activeColors: Record<string, string> = {
+            all: "bg-primary text-white",
+            Live: "bg-primary text-white",
+            Draft: "bg-yellow-500 text-white",
+            Pending: "bg-sky-500 text-white",
+            Archived: "bg-gray-500 text-white",
+            Pocket: "bg-purple-500 text-white",
+          };
+
+          return (
+            <button
+              key={tab.value}
+              onClick={() => { setActiveTab(tab.value); setPage(1); }}
+              className={cn(
+                "px-4 py-2 text-[11px] font-bold rounded-lg whitespace-nowrap transition-all duration-200",
+                activeTab === tab.value
+                  ? cn(activeColors[tab.value], "shadow-sm shadow-black/5")
+                  : cn("text-muted-foreground/70 active:scale-95", tabStyles[tab.value])
+              )}
+            >
+              {tab.label} ({tabCounts(tab.value)})
+            </button>
+          );
+        })}
       </div>
 
       {/* Search */}

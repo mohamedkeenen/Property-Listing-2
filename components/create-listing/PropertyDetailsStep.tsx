@@ -19,6 +19,7 @@ import { ModernField } from "@/components/ui/modern-field";
 import { ModernSelect } from "@/components/ui/modern-select";
 import { NumberSearchSelect } from "@/components/ui/number-search-select";
 import { CreditCard as CreditCardIcon, Paintbrush } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
 
 interface Props {
   form: UseFormReturn<any>;
@@ -226,9 +227,8 @@ export function PropertyDetailsStep({ form }: Props) {
               error={fieldError("type")}
             />
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 col-span-1 md:col-span-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 col-span-1 md:col-span-2">
               <ModernField label="Size (Total)" icon={Maximize} required type="number" {...register("size")} error={fieldError("size")} value={watch("size")} />
-              <ModernField label="Sq. ft (Built)" icon={Maximize} required type="number" {...register("sqft")} error={fieldError("sqft")} value={watch("sqft")} />
               <ModernField label="UNIT" icon={Maximize} value="SQ. FT" readOnly />
             </div>
 
@@ -328,65 +328,45 @@ export function PropertyDetailsStep({ form }: Props) {
               <Tag className="h-4 w-4 text-muted-foreground/30" />
           </div>
 
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            {["Yearly", "Monthly", "Weekly", "Daily"].map((period) => {
-              const active = pricePeriod === period;
-              return (
-                <div 
-                  key={period} 
-                  onClick={() => setValue("pricePeriod", period, { shouldValidate: true })}
-                  className={cn(
-                    "cursor-pointer border-2 rounded-2xl p-5 transition-all duration-500 relative overflow-hidden",
-                    active 
-                      ? "border-primary bg-primary/10 shadow-2xl scale-105" 
-                      : "border-border/40 bg-card hover:border-primary/20"
-                  )}
-                >
-                  <div className="flex items-center gap-2 mb-4">
-                    <div className={cn(
-                      "h-4 w-4 rounded-full border-2 flex items-center justify-center transition-all duration-500",
-                      active ? "border-primary bg-primary" : "border-border/40"
-                    )}>
-                      {active && <div className="h-1.5 w-1.5 rounded-full bg-white animate-in zoom-in-50" />}
-                    </div>
-                    <span className={cn("text-[10px] font-black uppercase tracking-widest transition-colors", active ? "text-primary" : "text-muted-foreground")}>{period}</span>
-                  </div>
-                  <div className="relative group/price flex items-baseline gap-1.5">
-                     <span className={cn("text-[10px] font-black tracking-widest", active ? "text-primary" : "text-muted-foreground/50")}>AED</span>
-                      <input 
-                         type="number" 
-                         min="0"
-                         onKeyDown={(e) => {
-                           if (e.key === "-" || e.key === "e") e.preventDefault();
-                         }}
-                         placeholder="0.00"
-                         value={active ? (watch("price") || "") : ""}
-                         onChange={(e) => {
-                           if (active) {
-                             const val = e.target.value === "" ? undefined : Number(e.target.value);
-                             setValue("price", val, { shouldValidate: true });
-                           }
-                         }}
-                         onFocus={() => setValue("pricePeriod", period, { shouldValidate: true })}
-                         className="w-full bg-transparent border-none focus:ring-0 text-lg font-black placeholder:text-muted-foreground/20 text-foreground dark:text-white py-0 h-6 outline-none"
-                       />
-                  </div>
-                  {active && <div className="absolute top-0 right-0 p-3"><Tag className="h-3 w-3 text-primary/40" /></div>}
-                </div>
-              );
-            })}
-          </div>
+          {purpose === "Sale" ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-8 bg-card/30 p-8 rounded-4xl border border-border/20">
+              <ModernField 
+                label="Price" 
+                icon={DollarSign} 
+                required 
+                type="number" 
+                {...register("price")} 
+                error={fieldError("price")} 
+                value={watch("price")} 
+              />
+              
+              <div className="flex items-center gap-3 h-14 px-4 bg-muted/20 rounded-2xl border border-border/40">
+                <Switch 
+                  id="hide-price" 
+                  checked={watch("hidePrice")} 
+                  onCheckedChange={(v) => setValue("hidePrice", v, { shouldValidate: true })}
+                />
+                <Label htmlFor="hide-price" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground cursor-pointer">
+                  Hide Price (Property Finder Only)
+                </Label>
+              </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-8 bg-card/30 p-8 rounded-4xl border border-border/20">
-            <ModernSelect 
-              label="Payment Method" 
-              icon={CreditCardIcon} 
-              value={watch("paymentMethod")} 
-              onValueChange={(v) => setValue("paymentMethod", v, { shouldValidate: true })}
-              options={filterOptions.paymentMethods}
-            />
+              <ModernSelect 
+                label="Payment Method" 
+                icon={CreditCardIcon} 
+                value={watch("paymentMethod")} 
+                onValueChange={(v) => setValue("paymentMethod", v, { shouldValidate: true })}
+                options={filterOptions.paymentMethods}
+              />
 
-            {watch("paymentMethod") !== "Cash" && (
+              <ModernField 
+                label="Down Payment Price" 
+                icon={DollarSign} 
+                type="number" 
+                {...register("downPayment")} 
+                value={watch("downPayment")} 
+              />
+
               <ModernSelect 
                 label="Number Of cheques" 
                 icon={Hash} 
@@ -394,18 +374,99 @@ export function PropertyDetailsStep({ form }: Props) {
                 onValueChange={(v) => setValue("cheques", v, { shouldValidate: true })}
                 options={["1", "2", "4", "6", "12"]}
               />
-            )}
 
-            <ModernField label="Service Charges" icon={FileText} {...register("serviceCharges")} value={watch("serviceCharges")} />
+              <ModernField label="Service Charges" icon={FileText} {...register("serviceCharges")} value={watch("serviceCharges")} />
 
-            <ModernSelect 
-              label="Financial Status" 
-              icon={AlertCircle} 
-              value={watch("financialStatus")} 
-              onValueChange={(v) => setValue("financialStatus", v, { shouldValidate: true })}
-              options={["Paid", "Outstanding"]}
-            />
-          </div>
+              <ModernSelect 
+                label="Financial Status" 
+                icon={AlertCircle} 
+                value={watch("financialStatus")} 
+                onValueChange={(v) => setValue("financialStatus", v, { shouldValidate: true })}
+                options={["Paid", "Outstanding"]}
+              />
+            </div>
+          ) : (
+            <>
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                {["Yearly", "Monthly", "Weekly", "Daily"].map((period) => {
+                  const active = pricePeriod === period;
+                  return (
+                    <div 
+                      key={period} 
+                      onClick={() => setValue("pricePeriod", period, { shouldValidate: true })}
+                      className={cn(
+                        "cursor-pointer border-2 rounded-2xl p-5 transition-all duration-500 relative overflow-hidden",
+                        active 
+                          ? "border-primary bg-primary/10 shadow-2xl scale-105" 
+                          : "border-border/40 bg-card hover:border-primary/20"
+                      )}
+                    >
+                      <div className="flex items-center gap-2 mb-4">
+                        <div className={cn(
+                          "h-4 w-4 rounded-full border-2 flex items-center justify-center transition-all duration-500",
+                          active ? "border-primary bg-primary" : "border-border/40"
+                        )}>
+                          {active && <div className="h-1.5 w-1.5 rounded-full bg-white animate-in zoom-in-50" />}
+                        </div>
+                        <span className={cn("text-[10px] font-black uppercase tracking-widest transition-colors", active ? "text-primary" : "text-muted-foreground")}>{period}</span>
+                      </div>
+                      <div className="relative group/price flex items-baseline gap-1.5">
+                        <span className={cn("text-[10px] font-black tracking-widest", active ? "text-primary" : "text-muted-foreground/50")}>AED</span>
+                          <input 
+                            type="number" 
+                            min="0"
+                            onKeyDown={(e) => {
+                              if (e.key === "-" || e.key === "e") e.preventDefault();
+                            }}
+                            placeholder="0.00"
+                            value={active ? (watch("price") || "") : ""}
+                            onChange={(e) => {
+                              if (active) {
+                                const val = e.target.value === "" ? undefined : Number(e.target.value);
+                                setValue("price", val, { shouldValidate: true });
+                              }
+                            }}
+                            onFocus={() => setValue("pricePeriod", period, { shouldValidate: true })}
+                            className="w-full bg-transparent border-none focus:ring-0 text-lg font-black placeholder:text-muted-foreground/20 text-foreground dark:text-white py-0 h-6 outline-none"
+                          />
+                      </div>
+                      {active && <div className="absolute top-0 right-0 p-3"><Tag className="h-3 w-3 text-primary/40" /></div>}
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-8 bg-card/30 p-8 rounded-4xl border border-border/20">
+                <ModernSelect 
+                  label="Payment Method" 
+                  icon={CreditCardIcon} 
+                  value={watch("paymentMethod")} 
+                  onValueChange={(v) => setValue("paymentMethod", v, { shouldValidate: true })}
+                  options={filterOptions.paymentMethods}
+                />
+
+                {watch("paymentMethod") !== "Cash" && (
+                  <ModernSelect 
+                    label="Number Of cheques" 
+                    icon={Hash} 
+                    value={watch("cheques")} 
+                    onValueChange={(v) => setValue("cheques", v, { shouldValidate: true })}
+                    options={["1", "2", "4", "6", "12"]}
+                  />
+                )}
+
+                <ModernField label="Service Charges" icon={FileText} {...register("serviceCharges")} value={watch("serviceCharges")} />
+
+                <ModernSelect 
+                  label="Financial Status" 
+                  icon={AlertCircle} 
+                  value={watch("financialStatus")} 
+                  onValueChange={(v) => setValue("financialStatus", v, { shouldValidate: true })}
+                  options={["Paid", "Outstanding"]}
+                />
+              </div>
+            </>
+          )}
         </section>
 
         {/* Section 4: Description */}
@@ -446,11 +507,11 @@ export function PropertyDetailsStep({ form }: Props) {
                    value={watch("description")}
                    error={fieldError("description")}
                    onClear={() => setValue("description", "", { shouldValidate: true })}
+                   alignTop
                  >
                    <textarea 
                      {...register("description")} 
-                     className="w-full min-h-[160px] bg-transparent border-none focus:ring-0 text-sm font-bold text-foreground dark:text-white outline-none p-0 resize-none overflow-hidden placeholder:text-muted-foreground/40 mt-4 leading-relaxed"
-                     placeholder="Craft a compelling story for your property..."
+                     className="w-full min-h-[160px] bg-transparent border-none focus:ring-0 text-sm font-bold text-foreground dark:text-white outline-none p-0 resize-none overflow-hidden placeholder:text-muted-foreground/40 leading-relaxed"
                    />
                  </ModernField>
               </TabsContent>
@@ -471,12 +532,12 @@ export function PropertyDetailsStep({ form }: Props) {
                    value={watch("descriptionAr")}
                    dir="rtl"
                    onClear={() => setValue("descriptionAr", "", { shouldValidate: true })}
+                   alignTop
                  >
                    <textarea 
                      {...register("descriptionAr")} 
-                     className="w-full min-h-[160px] bg-transparent border-none focus:ring-0 text-sm font-bold text-foreground dark:text-white outline-none p-0 resize-none overflow-hidden text-right placeholder:text-muted-foreground/40 mt-4 leading-relaxed font-arabic"
+                     className="w-full min-h-[160px] bg-transparent border-none focus:ring-0 text-sm font-bold text-foreground dark:text-white outline-none p-0 resize-none overflow-hidden text-right placeholder:text-muted-foreground/40 leading-relaxed font-arabic"
                      dir="rtl"
-                     placeholder="اكتب وصفاً جذاباً لعقارك هنا..."
                    />
                  </ModernField>
               </TabsContent>
@@ -606,40 +667,7 @@ export function PropertyDetailsStep({ form }: Props) {
           </CardContent>
         </Card>
 
-        {/* Property Permit Card */}
-        <Card className="rounded-4xl border-border/40 shadow-sm overflow-hidden bg-card transition-all hover:shadow-xl">
-          <CardHeader className="bg-muted/5 border-b border-border/20 py-4 px-6">
-            <CardTitle className="text-sm font-bold text-foreground flex items-center gap-2">
-              <FileText className="h-3.5 w-3.5 text-orange-500" />
-              Permits & License
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-6 space-y-6">
-            <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1 block">License Type</Label>
-            <div className="flex bg-muted/20 p-1.5 rounded-xl gap-1.5 border border-border/40">
-              {["Rera", "DTCM"].map((type) => (
-                <button
-                  key={type}
-                  type="button"
-                  onClick={() => setValue("licenseType", type, { shouldValidate: true })}
-                  className={cn(
-                    "flex-1 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
-                    licenseType === type ? "bg-primary text-white shadow-md" : "text-muted-foreground hover:bg-white/5"
-                  )}
-                >
-                  {type}
-                </button>
-              ))}
-            </div>
-
-            <ModernField label="Permit Number" icon={FileText} {...register("permitNumber")} value={watch("permitNumber")} />
-            <ModernField label="Issue Date" icon={Calendar} {...register("permitIssueDate")} value={watch("permitIssueDate")} />
-            <ModernField label="Expiration" icon={Calendar} {...register("permitExpiryDate")} value={watch("permitExpiryDate")} />
-          </CardContent>
-        </Card>
       </aside>
     </div>
   );
 }
-
-

@@ -71,62 +71,125 @@ export function LeadsTable() {
       <div className="bg-card border border-border rounded-lg overflow-hidden flex flex-col h-full">
         {/* Tabs and Filters */}
         <div className="flex flex-col gap-1 p-3 border-b border-border/10">
-          <div className="flex items-center gap-1 overflow-x-auto no-scrollbar pb-2">
+          <div className="flex items-center gap-1 overflow-x-auto overflow-y-hidden no-scrollbar pb-2">
             <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mr-2 shrink-0">Portal:</span>
-            {sourceTabs.map((tab) => (
-              <button
-                key={tab}
-                onClick={() => { 
-                  if (tab === "Skyloov") return;
-                  setSourceFilter(tab); 
-                  setPage(1); 
-                }}
-                className={cn(
-                  "px-3 py-1.5 text-xs font-medium rounded-md transition-all whitespace-nowrap relative group",
-                  sourceFilter === tab 
-                    ? "bg-primary text-primary-foreground" 
-                    : "text-muted-foreground hover:bg-muted",
-                  tab === "Skyloov" && "opacity-40 cursor-not-allowed grayscale pointer-events-none"
-                )}
-              >
-                {tab}
-                {tab === "Skyloov" && (
-                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[6px] font-black px-1 py-0.5 rounded shadow-sm opacity-100 uppercase transform rotate-2 animate-pulse">
-                    Soon
-                  </span>
-                )}
-              </button>
-            ))}
+            {sourceTabs.map((tab) => {
+              const colors: Record<string, string> = {
+                All: "hover:bg-primary/10 hover:text-primary",
+                "Property Finder": "hover:bg-orange-500/10 hover:text-orange-500",
+                Bayut: "hover:bg-emerald-500/10 hover:text-emerald-500",
+                Website: "hover:bg-cyan-500/10 hover:text-cyan-500",
+              };
+
+              const active: Record<string, string> = {
+                All: "bg-primary text-primary-foreground shadow-primary/20",
+                "Property Finder": "bg-orange-500 text-white shadow-orange-500/20",
+                Bayut: "bg-emerald-500 text-white shadow-emerald-500/20",
+                Website: "bg-cyan-500 text-white shadow-cyan-500/20",
+              };
+
+              return (
+                <button
+                  key={tab}
+                  onClick={() => { 
+                    if (tab === "Skyloov") return;
+                    setSourceFilter(tab); 
+                    setPage(1); 
+                  }}
+                  className={cn(
+                    "px-3 py-1.5 text-xs font-bold rounded-lg transition-all whitespace-nowrap relative group",
+                    sourceFilter === tab 
+                      ? cn(active[tab], "shadow-sm shadow-black/5") 
+                      : cn("text-muted-foreground hover:bg-muted/50", colors[tab]),
+                    tab === "Skyloov" && "opacity-40 cursor-not-allowed grayscale pointer-events-none"
+                  )}
+                >
+                  {tab}
+                  {tab === "Skyloov" && (
+                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[6px] font-black px-1 py-0.5 rounded shadow-sm opacity-100 uppercase transform rotate-2 animate-pulse">
+                      Soon
+                    </span>
+                  )}
+                </button>
+              );
+            })}
           </div>
 
           <div className="flex items-center gap-3">
-            <div className="flex items-center gap-1 overflow-x-auto no-scrollbar">
+            <div className="flex items-center gap-1 overflow-x-auto overflow-y-hidden no-scrollbar">
               <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mr-2 shrink-0">Channel:</span>
-              {["All", "WhatsApp", "Email", "Call"].map((tab) => (
-                <button
-                  key={tab}
-                  onClick={() => { setSubSourceFilter(tab); setPage(1); }}
-                  className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors whitespace-nowrap ${
-                    subSourceFilter === tab ? "bg-primary/10 text-primary border border-primary/20" : "text-muted-foreground hover:bg-muted"
-                  }`}
-                >
-                  {tab}
-                </button>
-              ))}
+              {["All", "WhatsApp", "Email", "Call"].map((tab) => {
+                const colors: Record<string, string> = {
+                  All: "hover:bg-primary/10 hover:text-primary",
+                  WhatsApp: "hover:bg-emerald-500/10 hover:text-emerald-500",
+                  Email: "hover:bg-blue-500/10 hover:text-blue-500",
+                  Call: "hover:bg-orange-500/10 hover:text-orange-500",
+                };
+
+                const active: Record<string, string> = {
+                  All: "bg-primary/10 text-primary border-primary/20",
+                  WhatsApp: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20 shadow-emerald-500/10",
+                  Email: "bg-blue-500/10 text-blue-500 border-blue-500/20 shadow-blue-500/10",
+                  Call: "bg-orange-500/10 text-orange-500 border-orange-500/20 shadow-orange-500/10",
+                };
+
+                return (
+                  <button
+                    key={tab}
+                    onClick={() => { setSubSourceFilter(tab); setPage(1); }}
+                    className={cn(
+                      "px-3 py-1.5 text-xs font-bold rounded-lg transition-all whitespace-nowrap",
+                      subSourceFilter === tab 
+                        ? cn(active[tab], "shadow-sm shadow-black/5") 
+                        : cn("text-muted-foreground hover:bg-muted/50", colors[tab])
+                    )}
+                  >
+                    {tab}
+                  </button>
+                );
+              })}
             </div>
             
-            <div className="ml-auto flex items-center gap-1">
-              {statusTabs.map((tab) => (
-                <button
-                  key={tab}
-                  onClick={() => { setStatusFilter(tab); setPage(1); }}
-                  className={`px-2.5 py-1.5 text-xs font-medium rounded-md transition-colors whitespace-nowrap ${
-                    statusFilter === tab ? "bg-muted text-foreground" : "text-muted-foreground hover:bg-muted/50"
-                  }`}
-                >
-                  {tab}
-                </button>
-              ))}
+            <div className="ml-auto flex items-center gap-1 overflow-x-auto overflow-y-hidden no-scrollbar">
+              {statusTabs.map((tab) => {
+                const colors: Record<string, string> = {
+                  "All Statuses": "hover:bg-primary/10 hover:text-primary",
+                  New: "hover:bg-emerald-500/10 hover:text-emerald-500",
+                  Contacted: "hover:bg-blue-500/10 hover:text-blue-500",
+                  Qualified: "hover:bg-purple-500/10 hover:text-purple-600",
+                  Lost: "hover:bg-red-500/10 hover:text-red-500",
+                };
+                const tabStyles: Record<string, string> = {
+                  "All Statuses": "hover:bg-primary/10 hover:text-primary active:bg-primary active:text-white",
+                  New: "hover:bg-emerald-500/10 hover:text-emerald-600 active:bg-emerald-500 active:text-white dark:hover:text-emerald-400 dark:active:text-white",
+                  Contacted: "hover:bg-blue-500/10 hover:text-blue-600 active:bg-blue-500 active:text-white dark:hover:text-blue-400 dark:active:text-white",
+                  Qualified: "hover:bg-purple-500/10 hover:text-purple-600 active:bg-purple-500 active:text-white dark:hover:text-purple-400 dark:active:text-white",
+                  Lost: "hover:bg-red-500/10 hover:text-red-500 active:bg-red-500 active:text-white dark:hover:text-red-400 dark:active:text-white",
+                };
+
+                const activeColors: Record<string, string> = {
+                  "All Statuses": "bg-primary text-primary-foreground shadow-primary/20",
+                  New: "bg-emerald-500 text-white shadow-emerald-500/20",
+                  Contacted: "bg-blue-500 text-white shadow-blue-500/20",
+                  Qualified: "bg-purple-500 text-white shadow-purple-500/20",
+                  Lost: "bg-red-500 text-white shadow-red-500/20",
+                };
+
+                return (
+                  <button
+                    key={tab}
+                    onClick={() => { setStatusFilter(tab); setPage(1); }}
+                    className={cn(
+                      "px-3 py-1.5 text-xs font-bold rounded-lg transition-all whitespace-nowrap",
+                      statusFilter === tab 
+                        ? cn(activeColors[tab], "shadow-sm shadow-black/5") 
+                        : cn("text-muted-foreground/70 hover:bg-muted/50", tabStyles[tab])
+                    )}
+                  >
+                    {tab}
+                  </button>
+                );
+              })}
             </div>
           </div>
         </div>

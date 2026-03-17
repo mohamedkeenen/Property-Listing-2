@@ -1,11 +1,13 @@
 "use client";
 
 import { useState, useRef } from "react";
+import { useSelector } from "react-redux";
 import { UseFormReturn } from "react-hook-form";
 import { Upload, X, Image as ImageIcon, Video, RotateCw, ChevronLeft, ChevronRight, QrCode, Info } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ModernField } from "@/components/ui/modern-field";
 import { cn } from "@/lib/utils";
+import { selectCompanyLogo, selectSettingsLastUpdated } from "@/api/redux/slices/settingsSlice";
 
 interface Props {
   form: UseFormReturn<any>;
@@ -27,24 +29,30 @@ const applyWatermark = (base64Image: string, logoUrl: string): Promise<string> =
       const logo = new Image();
       logo.crossOrigin = "anonymous";
       logo.onload = () => {
-        const logoTargetWidth = canvas.width * 0.34;
+        // Advanced Branding Logic
+        const logoTargetWidth = canvas.width * 0.35;
         const logoTargetHeight = (logo.height / logo.width) * logoTargetWidth;
         const x = (canvas.width - logoTargetWidth) / 2;
         const y = (canvas.height - logoTargetHeight) / 2;
         
-        ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
-        ctx.globalAlpha = 0.9;
+        // Branded Background Plate with transparency
+        ctx.fillStyle = "rgba(255, 255, 255, 0.4)"; // Softened transparency as requested
+        ctx.globalAlpha = 0.6;
         ctx.beginPath();
-        const padding = 16;
+        const padding = 20;
         ctx.roundRect(x - padding, y - padding, logoTargetWidth + (padding * 2), logoTargetHeight + (padding * 2), 24);
         ctx.fill();
 
+        // Optimized Logo Overlay
         ctx.globalAlpha = 1.0;
         ctx.drawImage(logo, x, y, logoTargetWidth, logoTargetHeight);
         ctx.globalAlpha = 1.0;
         resolve(canvas.toDataURL("image/jpeg", 0.95));
       };
-      logo.onerror = () => resolve(base64Image);
+      logo.onerror = () => {
+        console.error("Watermark failed: Could not load logo from", logoUrl);
+        resolve(base64Image);
+      };
       logo.src = logoUrl;
     };
     img.onerror = () => resolve(base64Image);
@@ -55,8 +63,17 @@ const applyWatermark = (base64Image: string, logoUrl: string): Promise<string> =
 export function MediaStep({ form }: Props) {
   const { register, watch, setValue, getValues } = form;
   const images = watch("images") || [];
+  const companyLogo = useSelector(selectCompanyLogo);
+  const settingsLastUpdated = useSelector(selectSettingsLastUpdated);
   const [activePreviewIndex, setActivePreviewIndex] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const getLogoUrl = (logo: string) => {
+    if (!logo) return "";
+    if (logo.startsWith('http') || logo.startsWith('data:image')) return logo;
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+    return `${apiUrl}/settings/logo?v=${settingsLastUpdated}`;
+  };
 
   const handleFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -67,8 +84,8 @@ export function MediaStep({ form }: Props) {
       const reader = new FileReader();
       reader.onloadend = async () => {
         const base64String = reader.result as string;
-        // Apply branded watermark before saving
-        const watermarked = await applyWatermark(base64String, "/logo.jpg");
+        // Apply branded watermark using the actual company logo from settings
+        const watermarked = await applyWatermark(base64String, getLogoUrl(companyLogo));
         const currentImages = getValues("images") || [];
         setValue("images", [...currentImages, watermarked], { shouldValidate: true });
       };

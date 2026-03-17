@@ -16,6 +16,7 @@ export const authApi = createApi({
       return headers;
     },
   }),
+  tagTypes: ['User'],
   endpoints: (builder) => ({
     register: builder.mutation({
       query: (credentials) => ({
@@ -68,6 +69,22 @@ export const authApi = createApi({
     }),
     getUser: builder.query({
       query: () => '/user',
+      providesTags: ['User'],
+    }),
+    updateProfile: builder.mutation({
+      query: (data) => ({
+        url: '/profile',
+        method: 'POST',
+        body: data,
+      }),
+      invalidatesTags: ['User'],
+    }),
+    updatePassword: builder.mutation({
+      query: (data) => ({
+        url: '/profile/password',
+        method: 'POST',
+        body: data,
+      }),
     }),
     logout: builder.mutation({
       query: () => ({
@@ -87,5 +104,7 @@ export const {
   useResetPasswordMutation,
   useVerifyEmailMutation,
   useGetUserQuery,
+  useUpdateProfileMutation,
+  useUpdatePasswordMutation,
   useLogoutMutation,
 } = authApi;

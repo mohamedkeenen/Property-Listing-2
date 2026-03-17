@@ -93,11 +93,11 @@ export function AppSidebar() {
           )}>
             {!collapsed ? (
               <>
-                <div className="relative w-full h-24 group/brand">
+                <div className="relative w-full h-24 group/brand flex items-center justify-center rounded-2xl transition-all duration-300 dark:bg-white/[0.05] dark:backdrop-blur-md dark:border dark:border-white/[0.1] p-3 shadow-inner">
                   <img
                     src={getLogoUrl(companyLogo)}
                     alt={companyName}
-                    className="object-contain transition-transform duration-700 group-hover/brand:scale-105 w-120 h-20"
+                    className="object-contain transition-transform duration-700 group-hover/brand:scale-105 w-full h-full max-h-[70px] dark:drop-shadow-[0_0_10px_rgba(255,255,255,0.2)]"
                   />
                 </div>
                 <div className="flex flex-col transition-all duration-500 delay-100 animate-in fade-in slide-in-from-bottom-2">
@@ -178,8 +178,8 @@ export function AppSidebar() {
               >
                 <DropdownMenuItem className="focus:bg-primary/10 focus:text-primary cursor-pointer rounded-xl px-4 py-3 transition-all mb-1 group" asChild>
                   <Link href="/settings" className="flex items-center gap-4 font-black text-sm text-foreground">
-                    <div className="p-1.5 rounded-lg bg-emerald-500/10 group-focus:bg-emerald-500/20 transition-colors">
-                      <Settings className="h-4 w-4 text-emerald-500" />
+                    <div className="p-1.5 rounded-lg bg-primary/10 group-focus:bg-primary/20 transition-colors">
+                      <Settings className="h-4 w-4 text-primary" />
                     </div>
                     Settings
                   </Link>
