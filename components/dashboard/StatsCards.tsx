@@ -1,15 +1,19 @@
 import { Globe, Key, Tag } from "lucide-react";
-import { mockListings } from "@/data/mockData";
 import { cn } from "@/lib/utils";
 import NextImage from "next/image";
+import { PropertyListing } from "@/data/mockData";
 
-export function StatsCards() {
-  const sales = mockListings.filter((l) => l.purpose === "Sale");
-  const rents = mockListings.filter((l) => l.purpose === "Rent");
-  const pf = mockListings.filter((l) => l.portals.pf);
-  const bayut = mockListings.filter((l) => l.portals.bayut);
-  const web = mockListings.filter((l) => l.portals.website);
-  const skyloov = mockListings.filter((l) => l.portals.skyloov && false); // Force 0 for now as it's inactive
+interface Props {
+  listings: PropertyListing[];
+}
+
+export function StatsCards({ listings }: Props) {
+  const sales = listings.filter((l) => l.purpose === "Sale");
+  const rents = listings.filter((l) => l.purpose === "Rent");
+  const pf = listings.filter((l) => l.portals.pf);
+  const bayut = listings.filter((l) => l.portals.bayut);
+  const web = listings.filter((l) => l.portals.website);
+  const skyloov = listings.filter((l) => l.portals.skyloov && false); // Force 0 for now as it's inactive
 
   const stats = [
     {

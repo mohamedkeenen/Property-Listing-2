@@ -1,14 +1,15 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { mockListings, mockLeads } from "@/data/mockData";
+import { mockLeads, PropertyListing, Lead } from "@/data/mockData";
 import { cn } from "@/lib/utils";
+import { useGetLeadsQuery } from "@/api/redux/services/leadsApi";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, Legend,
   AreaChart, Area,
 } from "recharts";
-import { TrendingUp, Users, Building2, BarChart3, MessageCircle, Mail, Phone, Globe } from "lucide-react";
+import { TrendingUp, Users, Building2, BarChart3, MessageCircle, Mail, Phone, Globe, Loader2 } from "lucide-react";
 import NextImage from "next/image";
 
 const COLORS = {
@@ -23,14 +24,17 @@ const COLORS = {
   skyloov: "#006bec",
 };
 
-export function DashboardCharts() {
+export function DashboardCharts({ listings }: { listings: PropertyListing[] }) {
+  const { data: apiLeads, isLoading: leadsLoading } = useGetLeadsQuery();
+  const leads: Lead[] = apiLeads || [];
+
   const statusData = ["Live", "Draft", "Pending", "Archived", "Pocket"].map((s) => ({
     name: s,
-    count: mockListings.filter((l) => l.status === s).length,
+    count: listings.filter((l) => l.status === s).length,
   }));
 
   const communityMap: Record<string, number> = {};
-  mockListings.forEach((l) => { communityMap[l.community] = (communityMap[l.community] || 0) + 1; });
+  listings.forEach((l) => { communityMap[l.community] = (communityMap[l.community] || 0) + 1; });
   const allCommunities = Object.entries(communityMap).sort((a, b) => b[1] - a[1]);
 
   const [showAllCommunities, setShowAllCommunities] = useState(false);
@@ -42,84 +46,90 @@ export function DashboardCharts() {
   const portalData = [
     { 
       name: "Property Finder", 
-      value: mockListings.filter((l) => l.portals.pf).length, 
+      value: listings.filter((l) => l.portals.pf).length, 
       color: COLORS.orange,
       breakdown: ["Apartment", "Villa", "Office", "Townhouse"].map(t => ({
         name: t,
-        value: mockListings.filter(l => l.portals.pf && l.type === t).length
+        value: listings.filter(l => l.portals.pf && l.type === t).length
       })).filter(i => i.value > 0)
     },
     { 
       name: "Bayut", 
-      value: mockListings.filter((l) => l.portals.bayut).length, 
+      value: listings.filter((l) => l.portals.bayut).length, 
       color: COLORS.emerald,
       breakdown: ["Apartment", "Villa", "Office", "Townhouse"].map(t => ({
         name: t,
-        value: mockListings.filter(l => l.portals.bayut && l.type === t).length
+        value: listings.filter(l => l.portals.bayut && l.type === t).length
       })).filter(i => i.value > 0)
     },
     { 
       name: "Website", 
-      value: mockListings.filter((l) => l.portals.website).length, 
+      value: listings.filter((l) => l.portals.website).length, 
       color: COLORS.cyan,
       breakdown: ["Apartment", "Villa", "Office", "Townhouse"].map(t => ({
         name: t,
-        value: mockListings.filter(l => l.portals.website && l.type === t).length
+        value: listings.filter(l => l.portals.website && l.type === t).length
       })).filter(i => i.value > 0)
     },
     { 
+      name: "Facebook", 
+      value: listings.filter((l) => l.portals.website && false).length, // Placeholder logic or based on leads if you want
+      color: COLORS.blue,
+      breakdown: []
+    },
+    { 
       name: "Skyloov", 
-      value: mockListings.filter((l) => l.portals.skyloov && false).length, // Forced 0 as inactive
+      value: listings.filter((l) => l.portals.skyloov && false).length, // Forced 0 as inactive
       color: COLORS.skyloov,
       breakdown: []
     },
   ];
 
   const typeMap: Record<string, number> = {};
-  mockListings.forEach((l) => { typeMap[l.type] = (typeMap[l.type] || 0) + 1; });
+  listings.forEach((l) => { typeMap[l.type] = (typeMap[l.type] || 0) + 1; });
   const typeData = Object.entries(typeMap).map(([name, value]) => ({ name, value }));
   const typeColors = [COLORS.blue, COLORS.emerald, COLORS.orange, COLORS.purple, COLORS.red, COLORS.cyan, COLORS.amber];
 
   const priceData = [
-    { range: "< 100K", rent: mockListings.filter((l) => l.purpose === "Rent" && l.price < 100000).length, sale: mockListings.filter((l) => l.purpose === "Sale" && l.price < 100000).length },
-    { range: "100K-500K", rent: mockListings.filter((l) => l.purpose === "Rent" && l.price >= 100000 && l.price < 500000).length, sale: mockListings.filter((l) => l.purpose === "Sale" && l.price >= 100000 && l.price < 500000).length },
-    { range: "500K-2M", rent: mockListings.filter((l) => l.purpose === "Rent" && l.price >= 500000 && l.price < 2000000).length, sale: mockListings.filter((l) => l.purpose === "Sale" && l.price >= 500000 && l.price < 2000000).length },
-    { range: "2M-5M", rent: mockListings.filter((l) => l.purpose === "Rent" && l.price >= 2000000 && l.price < 5000000).length, sale: mockListings.filter((l) => l.purpose === "Sale" && l.price >= 2000000 && l.price < 5000000).length },
-    { range: "5M+", rent: mockListings.filter((l) => l.purpose === "Rent" && l.price >= 5000000).length, sale: mockListings.filter((l) => l.purpose === "Sale" && l.price >= 5000000).length },
+    { range: "< 100K", rent: listings.filter((l) => l.purpose === "Rent" && l.price < 100000).length, sale: listings.filter((l) => l.purpose === "Sale" && l.price < 100000).length },
+    { range: "100K-500K", rent: listings.filter((l) => l.purpose === "Rent" && l.price >= 100000 && l.price < 500000).length, sale: listings.filter((l) => l.purpose === "Sale" && l.price >= 100000 && l.price < 500000).length },
+    { range: "500K-2M", rent: listings.filter((l) => l.purpose === "Rent" && l.price >= 500000 && l.price < 2000000).length, sale: listings.filter((l) => l.purpose === "Sale" && l.price >= 500000 && l.price < 2000000).length },
+    { range: "2M-5M", rent: listings.filter((l) => l.purpose === "Rent" && l.price >= 2000000 && l.price < 5000000).length, sale: listings.filter((l) => l.purpose === "Sale" && l.price >= 2000000 && l.price < 5000000).length },
+    { range: "5M+", rent: listings.filter((l) => l.purpose === "Rent" && l.price >= 5000000).length, sale: listings.filter((l) => l.purpose === "Sale" && l.price >= 5000000).length },
   ];
 
   const leadsSourceData = [
     { 
       name: "WhatsApp", 
-      value: mockLeads.filter((l) => l.subSource === "WhatsApp").length, 
+      value: leads.filter((l) => l.subSource === "WhatsApp").length, 
       color: COLORS.green,
-      breakdown: ["Property Finder", "Bayut", "Website"].map(p => ({
+      breakdown: ["Property Finder", "Bayut", "Website", "Facebook"].map(p => ({
         name: p,
-        value: mockLeads.filter(l => l.subSource === "WhatsApp" && l.source === p).length
+        value: leads.filter(l => l.subSource === "WhatsApp" && l.source === p).length
       })).filter(i => i.value > 0)
     },
     { 
       name: "Email", 
-      value: mockLeads.filter((l) => l.subSource === "Email").length, 
+      value: leads.filter((l) => l.subSource === "Email").length, 
       color: COLORS.blue,
-      breakdown: ["Property Finder", "Bayut", "Website"].map(p => ({
+      breakdown: ["Property Finder", "Bayut", "Website", "Facebook"].map(p => ({
         name: p,
-        value: mockLeads.filter(l => l.subSource === "Email" && l.source === p).length
+        value: leads.filter(l => l.subSource === "Email" && l.source === p).length
       })).filter(i => i.value > 0)
     },
     { 
       name: "Call", 
-      value: mockLeads.filter((l) => l.subSource === "Call").length, 
+      value: leads.filter((l) => l.subSource === "Call").length, 
       color: COLORS.orange,
-      breakdown: ["Property Finder", "Bayut", "Skyloov", "Website"].map(p => ({
+      breakdown: ["Property Finder", "Bayut", "Facebook", "Skyloov", "Website"].map(p => ({
         name: p,
-        value: mockLeads.filter(l => l.subSource === "Call" && l.source === p).length
+        value: leads.filter(l => l.subSource === "Call" && l.source === p).length
       })).filter(i => i.value > 0)
     },
   ];
 
   const agentMap: Record<string, { total: number; live: number }> = {};
-  mockListings.forEach((l) => {
+  listings.forEach((l) => {
     if (!agentMap[l.listingAgent]) agentMap[l.listingAgent] = { total: 0, live: 0 };
     agentMap[l.listingAgent].total++;
     if (l.status === "Live") agentMap[l.listingAgent].live++;
@@ -134,6 +144,7 @@ export function DashboardCharts() {
     "Property Finder": "https://res.cloudinary.com/devht0mp5/image/upload/v1772105511/PF_ljkahc.png",
     "Bayut": "https://res.cloudinary.com/devht0mp5/image/upload/v1772105511/bayut_gy4ev2.png",
     "Skyloov": "https://res.cloudinary.com/devht0mp5/image/upload/v1773486432/Logo-rebrand-blue_dwxrba.svg",
+    "Facebook": "https://upload.wikimedia.org/wikipedia/commons/b/b8/2021_Facebook_icon.svg",
   };
 
   const channelIcons: Record<string, any> = {
@@ -233,7 +244,7 @@ export function DashboardCharts() {
               Inventory Status Distribution
             </CardTitle>
             <div className="text-[10px] font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-500 px-2 py-1 rounded-md">
-              {mockListings.length} Total
+              {listings.length} Total
             </div>
           </CardHeader>
           <CardContent className="pt-8 pb-6 px-6">
@@ -278,7 +289,7 @@ export function DashboardCharts() {
                 {showAllCommunities ? "Show Less" : "See All"}
               </button>
               <div className="text-[10px] font-bold uppercase tracking-wider bg-blue-500/10 text-blue-500 px-2 py-1 rounded-md">
-                {mockListings.length} Total
+                {listings.length} Total
               </div>
             </div>
           </CardHeader>
@@ -367,7 +378,7 @@ export function DashboardCharts() {
               Structure Types
             </CardTitle>
             <div className="text-[10px] font-bold uppercase tracking-wider bg-purple-500/10 text-purple-500 px-2 py-1 rounded-md">
-              {mockListings.length} Total
+              {listings.length} Total
             </div>
           </CardHeader>
           <CardContent className="pt-6 pb-6 px-6">
@@ -408,7 +419,7 @@ export function DashboardCharts() {
               Inquiry Sources
             </CardTitle>
             <div className="text-[10px] font-bold uppercase tracking-wider bg-orange-500/10 text-orange-500 px-2 py-1 rounded-md">
-              {mockLeads.length} Total
+              {leads.length} Total
             </div>
           </CardHeader>
           <CardContent className="pt-6 pb-6 px-6">
@@ -459,7 +470,7 @@ export function DashboardCharts() {
               Rent & Sale
             </CardTitle>
             <div className="text-[10px] font-bold uppercase tracking-wider bg-blue-500/10 text-blue-500 px-2 py-1 rounded-md">
-              {mockListings.length} Total
+              {listings.length} Total
             </div>
           </CardHeader>
           <CardContent className="pt-8 pb-6 px-6">
@@ -502,7 +513,7 @@ export function DashboardCharts() {
               Team Performance
             </CardTitle>
             <div className="text-[10px] font-bold uppercase tracking-wider bg-blue-500/10 text-blue-500 px-2 py-1 rounded-md">
-              {mockListings.length} Total
+              {listings.length} Total
             </div>
           </CardHeader>
           <CardContent className="pt-8 pb-6 px-6">

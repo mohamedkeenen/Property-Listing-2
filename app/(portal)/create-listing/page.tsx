@@ -7,31 +7,36 @@ import { listingSchema, ListingFormValues } from "@/validation/listingSchema";
 import { StepIndicator } from "@/components/create-listing/StepIndicator";
 import { PortalSelectionStep } from "@/components/create-listing/PortalSelectionStep";
 import { PropertyDetailsStep } from "@/components/create-listing/PropertyDetailsStep";
-import { MediaStep } from "@/components/create-listing/MediaStep";
 import { LocationStep } from "@/components/create-listing/LocationStep";
 import { PublishingStep } from "@/components/create-listing/PublishingStep";
-import { NotesStep } from "@/components/create-listing/NotesStep";
-import { DocumentsStep } from "@/components/create-listing/DocumentsStep";
 import { CompletedStep } from "@/components/create-listing/CompletedStep";
 import { Button } from "@/components/ui/button";
 import { ChevronRight, Save, LayoutGrid, CheckCircle2, ChevronLeft } from "lucide-react";
 import { FormProvider } from "react-hook-form";
 import { useToast } from "@/hooks/use-toast";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { useGetPropertyQuery } from "@/api/redux/services/propertyApi";
+import { mapBackendPropertyToFormValues } from "@/lib/mappers";
+import { Loader2 } from "lucide-react";
 
 const STEPS = [
   "Property Details",
-  "Media",
   "Location",
   "Publishing",
-  "Notes",
-  "Documents",
   "Completed",
 ];
 
 export default function CreateListingPage() {
   const [currentStep, setCurrentStep] = useState(0);
   const { toast } = useToast();
+  const searchParams = useSearchParams();
+  const propertyId = searchParams.get("id");
+  const isEdit = !!propertyId;
+
+  const { data: propertyResponse, isLoading: isFetching } = useGetPropertyQuery(propertyId as string, {
+    skip: !isEdit,
+  });
 
   const form = useForm<ListingFormValues>({
     resolver: zodResolver(listingSchema) as any,
@@ -40,18 +45,51 @@ export default function CreateListingPage() {
       purpose: "Rent",
       type: "",
       title: "",
-      size: undefined,
-      sqft: undefined,
-      bedrooms: undefined,
-      bathrooms: undefined,
-      parking: undefined,
+      titleAr: "",
+      description: "",
+      descriptionAr: "",
+      size: "",
+      sqft: "",
+      bedrooms: "",
+      bathrooms: "",
+      parking: "",
       unitNo: "",
-      price: undefined,
+      price: "",
       pricePeriod: "Yearly",
-      currency: "",
+      currency: "Dirham",
       listingAgent: "",
+      listingOwner: "",
+      landlord: "",
       availabilityStatus: "",
       licenseType: "",
+      titleDeed: "",
+      landArea: "",
+      builtUpArea: "",
+      layoutType: "",
+      projectName: "",
+      ownership: "",
+      developers: "",
+      buildYear: "",
+      finishingType: "",
+      paymentMethod: "Cash",
+      cheques: "1",
+      serviceCharges: "",
+      financialStatus: "Paid",
+      hidePrice: false,
+      amenities: [],
+      images: [],
+      documents: [],
+      notes: "",
+      pfLocation: "",
+      city: "",
+      community: "",
+      subCommunity: "",
+      building: "",
+      bayutLocation: "",
+      bayutCity: "",
+      bayutCommunity: "",
+      bayutSubCommunity: "",
+      bayutBuilding: "",
       portals: {
         propertyFinder: false,
         bayutEnabled: false,
@@ -63,8 +101,17 @@ export default function CreateListingPage() {
     } as any,
   });
 
-  // Load from localStorage
+  // Load data for editing
   useEffect(() => {
+    if (isEdit && propertyResponse?.data) {
+      const formValues = mapBackendPropertyToFormValues(propertyResponse.data);
+      form.reset(formValues);
+    }
+  }, [isEdit, propertyResponse, form]);
+
+  // Load from localStorage (only for new listings)
+  useEffect(() => {
+    if (isEdit) return; // Don't use draft for editing existing
     const saved = localStorage.getItem("property-listing-draft");
     if (saved) {
       try {
@@ -76,38 +123,33 @@ export default function CreateListingPage() {
         console.error("Failed to parse saved draft", e);
       }
     }
-  }, [form]);
+  }, [form, isEdit]);
 
-  // Save to localStorage on change (but only lightweight fields)
+  // Save to localStorage on change (but only lightweight fields and only for new listings)
   useEffect(() => {
+    if (isEdit) return;
     const subscription = form.watch((value) => {
       // Create a lightweight draft copy without heavy base64 arrays
       const { images, documents, ...lightDraft } = value as any;
       localStorage.setItem("property-listing-draft", JSON.stringify(lightDraft));
     });
     return () => subscription.unsubscribe();
-  }, [form]);
+  }, [form, isEdit]);
 
   const validateStep = async (stepIndex: number) => {
     let fields: (keyof ListingFormValues)[] = [];
     
-    if (stepIndex === 0) { // Property Details
-      fields = ["category", "purpose", "type", "unitNo", "bedrooms", "bathrooms", "size", "price", "title", "listingAgent"];
-    } else if (stepIndex === 1) { // Media
+    if (stepIndex === 0) { // Property Details (+ Media)
       const images = form.getValues("images" as any) || [];
       if (images.length === 0) {
-        toast({
-          title: "Photos Required",
-          description: "Photo is required", // User requested specific simplified validation text.
-          variant: "destructive",
-        });
+        toast({ title: "Photos Required", description: "At least one photo is required.", variant: "destructive" });
         return false;
       }
+      fields = ["category", "purpose", "type", "unitNo", "bedrooms", "bathrooms", "size", "price", "title", "listingAgent"];
+    } else if (stepIndex === 1) { // Location
       return true;
-    } else if (stepIndex === 2) { // Location
-      return true; // No mandatory validation needed for locations
-    } else if (stepIndex === 3) { // Publishing
-      return true; // No longer forcing channel selection unconditionally
+    } else if (stepIndex === 2) { // Publishing
+      return true;
     }
     
     if (fields.length === 0) return true;
@@ -169,12 +211,9 @@ export default function CreateListingPage() {
   const renderStep = () => {
     switch (currentStep) {
       case 0: return <PropertyDetailsStep form={form} />;
-      case 1: return <MediaStep form={form} />;
-      case 2: return <LocationStep form={form} />;
-      case 3: return <PublishingStep form={form} />;
-      case 4: return <NotesStep form={form} />;
-      case 5: return <DocumentsStep form={form} />;
-      case 6: return <CompletedStep form={form} />;
+      case 1: return <LocationStep form={form} />;
+      case 2: return <PublishingStep form={form} />;
+      case 3: return <CompletedStep form={form} />;
       default: return null;
     }
   };
@@ -193,9 +232,13 @@ export default function CreateListingPage() {
                        <span className="text-[9px] font-black uppercase tracking-[0.2em] text-primary leading-none">Live Draft Progress</span>
                     </div>
                     <div className="flex items-center gap-3">
-                       <span className="text-xl font-black text-foreground dark:text-white tracking-tight">New Property Listing</span>
+                       <span className="text-xl font-black text-foreground dark:text-white tracking-tight">
+                         {isEdit ? "Update Property Listing" : "New Property Listing"}
+                       </span>
                        <div className="h-4 w-px bg-border/20 mx-1" />
-                       <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest bg-muted/30 dark:bg-white/5 py-1 px-3 rounded-full">Draft Auto-Saved</span>
+                       <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest bg-muted/30 dark:bg-white/5 py-1 px-3 rounded-full">
+                         {isEdit ? "Editing Mode" : "Draft Auto-Saved"}
+                       </span>
                     </div>
                  </div>
               </div>
@@ -230,9 +273,24 @@ export default function CreateListingPage() {
 
         {/* Main Content Area */}
         <div className="max-w-[1600px] mx-auto px-4 md:px-8 py-12">
-          <div className="animate-in fade-in slide-in-from-bottom-6 duration-700">
-            {renderStep()}
-          </div>
+          {isFetching ? (
+            <div className="flex flex-col items-center justify-center min-h-[400px] gap-6">
+               <div className="relative">
+                 <div className="h-24 w-24 rounded-full border-t-2 border-primary animate-spin" />
+                 <div className="absolute inset-0 flex items-center justify-center">
+                    <Loader2 className="h-8 w-8 text-primary/40 animate-pulse" />
+                 </div>
+               </div>
+               <div className="text-center">
+                 <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary animate-pulse mb-2">Decrypted Access Secured</p>
+                 <p className="text-xs text-muted-foreground font-medium">Retrieving listing assets from the core repository...</p>
+               </div>
+            </div>
+          ) : (
+            <div className="animate-in fade-in slide-in-from-bottom-6 duration-700">
+              {renderStep()}
+            </div>
+          )}
 
           {/* Bottom Navigation */}
           {currentStep < STEPS.length - 1 && (

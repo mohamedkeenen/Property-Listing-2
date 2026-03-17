@@ -20,6 +20,12 @@ import { ModernSelect } from "@/components/ui/modern-select";
 import { NumberSearchSelect } from "@/components/ui/number-search-select";
 import { CreditCard as CreditCardIcon, Paintbrush } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
+import { useGetProjectsQuery, useGetDevelopersQuery } from "@/api/redux/services/settingsApi";
+import { useGetUsersQuery } from "@/api/redux/services/userApi";
+import { useSelector } from "react-redux";
+import { selectCompanyLogo, selectSettingsLastUpdated } from "@/api/redux/slices/settingsSlice";
+import { Upload, Image as ImageIcon, Video, RotateCw, QrCode, StickyNote } from "lucide-react";
+import { useRef, useEffect } from "react";
 
 interface Props {
   form: UseFormReturn<any>;
@@ -35,6 +41,127 @@ export function PropertyDetailsStep({ form }: Props) {
   const pricePeriod = watch("pricePeriod");
   const availabilityStatus = watch("availabilityStatus");
   const licenseType = watch("licenseType");
+
+  const { data: projectsData } = useGetProjectsQuery();
+  const { data: developersData } = useGetDevelopersQuery();
+  const { data: usersData } = useGetUsersQuery();
+  const { data: adminsData } = useGetUsersQuery({ role: 'admin' });
+
+  const projectOptions = useMemo(() => 
+    projectsData?.data?.map((p: any) => ({ label: p.name, value: p.id.toString() })) || [], 
+  [projectsData]);
+
+  const developerOptions = useMemo(() => 
+    developersData?.data?.map((d: any) => ({ label: d.name, value: d.id.toString() })) || [], 
+  [developersData]);
+
+  const agentOptions = useMemo(() => 
+    usersData?.data?.map((u: any) => ({ label: u.name, value: u.id.toString() })) || [], 
+  [usersData]);
+
+  const ownerOptions = useMemo(() => 
+    adminsData?.data?.map((u: any) => ({ label: u.name, value: u.id.toString() })) || [], 
+  [adminsData]);
+
+  const companyLogo = useSelector(selectCompanyLogo);
+  const settingsLastUpdated = useSelector(selectSettingsLastUpdated);
+  const [activePreviewIndex, setActivePreviewIndex] = useState(0);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const docInputRef = useRef<HTMLInputElement>(null);
+
+  const images = watch("images") || [];
+  const documents = watch("documents") || [];
+  const notes = watch("notes") || "";
+
+  const getLogoUrl = (logo: string) => {
+    if (!logo) return "";
+    if (logo.startsWith('http') || logo.startsWith('data:image')) return logo;
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+    return `${apiUrl}/settings/logo?v=${settingsLastUpdated}`;
+  };
+
+  const applyWatermark = (base64Image: string, logoUrl: string): Promise<string> => {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return resolve(base64Image);
+        ctx.drawImage(img, 0, 0);
+        const logo = new Image();
+        logo.crossOrigin = "anonymous";
+        logo.onload = () => {
+          const logoTargetWidth = canvas.width * 0.35;
+          const logoTargetHeight = (logo.height / logo.width) * logoTargetWidth;
+          const x = (canvas.width - logoTargetWidth) / 2;
+          const y = (canvas.height - logoTargetHeight) / 2;
+          ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
+          ctx.globalAlpha = 0.6;
+          ctx.beginPath();
+          const padding = 20;
+          ctx.roundRect(x - padding, y - padding, logoTargetWidth + (padding * 2), logoTargetHeight + (padding * 2), 24);
+          ctx.fill();
+          ctx.globalAlpha = 1.0;
+          ctx.drawImage(logo, x, y, logoTargetWidth, logoTargetHeight);
+          resolve(canvas.toDataURL("image/jpeg", 0.95));
+        };
+        logo.onerror = () => resolve(base64Image);
+        logo.src = logoUrl;
+      };
+      img.onerror = () => resolve(base64Image);
+      img.src = base64Image;
+    });
+  };
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files) return;
+    Array.from(files).forEach((file) => {
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        const base64String = reader.result as string;
+        const watermarked = await applyWatermark(base64String, getLogoUrl(companyLogo));
+        const currentImages = watch("images") || [];
+        setValue("images", [...currentImages, watermarked], { shouldValidate: true });
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const removeImage = (index: number) => {
+    const newList = images.filter((_: any, i: number) => i !== index);
+    setValue("images", newList, { shouldValidate: true });
+    if (activePreviewIndex >= newList.length) {
+      setActivePreviewIndex(Math.max(0, newList.length - 1));
+    }
+  };
+
+  const handleDocUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files) return;
+    Array.from(files).forEach((file) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const docEntry = JSON.stringify({
+          name: file.name,
+          size: `${(file.size / 1024).toFixed(1)} KB`,
+          type: file.type || "Document",
+          data: reader.result as string
+        });
+        const currentDocs = watch("documents") || [];
+        setValue("documents", [...currentDocs, docEntry], { shouldValidate: true });
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const removeDoc = (index: number) => {
+    const newList = documents.filter((_: any, i: number) => i !== index);
+    setValue("documents", newList, { shouldValidate: true });
+  };
 
   const fieldError = (name: string) => errors[name]?.message as string | undefined;
 
@@ -239,7 +366,7 @@ export function PropertyDetailsStep({ form }: Props) {
               icon={BedDouble} 
               required 
               showStudio
-              value={watch("bedrooms") === 0 ? "Studio" : (watch("bedrooms") !== undefined ? watch("bedrooms")?.toString() : undefined)} 
+              value={watch("bedrooms") === 0 ? "Studio" : (watch("bedrooms") ? watch("bedrooms")?.toString() : "")} 
               onChange={(v: string) => {
                 const val = v === "" ? undefined : (v === "Studio" ? 0 : Number(v));
                 setValue("bedrooms", val, { shouldValidate: true });
@@ -251,7 +378,7 @@ export function PropertyDetailsStep({ form }: Props) {
               label="Bathrooms" 
               icon={Bath} 
               required 
-              value={watch("bathrooms") !== undefined ? watch("bathrooms")?.toString() : undefined} 
+              value={watch("bathrooms") ? watch("bathrooms")?.toString() : ""} 
               onChange={(v: string) => {
                 const val = v === "" ? undefined : Number(v);
                 setValue("bathrooms", val, { shouldValidate: true });
@@ -278,7 +405,7 @@ export function PropertyDetailsStep({ form }: Props) {
               icon={Building2} 
               value={watch("projectName")} 
               onValueChange={(v) => setValue("projectName", v, { shouldValidate: true })}
-              options={filterOptions.projectNames}
+              options={projectOptions}
             />
             
             <ModernSelect 
@@ -294,7 +421,7 @@ export function PropertyDetailsStep({ form }: Props) {
               icon={Building2} 
               value={watch("developers")} 
               onValueChange={(v) => setValue("developers", v, { shouldValidate: true })}
-              options={filterOptions.developers}
+              options={developerOptions}
             />
 
             <ModernField label="Build Year" icon={Calendar} type="number" {...register("buildYear")} value={watch("buildYear")} />
@@ -593,6 +720,131 @@ export function PropertyDetailsStep({ form }: Props) {
             })}
           </div>
         </section>
+        {/* Section 6: Media & Photos */}
+        <section className="space-y-6">
+          <div className="flex items-center gap-3">
+             <div className="p-2 rounded-xl bg-blue-500/10 text-blue-500">
+                <ImageIcon className="h-4 w-4" />
+             </div>
+             <h3 className="text-sm font-bold text-foreground">Media & Photographs</h3>
+             <div className="h-px flex-1 bg-border/20" />
+             <Upload className="h-4 w-4 text-muted-foreground/30" />
+          </div>
+
+          <div className="bg-card/30 p-8 rounded-4xl border border-border/20 space-y-8">
+            <div className="flex flex-wrap gap-4 min-h-[120px]">
+              {images.map((url: string, i: number) => (
+                <div 
+                  key={i} 
+                  className={cn(
+                    "relative group w-28 h-28 rounded-2xl overflow-hidden shadow-sm border border-border/40 transition-all hover:shadow-lg hover:-translate-y-1 cursor-pointer",
+                    activePreviewIndex === i ? "ring-2 ring-primary" : ""
+                  )}
+                  onClick={() => setActivePreviewIndex(i)}
+                >
+                  <img src={url} alt={`Upload ${i}`} className="w-full h-full object-cover" />
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <button
+                      type="button"
+                      onClick={(e) => { e.stopPropagation(); removeImage(i); }}
+                      className="bg-white/20 backdrop-blur-md hover:bg-destructive/80 text-white rounded-xl p-2 transition-all"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="w-28 h-28 flex flex-col items-center justify-center border-2 border-dashed border-border rounded-2xl hover:border-primary/50 hover:bg-primary/5 transition-all group"
+              >
+                <Upload className="h-5 w-5 text-muted-foreground group-hover:text-primary mb-2" />
+                <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground group-hover:text-primary">Upload</span>
+                <input ref={fileInputRef} type="file" multiple accept="image/*" className="hidden" onChange={handleImageUpload} />
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <ModernField label="Video Tour URL" icon={Video} {...register("videoUrl")} value={watch("videoUrl")} />
+              <ModernField label="View 360 URL" icon={RotateCw} {...register("view360Url")} value={watch("view360Url")} />
+              <ModernField label="QR Code URL" icon={QrCode} {...register("qrCodeUrl")} value={watch("qrCodeUrl")} />
+            </div>
+          </div>
+        </section>
+
+        {/* Section 7: Documents */}
+        <section className="space-y-6">
+          <div className="flex items-center gap-3">
+             <div className="p-2 rounded-xl bg-amber-500/10 text-amber-500">
+                <FileText className="h-4 w-4" />
+             </div>
+             <h3 className="text-sm font-bold text-foreground">Internal Documents</h3>
+             <div className="h-px flex-1 bg-border/20" />
+             <PlusCircle className="h-4 w-4 text-muted-foreground/30" />
+          </div>
+
+          <div className="bg-card/30 p-8 rounded-4xl border border-border/20">
+            <div className="space-y-4">
+              <button
+                type="button"
+                onClick={() => docInputRef.current?.click()}
+                className="w-full py-4 border-2 border-dashed border-border rounded-2xl flex items-center justify-center gap-3 hover:border-primary/50 hover:bg-primary/5 transition-all text-xs font-bold text-muted-foreground"
+              >
+                <PlusCircle className="h-4 w-4" /> Add Document
+                <input ref={docInputRef} type="file" multiple className="hidden" onChange={handleDocUpload} />
+              </button>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {documents.map((docJson: string, i: number) => {
+                  const doc = JSON.parse(docJson);
+                  return (
+                    <div key={i} className="flex items-center justify-between bg-muted/20 border border-border/40 rounded-2xl p-4">
+                      <div className="flex items-center gap-3 overflow-hidden">
+                        <FileText className="h-4 w-4 text-primary shrink-0" />
+                        <div className="truncate">
+                          <p className="text-xs font-bold truncate">{doc.name}</p>
+                          <p className="text-[10px] text-muted-foreground">{doc.size}</p>
+                        </div>
+                      </div>
+                      <button type="button" onClick={() => removeDoc(i)} className="text-muted-foreground hover:text-destructive p-1">
+                        <X className="h-4 w-4" />
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Section 8: Internal Notes */}
+        <section className="space-y-6">
+          <div className="flex items-center gap-3">
+             <div className="p-2 rounded-xl bg-gray-500/10 text-gray-500">
+                <StickyNote className="h-4 w-4" />
+             </div>
+             <h3 className="text-sm font-bold text-foreground">Internal Notes</h3>
+             <div className="h-px flex-1 bg-border/20" />
+             <FileText className="h-4 w-4 text-muted-foreground/30" />
+          </div>
+
+          <div className="bg-card/30 p-8 rounded-4xl border border-border/20">
+            <ModernField 
+              label="Private Remarks" 
+              icon={StickyNote} 
+              value={watch("notes")}
+              onClear={() => setValue("notes", "", { shouldValidate: true })}
+              alignTop
+            >
+              <textarea 
+                {...register("notes")} 
+                className="w-full min-h-[120px] bg-transparent border-none focus:ring-0 text-sm font-bold text-foreground outline-none p-0 resize-none placeholder:text-muted-foreground/20 leading-relaxed"
+                placeholder="Internal notes only, not visible to clients..."
+              />
+            </ModernField>
+          </div>
+        </section>
       </div>
 
       {/* RIGHT SIDEBAR */}
@@ -641,7 +893,7 @@ export function PropertyDetailsStep({ form }: Props) {
               required 
               value={watch("listingAgent")} 
               onValueChange={(v) => setValue("listingAgent", v, { shouldValidate: true })}
-              options={filterOptions.agents}
+              options={agentOptions}
               error={fieldError("listingAgent")}
             />
 
@@ -651,7 +903,7 @@ export function PropertyDetailsStep({ form }: Props) {
               required 
               value={watch("listingOwner")} 
               onValueChange={(v) => setValue("listingOwner", v, { shouldValidate: true })}
-              options={filterOptions.agents}
+              options={ownerOptions}
               error={fieldError("listingOwner")}
             />
 

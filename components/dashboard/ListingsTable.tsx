@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import NextImage from "next/image";
 import { useRouter } from "next/navigation";
-import { Eye, Pencil, Trash2, ChevronLeft, ChevronRight, Search, MoreHorizontal, FileDown, Bath, BedDouble, ArrowUpDown, User } from "lucide-react";
+import { Eye, Pencil, Trash2, ChevronLeft, ChevronRight, Search, MoreHorizontal, FileDown, Bath, BedDouble, ArrowUpDown, User, Image as ImageIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -9,9 +9,10 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { PropertyListing } from "@/data/mockData";
-import { cn } from "@/lib/utils";
+import { cn, formatRelativeTime } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
 import { generatePropertyPDF } from "@/lib/generatePDF";
+import { useDeletePropertyMutation } from "@/api/redux/services/propertyApi";
 
 interface Props {
   listings: PropertyListing[];  
@@ -38,6 +39,7 @@ const statusColors: Record<string, string> = {
 
 export function ListingsTable({ listings, onViewDetails, onEdit }: Props) {
   const router = useRouter();
+  const [deleteProperty] = useDeletePropertyMutation();
   const scrollRef = useRef<HTMLDivElement>(null);
   const [activeTab, setActiveTab] = useState("all");
   const [search, setSearch] = useState("");
@@ -57,8 +59,19 @@ export function ListingsTable({ listings, onViewDetails, onEdit }: Props) {
 
   const tabCounts = (val: string) => val === "all" ? listings.length : listings.filter((l) => l.status === val).length;
 
-  const handleDelete = (listing: PropertyListing) => {
-    toast({ title: "Listing deleted", description: `${listing.reference} has been removed.` });
+  const handleDelete = async (listing: PropertyListing) => {
+    if (!confirm(`Are you sure you want to delete ${listing.reference}?`)) return;
+    
+    try {
+      await deleteProperty(listing.id).unwrap();
+      toast({ title: "Listing deleted", description: `${listing.reference} has been removed successfully.` });
+    } catch (err: any) {
+      toast({ 
+        title: "Delete failed", 
+        description: err.data?.message || "Failed to delete the property. Internal server error.",
+        variant: "destructive" 
+      });
+    }
   };
 
   const handleDownloadPDF = async (listing: PropertyListing) => {
@@ -200,7 +213,7 @@ export function ListingsTable({ listings, onViewDetails, onEdit }: Props) {
           <TableBody>
             {paginated.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={12} className="text-center py-8 text-muted-foreground">
+                <TableCell colSpan={13} className="text-center py-8 text-muted-foreground">
                   No listings found
                 </TableCell>
               </TableRow>
@@ -241,12 +254,23 @@ export function ListingsTable({ listings, onViewDetails, onEdit }: Props) {
                   <TableCell className="font-mono text-xs">{l.reference}</TableCell>
                   <TableCell>
                     <div className="flex items-center gap-3">
-                      <div className="relative h-10 w-14 rounded overflow-hidden shrink-0">
-                        <NextImage src={l.image} alt={l.title} fill className="object-cover" />
+                      <div className="relative h-10 w-14 rounded overflow-hidden shrink-0 bg-muted flex items-center justify-center">
+                        {l.image ? (
+                          <img 
+                            src={l.image} 
+                            alt={l.title} 
+                            className="w-full h-full object-cover transition-opacity duration-300 opacity-0" 
+                            onLoad={(e) => e.currentTarget.classList.remove('opacity-0')}
+                          />
+                        ) : (
+                          <ImageIcon className="h-4 w-4 text-muted-foreground/30" />
+                        )}
                       </div>
                       <div className="min-w-0">
                         <p className="text-sm font-medium truncate">{l.title}</p>
-                        <p className="text-xs text-muted-foreground truncate">{l.location}</p>
+                        <p className="text-[10px] text-muted-foreground/60 truncate uppercase tracking-tight">
+                          {l.location} • {l.community} {l.building && `• ${l.building}`}
+                        </p>
                       </div>
                     </div>
                   </TableCell>
@@ -281,8 +305,9 @@ export function ListingsTable({ listings, onViewDetails, onEdit }: Props) {
                   </TableCell>
                   <TableCell>
                     <div className="flex flex-col gap-1 py-1">
-                      <span className="text-[13px] font-semibold text-foreground/80">3 days ago</span>
-                      <span className="text-[11px] font-medium text-muted-foreground/50">3 days ago</span>
+                      <span className="text-[13px] font-semibold text-foreground/80">
+                        {formatRelativeTime(l.updatedAt)}
+                      </span>
                     </div>
                   </TableCell>
                   <TableCell>
@@ -295,7 +320,7 @@ export function ListingsTable({ listings, onViewDetails, onEdit }: Props) {
                     <div className="flex items-center gap-3 py-1">
                        <div className="h-8 w-8 rounded-full bg-sky-100 flex items-center justify-center overflow-hidden shrink-0 border border-sky-200/50">
                           {l.listingAgentAvatar ? (
-                            <NextImage src={l.listingAgentAvatar} alt={l.listingAgent} width={32} height={32} className="object-cover" />
+                            <img src={l.listingAgentAvatar} alt={l.listingAgent} className="w-full h-full object-cover" />
                           ) : (
                             <User className="h-5 w-5 text-sky-500" />
                           )}
@@ -307,7 +332,7 @@ export function ListingsTable({ listings, onViewDetails, onEdit }: Props) {
                     <div className="flex items-center gap-3 py-1">
                        <div className="h-8 w-8 rounded-full bg-sky-100 flex items-center justify-center overflow-hidden shrink-0 border border-sky-200/50">
                           {l.ownerAvatar ? (
-                            <NextImage src={l.ownerAvatar} alt={l.owner} width={32} height={32} className="object-cover" />
+                            <img src={l.ownerAvatar} alt={l.owner} className="w-full h-full object-cover" />
                           ) : (
                             <User className="h-5 w-5 text-sky-500" />
                           )}

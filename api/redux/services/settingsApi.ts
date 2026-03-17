@@ -12,7 +12,7 @@ export const settingsApi = createApi({
       return headers;
     },
   }),
-  tagTypes: ['CompanySettings'],
+  tagTypes: ['CompanySettings', 'Projects', 'Developers'],
   endpoints: (builder) => ({
     getCompanySettings: builder.query<any, void>({
       query: () => '/settings/company',
@@ -26,7 +26,20 @@ export const settingsApi = createApi({
       }),
       invalidatesTags: ['CompanySettings'],
     }),
+    getProjects: builder.query<any, void>({
+      query: () => '/settings/projects',
+      providesTags: ['Projects'],
+    }),
+    getDevelopers: builder.query<any, void>({
+      query: () => '/settings/developers',
+      providesTags: ['Developers'],
+    }),
   }),
 });
 
-export const { useGetCompanySettingsQuery, useUpdateCompanySettingsMutation } = settingsApi;
+export const { 
+  useGetCompanySettingsQuery, 
+  useUpdateCompanySettingsMutation,
+  useGetProjectsQuery,
+  useGetDevelopersQuery
+} = settingsApi;

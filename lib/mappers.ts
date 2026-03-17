@@ -1,0 +1,125 @@
+import { PropertyListing } from "@/data/mockData";
+
+export const mapBackendPropertyToFrontend = (p: any): PropertyListing => {
+  const getImageUrl = (path: string) => {
+    if (!path) return "";
+    if (path.startsWith('http') || path.startsWith('data:image')) return path;
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'http://localhost:8000';
+    return `${apiUrl}/storage/${path}`;
+  };
+
+  const imagesList = p.images || [];
+  const coverMedia = imagesList.find((m: any) => m.type === 'cover') || imagesList[0];
+  const coverUrl = coverMedia ? (coverMedia.url || getImageUrl(coverMedia.file_path)) : "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400&h=300&fit=crop";
+  const allImages = imagesList.map((m: any) => m.url || getImageUrl(m.file_path));
+
+  return {
+    id: p.id.toString(),
+    reference: `REF-${p.id}`, 
+    title: p.title_en || "Untitled",
+    location: p.city || "Dubai", 
+    community: p.community || "Main",
+    subCommunity: p.sub_community || "",
+    building: p.tower || p.building || "",
+    unitNo: p.unit_number || "",
+    type: p.property_type || "Apartment",
+    category: p.category?.charAt(0).toUpperCase() + p.category?.slice(1) as any,
+    purpose: p.purpose?.charAt(0).toUpperCase() + p.purpose?.slice(1) as any,
+    status: p.status as any,
+    price: parseFloat(p.sale_price || p.rent_price || "0"),
+    bedrooms: p.bedrooms || 0,
+    bathrooms: p.bathrooms || 0,
+    size: p.size || 0,
+    image: coverUrl,
+    images: allImages,
+    listingAgent: p.agent?.name || "Unknown Agent",
+    listingAgentAvatar: p.agent?.photo ? getImageUrl(p.agent.photo) : "",
+    owner: p.owner?.name || "System Admin",
+    ownerAvatar: p.owner?.photo ? getImageUrl(p.owner.photo) : "",
+    ownerPhone: p.owner?.phone || "",
+    portals: {
+      pf: p.is_on_pf || false,
+      bayut: p.is_on_bayut || false,
+      website: p.is_on_website || false,
+      skyloov: false, 
+    },
+    updatedAt: p.updated_at || new Date().toISOString(),
+    description: p.description_en || "",
+    descriptionAr: p.description_ar || "",
+    amenities: p.amenities || [],
+    permitNumber: p.permit_number || "",
+    availableFrom: p.available_date || "",
+    parking: p.parking || 0,
+    furnished: p.furnished || "Unfurnished",
+    notes: typeof p.notes === 'string' 
+      ? [{ id: Math.random(), content: p.notes, user: "System Admin", date: p.updated_at }]
+      : (p.notes || []).map((n: any) => ({
+          id: n.id || Math.random(),
+          content: n.content || n,
+          user: n.user?.name || "System Admin",
+          date: n.created_at || p.updated_at
+        })),
+    documents: (p.documents || []).map((d: any) => ({
+      id: d.id || Math.random(),
+      title: d.title,
+      url: d.url || getImageUrl(d.file_path)
+    })),
+  };
+};
+
+export const mapBackendPropertyToFormValues = (p: any): any => {
+  const getImageUrl = (path: string) => {
+    if (!path) return "";
+    if (path.startsWith('http') || path.startsWith('data:image')) return path;
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'http://localhost:8000';
+    return `${apiUrl}/storage/${path}`;
+  };
+
+  const getPrice = () => {
+    const sale = parseFloat(p.sale_price || "0");
+    const rent = parseFloat(p.rent_price || "0");
+    return sale > 0 ? sale : (rent > 0 ? rent : "");
+  };
+
+  return {
+    category: p.category ? p.category.charAt(0).toUpperCase() + p.category.slice(1) : "Residential",
+    purpose: p.purpose ? p.purpose.charAt(0).toUpperCase() + p.purpose.slice(1) : "Rent",
+    type: p.property_type || "",
+    title: p.title_en || "",
+    titleAr: p.title_ar || "",
+    description: p.description_en || "",
+    descriptionAr: p.description_ar || "",
+    size: p.size ? parseFloat(p.size) : "",
+    bedrooms: p.bedrooms !== null ? p.bedrooms : "",
+    bathrooms: p.bathrooms !== null ? p.bathrooms : "",
+    parking: p.parking !== null ? p.parking : "",
+    unitNo: p.unit_number || "",
+    price: getPrice(),
+    pricePeriod: p.rent_frequency || "Yearly",
+    currency: p.currency || "Dirham",
+    listingAgent: p.agent_id?.toString() || "",
+    listingOwner: p.owner_id?.toString() || "",
+    projectName: p.project_id?.toString() || "",
+    developers: p.developer_id?.toString() || "",
+    amenities: p.amenities || [],
+    city: p.city || "",
+    community: p.community || "",
+    subCommunity: p.sub_community || "",
+    building: p.tower || p.building || "",
+    images: (p.images || []).map((img: any) => img.url || getImageUrl(img.file_path)),
+    documents: (p.documents || []).map((doc: any) => JSON.stringify({
+      name: doc.name || doc.title,
+      data: doc.url || getImageUrl(doc.file_path),
+      size: doc.size || "Unknown"
+    })),
+    notes: typeof p.notes === 'string' ? p.notes : (Array.isArray(p.notes) ? p.notes.map((n: any) => n.content || n).join('\n') : ""),
+    portals: {
+      propertyFinder: !!p.is_on_pf,
+      bayutEnabled: !!p.is_on_bayut,
+      bayutSelection: !!p.is_on_bayut,
+      dubizzleSelection: !!p.is_on_dubizzle,
+      officeWebsite: !!p.is_on_website,
+      primeZamWebsite: false,
+    }
+  };
+};

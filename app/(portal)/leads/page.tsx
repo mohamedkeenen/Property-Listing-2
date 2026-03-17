@@ -1,15 +1,20 @@
 "use client";
 
 import { LeadsTable } from "@/components/leads/LeadsTable";
-import { mockLeads } from "@/data/mockData";
+import { Lead } from "@/data/mockData";
 import { Users, UserPlus, UserCheck, UserX, Info, List, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useGetLeadsQuery } from "@/api/redux/services/leadsApi";
 
 export default function Leads() {
-  const totalLeads = mockLeads.length;
-  const newLeads = mockLeads.filter((l) => l.status === "New").length;
-  const qualifiedLeads = mockLeads.filter((l) => l.status === "Qualified").length;
-  const lostLeads = mockLeads.filter((l) => l.status === "Lost").length;
+  const { data: apiLeads, isLoading: leadsLoading } = useGetLeadsQuery();
+  // Remove mockLeads fallback to only show real data
+  const leads: Lead[] = apiLeads || [];
+
+  const totalLeads = leads.length;
+  const newLeads = leads.filter((l: Lead) => l.status === "New").length;
+  const qualifiedLeads = leads.filter((l: Lead) => l.status === "Qualified").length;
+  const lostLeads = leads.filter((l: Lead) => l.status === "Lost").length;
 
   const stats = [
     { label: "Total Leads", value: totalLeads, icon: Users, color: "text-primary", bg: "bg-primary/10", border: "border-primary/20 hover:border-primary/40" },
@@ -19,8 +24,8 @@ export default function Leads() {
   ];
 
   return (
-    <div className="flex flex-col h-full w-full min-w-0 overflow-hidden px-4 md:px-6 py-6">
-      <div className="flex flex-col gap-1 mb-10">
+    <div className="flex flex-col h-full w-full min-w-0 overflow-hidden px-4 md:px-6 py-6 scrollbar-hide">
+      <div className="flex flex-col gap-1 mb-10 shrink-0">
         <h1 className="text-3xl font-black text-foreground tracking-tight flex items-center gap-3">
           Leads Management
           <div className="h-2 w-2 rounded-full bg-primary animate-pulse" />
@@ -71,8 +76,15 @@ export default function Leads() {
           <div className="h-px flex-1 bg-border/50" />
           <Search className="h-4 w-4 text-muted-foreground" />
         </div>
-        <div className="flex-1 min-h-0 overflow-auto">
-          <LeadsTable />
+        <div className="flex-1 min-h-[200px] overflow-auto">
+          {leadsLoading ? (
+            <div className="h-full w-full flex flex-col items-center justify-center gap-4 py-20">
+              <div className="h-12 w-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+              <p className="text-sm font-bold text-muted-foreground animate-pulse uppercase tracking-widest">Fetching live leads from Bitrix24...</p>
+            </div>
+          ) : (
+            <LeadsTable leads={leads} />
+          )}
         </div>
       </div>
     </div>

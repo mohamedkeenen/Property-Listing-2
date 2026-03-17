@@ -1,9 +1,9 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import NextImage from "next/image";
+// removed next image
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { PropertyListing } from "@/data/mockData";
-import { Building2, BedDouble, Bath, Maximize, Car, MapPin, User, Calendar } from "lucide-react";
+import { Building2, BedDouble, Bath, Maximize, Car, MapPin, User, Calendar, Image as ImageIcon } from "lucide-react";
 
 interface Props {
   listing: PropertyListing | null;
@@ -21,8 +21,12 @@ export function PropertyDetailDialog({ listing, open, onClose }: Props) {
           <DialogTitle className="text-lg">{listing.title}</DialogTitle>
         </DialogHeader>
 
-        <div className="relative w-full h-56 rounded-lg overflow-hidden">
-          <NextImage src={listing.image} alt={listing.title} fill className="object-cover" />
+        <div className="relative w-full h-56 rounded-lg overflow-hidden bg-muted flex items-center justify-center">
+          {listing.image ? (
+            <img src={listing.image} alt={listing.title} className="w-full h-full object-cover" />
+          ) : (
+            <ImageIcon className="h-10 w-10 text-muted-foreground/20" />
+          )}
         </div>
 
         <div className="flex items-center gap-2 flex-wrap">

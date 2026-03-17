@@ -8,16 +8,24 @@ import { ListingsFilters, FiltersState } from "@/components/dashboard/ListingsFi
 import { ListingsTable } from "@/components/dashboard/ListingsTable";
 import { PropertyDetailDialog } from "@/components/listings/PropertyDetailDialog";
 import { mockListings, PropertyListing } from "@/data/mockData";
-import { BarChart3, List, PieChart, Search, Info } from "lucide-react";
+import { BarChart3, List, PieChart, Search, Info, Loader2 } from "lucide-react";
+import { useGetPropertiesQuery } from "@/api/redux/services/propertyApi";
+import { mapBackendPropertyToFrontend } from "@/lib/mappers";
 
 export default function Dashboard() {
   const router = useRouter();
   const [filters, setFilters] = useState<FiltersState | null>(null);
   const [selectedListing, setSelectedListing] = useState<PropertyListing | null>(null);
 
+  const { data: propertiesData, isLoading } = useGetPropertiesQuery({});
+
+  const listings = useMemo(() => {
+    return propertiesData?.data?.data?.map(mapBackendPropertyToFrontend) || [];
+  }, [propertiesData]);
+
   const filtered = useMemo(() => {
-    if (!filters) return mockListings;
-    return mockListings.filter((l) => {
+    if (!filters) return listings;
+    return listings.filter((l: PropertyListing) => {
       if (filters.refId && !l.reference.toLowerCase().includes(filters.refId.toLowerCase())) return false;
       if (filters.city && l.location !== filters.city) return false;
       if (filters.community && l.community !== filters.community) return false;
@@ -37,7 +45,7 @@ export default function Dashboard() {
       }
       return true;
     });
-  }, [filters]);
+  }, [filters, listings]);
 
   return (
     <div className="flex flex-col flex-1 h-full min-w-0 overflow-hidden px-4 md:px-6 py-6">
@@ -61,7 +69,7 @@ export default function Dashboard() {
             <div className="h-px flex-1 bg-border/50" />
             <Info className="h-4 w-4 text-muted-foreground" />
           </div>
-          <StatsCards />
+          <StatsCards listings={listings} />
         </div>
 
         {/* Charts Section */}
@@ -74,7 +82,7 @@ export default function Dashboard() {
             <div className="h-px flex-1 bg-border/50" />
             <BarChart3 className="h-4 w-4 text-muted-foreground" />
           </div>
-          <DashboardCharts />
+          <DashboardCharts listings={listings} />
         </div>
       </div>
 
@@ -90,12 +98,21 @@ export default function Dashboard() {
         </div>
         <div className="flex-1 flex flex-col min-h-0 space-y-4">
           <ListingsFilters onApply={setFilters} />
-          <div className="flex-1 min-h-0 overflow-auto">
-            <ListingsTable
-              listings={filtered}
-              onViewDetails={setSelectedListing}
-              onEdit={(l) => router.push("/create-listing")}
-            />
+          <div className="flex-1 min-h-0 overflow-auto relative">
+            {isLoading ? (
+              <div className="absolute inset-0 bg-background/50 backdrop-blur-sm z-50 flex items-center justify-center">
+                <div className="flex flex-col items-center gap-4">
+                  <Loader2 className="h-8 w-8 text-primary animate-spin" />
+                  <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Syncing Inventory...</p>
+                </div>
+              </div>
+            ) : (
+              <ListingsTable
+                listings={filtered}
+                onViewDetails={setSelectedListing}
+                onEdit={(l) => router.push(`/create-listing?id=${l.id}`)}
+              />
+            )}
           </div>
         </div>
       </div>

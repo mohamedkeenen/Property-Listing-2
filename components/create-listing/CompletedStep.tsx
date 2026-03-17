@@ -3,8 +3,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2, Rocket, FileText, Lock, Users, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
+import { useCreatePropertyMutation, useUpdatePropertyMutation } from "@/api/redux/services/propertyApi";
+import { Loader2 } from "lucide-react";
 
 interface Props {
   form: UseFormReturn<any>;
@@ -20,18 +22,80 @@ const publishOptions = [
 export function CompletedStep({ form }: Props) {
   const { watch, setValue } = form;
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const propertyId = searchParams.get("id");
+  const isEdit = !!propertyId;
   const { toast } = useToast();
   const publishStatus = watch("publishStatus") || "publish";
 
-  const handleFinalSubmit = () => {
-    // In a real app, this is where the API call happens
-    toast({
-      title: "Success! 🎉",
-      description: "Your property has been listed and is currently syncing with portals.",
-    });
-    // Clear draft and redirect
-    localStorage.removeItem("property-listing-draft");
-    router.push("/");
+  const [createProperty, { isLoading: isCreating }] = useCreatePropertyMutation();
+  const [updateProperty, { isLoading: isUpdating }] = useUpdatePropertyMutation();
+  const isLoading = isCreating || isUpdating;
+
+  const handleFinalSubmit = async () => {
+    const values = form.getValues();
+    
+    // Convert form values to API format
+    const payload = {
+      category: values.category.toLowerCase(),
+      purpose: values.purpose.toLowerCase(),
+      property_type: values.type,
+      unit_number: values.unitNo,
+      size: values.size,
+      bedrooms: values.bedrooms,
+      bathrooms: values.bathrooms,
+      parking: values.parking,
+      project_id: values.projectName ? parseInt(values.projectName) : null,
+      developer_id: values.developers ? parseInt(values.developers) : null,
+      agent_id: values.listingAgent ? parseInt(values.listingAgent) : null,
+      owner_id: values.listingOwner ? parseInt(values.listingOwner) : null,
+      title_en: values.title,
+      title_ar: values.titleAr || values.title,
+      description_en: values.description || "",
+      description_ar: values.descriptionAr || values.description || "",
+      sale_price: values.purpose === "Sale" ? values.price : null,
+      rent_price: values.purpose === "Rent" ? values.price : null,
+      rent_frequency: values.purpose === "Rent" ? values.pricePeriod : null,
+      amenities: values.amenities,
+      images: values.images,
+      status: publishStatus === "publish" ? "Live" : (publishStatus === "pocket" ? "Pocket" : "Draft"),
+      // Location fields
+      city: values.city,
+      community: values.community,
+      sub_community: values.subCommunity,
+      tower: values.building,
+      // Portal flags
+      is_on_pf: values.portals?.propertyFinder || false,
+      is_on_bayut: values.portals?.bayutEnabled || false,
+      is_on_website: values.portals?.officeWebsite || false,
+      is_on_dubizzle: values.portals?.primeZamWebsite || false,
+      // Notes & Docs
+      notes: values.notes,
+      documents: values.documents,
+    };
+
+    try {
+      if (isEdit && propertyId) {
+        await updateProperty({ id: propertyId, data: payload }).unwrap();
+      } else {
+        await createProperty(payload).unwrap();
+      }
+      
+      toast({
+        title: "Success! 🎉",
+        description: isEdit ? "Property listing updated successfully." : "Your property has been listed successfully.",
+      });
+      
+      if (!isEdit) localStorage.removeItem("property-listing-draft");
+      router.push("/");
+    } catch (error: any) {
+      toast({
+        title: "Submission Failed",
+        description: error.data?.message || "There was an error creating your listing. Please check the details and try again.",
+        variant: "destructive",
+      });
+      console.error("Submission error:", error);
+    }
   };
 
   return (
@@ -91,10 +155,20 @@ export function CompletedStep({ form }: Props) {
       <div className="pt-8 flex flex-col items-center gap-6">
          <Button 
            onClick={handleFinalSubmit}
+           disabled={isLoading}
            className="h-16 rounded-2xl font-black text-[11px] uppercase tracking-[0.3em] px-16 shadow-2xl shadow-primary/40 hover:shadow-primary/60 hover:-translate-y-1 transition-all bg-primary gap-4"
          >
-           Finalize & Publish Listing
-           <ArrowRight className="h-4 w-4" />
+           {isLoading ? (
+             <>
+               <Loader2 className="h-4 w-4 animate-spin" />
+               Processing...
+             </>
+           ) : (
+             <>
+               Finalize & Publish Listing
+               <ArrowRight className="h-4 w-4" />
+             </>
+           )}
          </Button>
          <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest text-center max-w-sm leading-loose">
            By clicking publish, your listing will be immediately broadcast to the selected distribution channels.

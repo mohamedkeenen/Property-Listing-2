@@ -35,6 +35,8 @@ export interface PropertyListing {
   finishingType?: string;
   currency?: string;
   office?: string;
+  notes?: any[];
+  documents?: any[];
 }
 
 export interface Lead {
@@ -42,7 +44,7 @@ export interface Lead {
   name: string;
   email: string;
   phone: string;
-  source: "Property Finder" | "Bayut" | "Website" | "Skyloov";
+  source: "Property Finder" | "Bayut" | "Website" | "Skyloov" | "Facebook";
   subSource: "WhatsApp" | "Email" | "Call";
   property: string;
   status: "New" | "Contacted" | "Qualified" | "Lost";

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import NextImage from "next/image";
-import { Search, MessageCircle, Mail, Phone, MoreHorizontal, Eye, Trash2, ChevronLeft, ChevronRight, Globe } from "lucide-react";
+import { Search, MessageCircle, Mail, Phone, MoreHorizontal, Eye, Trash2, ChevronLeft, ChevronRight, Globe, Facebook } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -24,6 +24,7 @@ const portalLogos: Record<string, string> = {
   "Property Finder": "https://res.cloudinary.com/devht0mp5/image/upload/v1772105511/PF_ljkahc.png",
   "Bayut": "https://res.cloudinary.com/devht0mp5/image/upload/v1772105511/bayut_gy4ev2.png",
   "Skyloov": "https://res.cloudinary.com/devht0mp5/image/upload/v1773486432/Logo-rebrand-blue_dwxrba.svg",
+  "Facebook": "https://upload.wikimedia.org/wikipedia/commons/b/b8/2021_Facebook_icon.svg",
 };
 
 const statusColors: Record<string, string> = {
@@ -33,10 +34,10 @@ const statusColors: Record<string, string> = {
   Lost: "bg-red-500/10 text-red-500 dark:text-red-400 border-red-200 dark:border-red-500/30",
 };
 
-const sourceTabs = ["All", "Property Finder", "Bayut", "Skyloov", "Website"];
+const sourceTabs = ["All", "Property Finder", "Bayut", "Facebook", "Skyloov", "Website"];
 const statusTabs = ["All Statuses", "New", "Contacted", "Qualified", "Lost"];
 
-export function LeadsTable() {
+export function LeadsTable({ leads = [] }: { leads?: Lead[] }) {
   const [search, setSearch] = useState("");
   const [sourceFilter, setSourceFilter] = useState("All");
   const [subSourceFilter, setSubSourceFilter] = useState("All");
@@ -45,7 +46,7 @@ export function LeadsTable() {
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(10);
 
-  const filtered = mockLeads.filter((l) => {
+  const filtered = leads.filter((l) => {
     const matchSource = sourceFilter === "All" || l.source === sourceFilter;
     const matchSubSource = subSourceFilter === "All" || l.subSource === subSourceFilter;
     const matchStatus = statusFilter === "All Statuses" || l.status === statusFilter;
@@ -78,6 +79,7 @@ export function LeadsTable() {
                 All: "hover:bg-primary/10 hover:text-primary",
                 "Property Finder": "hover:bg-orange-500/10 hover:text-orange-500",
                 Bayut: "hover:bg-emerald-500/10 hover:text-emerald-500",
+                Facebook: "hover:bg-blue-600/10 hover:text-blue-600",
                 Website: "hover:bg-cyan-500/10 hover:text-cyan-500",
               };
 
@@ -85,6 +87,7 @@ export function LeadsTable() {
                 All: "bg-primary text-primary-foreground shadow-primary/20",
                 "Property Finder": "bg-orange-500 text-white shadow-orange-500/20",
                 Bayut: "bg-emerald-500 text-white shadow-emerald-500/20",
+                Facebook: "bg-blue-600 text-white shadow-blue-600/20",
                 Website: "bg-cyan-500 text-white shadow-cyan-500/20",
               };
 
@@ -266,11 +269,17 @@ export function LeadsTable() {
                               </div>
                             ) : l.source === "Website" ? (
                               <Globe className="h-4 w-4 text-cyan-500" />
+                            ) : l.source === "Facebook" ? (
+                              <Facebook className="h-4 w-4 text-blue-600" />
                             ) : null}
                           </div>
                           <span className={cn(
-                            "text-xs font-semibold",
-                            l.source === "Website" ? "text-cyan-500" : "text-foreground/80"
+                            "text-xs font-semibold whitespace-nowrap",
+                            l.source === "Website" ? "text-cyan-500" : 
+                            l.source === "Property Finder" ? "text-orange-500" :
+                            l.source === "Bayut" ? "text-emerald-500" :
+                            l.source === "Facebook" ? "text-blue-600" :
+                            "text-foreground/80"
                           )}>
                             {l.source}
                           </span>
@@ -377,11 +386,17 @@ export function LeadsTable() {
                         </div>
                       ) : selectedLead.source === "Website" ? (
                         <Globe className="h-6 w-6 text-cyan-500" />
+                      ) : selectedLead.source === "Facebook" ? (
+                        <Facebook className="h-6 w-6 text-blue-600" />
                       ) : null}
                     </div>
                     <span className={cn(
                       "text-sm font-bold",
-                      selectedLead.source === "Website" ? "text-cyan-500" : "text-foreground"
+                      selectedLead.source === "Website" ? "text-cyan-500" : 
+                      selectedLead.source === "Property Finder" ? "text-orange-500" :
+                      selectedLead.source === "Bayut" ? "text-emerald-500" :
+                      selectedLead.source === "Facebook" ? "text-blue-600" :
+                      "text-foreground"
                     )}>
                       {selectedLead.source}
                     </span>

@@ -1,30 +1,47 @@
 "use client";
 
 import { useState, useRef, use } from "react";
-import NextImage from "next/image";
 import { useRouter } from "next/navigation";
-import { mockListings } from "@/data/mockData";
+import { useGetPropertyQuery } from "@/api/redux/services/propertyApi";
+import { mapBackendPropertyToFrontend } from "@/lib/mappers";
+import { cn, formatRelativeTime } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import {
   ArrowLeft, BedDouble, Bath, Maximize, Car, MapPin, Building2, User, Calendar,
-  Phone, ChevronLeft, ChevronRight, FileText, Tag, Armchair
+  Phone, ChevronLeft, ChevronRight, FileText, Tag, Armchair, Loader2, Image as ImageIcon
 } from "lucide-react";
 
 export default function PropertyDetail({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const router = useRouter();
-  const listing = mockListings.find((l) => l.id === id);
+  const { data: propertyResponse, isLoading } = useGetPropertyQuery(id);
+  const listing = propertyResponse?.data ? mapBackendPropertyToFrontend(propertyResponse.data) : null;
   const [activeImage, setActiveImage] = useState(0);
   const thumbRef = useRef<HTMLDivElement>(null);
 
+  if (isLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
+        <Loader2 className="h-8 w-8 text-primary animate-spin" />
+        <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground animate-pulse">Requesting Source Files...</p>
+      </div>
+    );
+  }
+
   if (!listing) {
     return (
-      <div className="p-6 text-center">
-        <p className="text-muted-foreground">Property not found</p>
-        <Button variant="outline" className="mt-4" onClick={() => router.push("/")}>
-          <ArrowLeft className="h-4 w-4 mr-2" /> Back to Dashboard
+      <div className="p-12 text-center max-w-sm mx-auto space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <div className="h-20 w-20 rounded-3xl bg-muted mx-auto flex items-center justify-center">
+          <ArrowLeft className="h-8 w-8 text-muted-foreground/40" />
+        </div>
+        <div className="space-y-2">
+           <h3 className="text-xl font-black text-foreground">Property Depleted</h3>
+           <p className="text-xs text-muted-foreground font-medium px-8">The requested digital asset could not be located in our encrypted database clusters.</p>
+        </div>
+        <Button variant="outline" className="h-12 px-8 rounded-2xl font-black text-[10px] uppercase tracking-widest border-border/40 hover:bg-muted" onClick={() => router.push("/")}>
+          <ArrowLeft className="h-4 w-4 mr-2" /> Back to Intelligence
          </Button>
       </div>
     );
@@ -67,12 +84,17 @@ export default function PropertyDetail({ params }: { params: Promise<{ id: strin
 
        {/* Main Image Slider */}
        <div className="relative rounded-2xl overflow-hidden bg-muted aspect-video group">
-        <NextImage
-          src={imgs[activeImage]}
-          alt={listing.title}
-          fill
-          className="object-cover transition-all duration-500"
-        />
+        {imgs[activeImage] ? (
+          <img
+            src={imgs[activeImage]}
+            alt={listing.title}
+            className="w-full h-full object-cover transition-all duration-500"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center bg-muted">
+            <ImageIcon className="h-12 w-12 text-muted-foreground/20" />
+          </div>
+        )}
         {/* Overlay with price */}
         <div className="absolute bottom-0 inset-x-0 bg-linear-to-t from-black/70 via-black/30 to-transparent p-6">
           <div className="flex items-end justify-between">
@@ -121,7 +143,13 @@ export default function PropertyDetail({ params }: { params: Promise<{ id: strin
               }`}
             >
               <div className="relative w-full h-full">
-                <NextImage src={img} alt={`Photo ${i + 1}`} fill className="object-cover" />
+                {img ? (
+                  <img src={img} alt={`Photo ${i + 1}`} className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full bg-muted flex items-center justify-center">
+                    <ImageIcon className="h-4 w-4 text-muted-foreground/20" />
+                  </div>
+                )}
               </div>
             </button>
           ))}
@@ -266,12 +294,17 @@ export default function PropertyDetail({ params }: { params: Promise<{ id: strin
             <h3 className="font-semibold text-foreground text-sm">Listing Agent</h3>
             <div className="flex items-center gap-3">
               <div className="relative h-12 w-12 shrink-0">
-                <NextImage
-                  src={listing.listingAgentAvatar}
-                  alt={listing.listingAgent}
-                  fill
-                  className="rounded-full object-cover ring-2 ring-primary/20"
-                />
+                {listing.listingAgentAvatar ? (
+                  <img
+                    src={listing.listingAgentAvatar}
+                    alt={listing.listingAgent}
+                    className="w-full h-full rounded-full object-cover ring-2 ring-primary/20"
+                  />
+                ) : (
+                  <div className="w-full h-full rounded-full bg-primary/10 flex items-center justify-center ring-2 ring-primary/20">
+                    <User className="h-6 w-6 text-primary" />
+                  </div>
+                )}
               </div>
               <div>
                 <p className="font-medium text-foreground">{listing.listingAgent}</p>
@@ -287,12 +320,17 @@ export default function PropertyDetail({ params }: { params: Promise<{ id: strin
             <h3 className="font-semibold text-foreground text-sm">Owner</h3>
             <div className="flex items-center gap-3">
               <div className="relative h-12 w-12 shrink-0">
-                <NextImage
-                  src={listing.ownerAvatar}
-                  alt={listing.owner}
-                  fill
-                  className="rounded-full object-cover ring-2 ring-muted"
-                />
+                {listing.ownerAvatar ? (
+                  <img
+                    src={listing.ownerAvatar}
+                    alt={listing.owner}
+                    className="w-full h-full rounded-full object-cover ring-2 ring-muted"
+                  />
+                ) : (
+                  <div className="w-full h-full rounded-full bg-muted flex items-center justify-center ring-2 ring-muted-foreground/10">
+                    <User className="h-6 w-6 text-muted-foreground/40" />
+                  </div>
+                )}
               </div>
               <div>
                 <p className="font-medium text-foreground">{listing.owner}</p>
@@ -324,7 +362,7 @@ export default function PropertyDetail({ params }: { params: Promise<{ id: strin
               <Separator />
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Updated</span>
-                <span className="text-foreground font-medium">{listing.updatedAt}</span>
+                <span className="text-foreground font-medium">{formatRelativeTime(listing.updatedAt)}</span>
               </div>
             </div>
           </div>
