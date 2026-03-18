@@ -1,5 +1,6 @@
 import { OTPForm } from "@/components/auth/OTPForm";
 import { Metadata } from "next";
+import { Suspense } from "react";
 
 export const metadata: Metadata = {
   title: "Verify Account | Keen Enterprises",
@@ -7,5 +8,9 @@ export const metadata: Metadata = {
 };
 
 export default function OTPPage() {
-  return <OTPForm />;
+  return (
+    <Suspense fallback={<div className="flex h-screen items-center justify-center">Loading...</div>}>
+      <OTPForm />
+    </Suspense>
+  );
 }

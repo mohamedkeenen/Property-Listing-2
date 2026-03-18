@@ -20,6 +20,8 @@ import { useGetPropertyQuery } from "@/api/redux/services/propertyApi";
 import { mapBackendPropertyToFormValues } from "@/lib/mappers";
 import { Loader2 } from "lucide-react";
 
+import { Suspense } from "react";
+
 const STEPS = [
   "Property Details",
   "Location",
@@ -27,7 +29,7 @@ const STEPS = [
   "Completed",
 ];
 
-export default function CreateListingPage() {
+function CreateListingContent() {
   const [currentStep, setCurrentStep] = useState(0);
   const { toast } = useToast();
   const searchParams = useSearchParams();
@@ -336,5 +338,13 @@ export default function CreateListingPage() {
         </div>
       </FormProvider>
     </div>
+  );
+}
+
+export default function CreateListingPage() {
+  return (
+    <Suspense fallback={<div className="flex h-screen items-center justify-center">Loading...</div>}>
+      <CreateListingContent />
+    </Suspense>
   );
 }
