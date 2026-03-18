@@ -6,7 +6,6 @@ import { useGetLeadsQuery, useSyncLeadsMutation } from "@/api/redux/services/lea
 import { useState } from "react";
 import { toast } from "@/hooks/use-toast";
 
-// Re-importing from lucide-react to be safe
 import { 
   Users as LucideUsers, 
   UserPlus as LucideUserPlus, 
@@ -113,10 +112,6 @@ export default function Leads() {
                     {s.value?.toLocaleString() || 0}
                 </div>
                 <p className="text-[11px] text-muted-foreground font-black uppercase tracking-widest mt-1">{s.label}</p>
-              </div>
-              
-              <div className="absolute bottom-0 right-0 p-2 opacity-0 group-hover:opacity-10 transition-opacity translate-x-1 translate-y-1 scale-150">
-                <s.icon className={cn("h-16 w-16", s.color)} />
               </div>
             </div>
           ))}

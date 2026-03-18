@@ -4,6 +4,12 @@ export interface PropertyListing {
   title: string;
   location: string;
   pfLocation?: string;
+  property_location?: string;
+  bayutLocation?: string;
+  bayutCity?: string;
+  bayutCommunity?: string;
+  bayutSubCommunity?: string;
+  bayutBuilding?: string;
   community: string;
   subCommunity: string;
   building: string;
@@ -46,9 +52,11 @@ export interface Lead {
   phone: string;
   source: "Property Finder" | "Bayut" | "Website" | "Skyloov" | "Facebook";
   subSource: "WhatsApp" | "Email" | "Call";
+  sub_source?: "WhatsApp" | "Email" | "Call";
   property: string;
   status: "New" | "Contacted" | "Qualified" | "Lost";
   date: string;
+  bitrix_created_at?: string;
   avatar: string;
 }
 

@@ -400,6 +400,14 @@ export function PropertyDetailsStep({ form }: Props) {
             <ModernField label="Built-up Area" icon={Maximize} type="number" {...register("builtUpArea")} value={watch("builtUpArea")} />
             <ModernField label="Layout Type" icon={Sparkles} {...register("layoutType")} value={watch("layoutType")} />
 
+            <ModernField 
+              label="Permit Number" 
+              icon={Hash} 
+              {...register("permitNumber")} 
+              value={watch("permitNumber")}
+              onClear={() => setValue("permitNumber", "", { shouldValidate: true })}
+            />
+
             <ModernSelect 
               label="Project Name" 
               icon={Building2} 

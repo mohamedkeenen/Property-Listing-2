@@ -60,6 +60,13 @@ export function CompletedStep({ form }: Props) {
       images: values.images,
       status: publishStatus === "publish" ? "Live" : (publishStatus === "pocket" ? "Pocket" : "Draft"),
       // Location fields
+      property_location: values.property_location, // Added this field in form if it exists, or just send it if it's there
+      bayut_location: values.bayutLocation,
+      bayut_city: values.bayutCity,
+      bayut_community: values.bayutCommunity,
+      bayut_sub_community: values.bayutSubCommunity,
+      bayut_tower: values.bayutBuilding,
+      permit_number: values.permitNumber || null,
       city: values.city,
       community: values.community,
       sub_community: values.subCommunity,

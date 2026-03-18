@@ -101,29 +101,29 @@ export function DashboardCharts({ listings }: { listings: PropertyListing[] }) {
   const leadsSourceData = [
     { 
       name: "WhatsApp", 
-      value: leads.filter((l) => l.subSource === "WhatsApp").length, 
+      value: leads.filter((l: any) => (l.sub_source || l.subSource) === "WhatsApp").length, 
       color: COLORS.green,
       breakdown: ["Property Finder", "Bayut", "Website", "Facebook"].map(p => ({
         name: p,
-        value: leads.filter(l => l.subSource === "WhatsApp" && l.source === p).length
+        value: leads.filter((l: any) => (l.sub_source || l.subSource) === "WhatsApp" && l.source === p).length
       })).filter(i => i.value > 0)
     },
     { 
       name: "Email", 
-      value: leads.filter((l) => l.subSource === "Email").length, 
+      value: leads.filter((l: any) => (l.sub_source || l.subSource) === "Email").length, 
       color: COLORS.blue,
       breakdown: ["Property Finder", "Bayut", "Website", "Facebook"].map(p => ({
         name: p,
-        value: leads.filter(l => l.subSource === "Email" && l.source === p).length
+        value: leads.filter((l: any) => (l.sub_source || l.subSource) === "Email" && l.source === p).length
       })).filter(i => i.value > 0)
     },
     { 
       name: "Call", 
-      value: leads.filter((l) => l.subSource === "Call").length, 
+      value: leads.filter((l: any) => (l.sub_source || l.subSource) === "Call").length, 
       color: COLORS.orange,
       breakdown: ["Property Finder", "Bayut", "Facebook", "Skyloov", "Website"].map(p => ({
         name: p,
-        value: leads.filter(l => l.subSource === "Call" && l.source === p).length
+        value: leads.filter((l: any) => (l.sub_source || l.subSource) === "Call" && l.source === p).length
       })).filter(i => i.value > 0)
     },
   ];

@@ -80,6 +80,7 @@ export default function CreateListingPage() {
       images: [],
       documents: [],
       notes: "",
+      property_location: "",
       pfLocation: "",
       city: "",
       community: "",

@@ -269,7 +269,7 @@ export function ListingsTable({ listings, onViewDetails, onEdit }: Props) {
                       <div className="min-w-0">
                         <p className="text-sm font-medium truncate">{l.title}</p>
                         <p className="text-[10px] text-muted-foreground/60 truncate uppercase tracking-tight">
-                          {l.location} • {l.community} {l.building && `• ${l.building}`}
+                          {l.property_location || l.location} • {l.community} {l.building && `• ${l.building}`}
                         </p>
                       </div>
                     </div>
