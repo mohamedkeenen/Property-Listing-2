@@ -25,8 +25,8 @@ const COLORS = {
 };
 
 export function DashboardCharts({ listings }: { listings: PropertyListing[] }) {
-  const { data: apiLeads, isLoading: leadsLoading } = useGetLeadsQuery();
-  const leads: Lead[] = apiLeads || [];
+  const { data: apiLeads, isLoading: leadsLoading } = useGetLeadsQuery({});
+  const leads: Lead[] = apiLeads?.leads || [];
 
   const statusData = ["Live", "Draft", "Pending", "Archived", "Pocket"].map((s) => ({
     name: s,

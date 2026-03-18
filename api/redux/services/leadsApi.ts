@@ -13,13 +13,41 @@ export const leadsApi = createApi({
       return headers;
     },
   }),
-  tagTypes: ['Lead'],
+  tagTypes: ['Leads'],
   endpoints: (builder) => ({
-    getLeads: builder.query<Lead[], void>({
-      query: () => '/leads',
-      providesTags: ['Lead'],
+    getLeads: builder.query<{ 
+      leads: any[], 
+      total: number, 
+      stats: { total: number, new: number, qualified: number, lost: number } 
+    }, { 
+      page?: number, 
+      limit?: number, 
+      search?: string, 
+      source?: string, 
+      subSource?: string, 
+      status?: string 
+    }>({
+      query: (params = {}) => ({
+        url: '/leads',
+        params: {
+          page: params?.page ?? 1,
+          limit: params?.limit ?? 50,
+          search: params?.search ?? '',
+          source: params?.source ?? 'All',
+          subSource: params?.subSource ?? 'All',
+          status: params?.status ?? 'All Statuses',
+        },
+      }),
+      providesTags: ['Leads'],
+    }),
+    syncLeads: builder.mutation<{ message: string, count: number }, void>({
+      query: () => ({
+        url: '/leads/sync',
+        method: 'POST',
+      }),
+      invalidatesTags: ['Leads'],
     }),
   }),
 });
 
-export const { useGetLeadsQuery } = leadsApi;
+export const { useGetLeadsQuery, useSyncLeadsMutation } = leadsApi;
