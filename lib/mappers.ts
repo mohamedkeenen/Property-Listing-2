@@ -49,6 +49,7 @@ export const mapBackendPropertyToFrontend = (p: any): PropertyListing => {
       bayut: p.is_on_bayut || false,
       website: p.is_on_website || false,
       skyloov: false, 
+      dubizzle: p.is_on_dubizzle || false,
     },
     updatedAt: p.updated_at || new Date().toISOString(),
     description: p.description_en || "",

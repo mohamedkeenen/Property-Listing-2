@@ -24,7 +24,8 @@ const ModernField = forwardRef<HTMLInputElement, ModernFieldProps>(
     const [hasInternalValue, setHasInternalValue] = useState(false);
     
     const isFocused = externalFocused || internalFocused;
-    const isFilled = (value !== undefined && value !== "" && value !== null) || (props.defaultValue !== undefined && props.defaultValue !== "" && props.defaultValue !== null) || isFocused || hasInternalValue || alignTop;
+    const isDate = props.type === "date";
+    const isFilled = isDate || (value !== undefined && value !== "" && value !== null) || (props.defaultValue !== undefined && props.defaultValue !== "" && props.defaultValue !== null) || isFocused || hasInternalValue || alignTop;
 
     return (
       <div className="relative w-full group">
@@ -71,7 +72,7 @@ const ModernField = forwardRef<HTMLInputElement, ModernFieldProps>(
                 {...props as any}
                 ref={ref}
                 value={value ?? ""}
-                placeholder={isFocused ? props.placeholder : ""}
+                placeholder={isFocused || isDate ? props.placeholder : ""}
                 min={props.type === "number" ? (props.min ?? 0) : props.min}
                 onInput={(e) => {
                   setHasInternalValue(!!e.currentTarget.value);
@@ -86,7 +87,10 @@ const ModernField = forwardRef<HTMLInputElement, ModernFieldProps>(
                   setHasInternalValue(!!e.currentTarget.value);
                   props.onBlur?.(e as any);
                 }}
-                className="w-full bg-transparent border-none focus:ring-0 text-sm font-bold text-foreground outline-none h-full placeholder:text-muted-foreground/50"
+                className={cn(
+                  "w-full bg-transparent border-none focus:ring-0 text-sm font-bold text-foreground outline-none h-full placeholder:text-muted-foreground/30",
+                  isDate && !isFocused && !value && "text-transparent"
+                )}
               />
             )}
 
@@ -101,6 +105,7 @@ const ModernField = forwardRef<HTMLInputElement, ModernFieldProps>(
                     : "top-[50%] -translate-y-1/2 text-[11px] text-muted-foreground"
               )}
             >
+
               {label}{required && <span className="text-destructive ml-1">*</span>}
             </label>
           </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { LayoutDashboard, Plus, Users, Settings, LogOut, User, ChevronUp } from "lucide-react";
+import { LayoutDashboard, Plus, Users, Settings, LogOut, User, ChevronUp, FileText } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { usePathname, useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
@@ -27,7 +27,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
-import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -35,6 +34,7 @@ const navItems = [
   { title: "Dashboard", url: "/", icon: LayoutDashboard },
   { title: "Create Listing", url: "/create-listing", icon: Plus },
   { title: "Leads", url: "/leads", icon: Users },
+  { title: "Sales Offer", url: "/sales-offer", icon: FileText },
 ];
 
 export function AppSidebar() {

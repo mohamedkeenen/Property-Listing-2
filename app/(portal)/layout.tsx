@@ -14,12 +14,12 @@ export default function PortalLayout({
     <ProtectedRoute>
       <SidebarProvider>
         <AppSidebar />
-        <SidebarInset className="min-h-0 h-full overflow-hidden">
+        <SidebarInset className="min-h-0 h-full overflow-y-auto overflow-x-hidden">
           <header className="h-14 flex items-center justify-between border-b border-border/40 px-4 bg-background sticky top-0 z-20 shrink-0">
             <SidebarTrigger />
             <ThemeToggle />
           </header>
-          <main className="flex-1 overflow-hidden flex flex-col min-h-0 min-w-0">
+          <main className="flex-1 flex flex-col min-h-0 min-w-0">
             {children}
           </main>
         </SidebarInset>

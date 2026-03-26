@@ -41,7 +41,9 @@ export default function Dashboard() {
       if (filters.portal) {
         if (filters.portal === "Property Finder" && !l.portals.pf) return false;
         if (filters.portal === "Bayut" && !l.portals.bayut) return false;
+        if (filters.portal === "Dubizzle" && !l.portals.dubizzle) return false;
         if (filters.portal === "Website" && !l.portals.website) return false;
+
       }
       return true;
     });
