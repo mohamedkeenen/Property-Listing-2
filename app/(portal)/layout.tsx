@@ -4,6 +4,7 @@ import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/s
 import { AppSidebar } from "@/components/AppSidebar";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+import { SettingsSync } from "@/components/SettingsSync";
 
 export default function PortalLayout({
   children,
@@ -12,6 +13,7 @@ export default function PortalLayout({
 }) {
   return (
     <ProtectedRoute>
+      <SettingsSync />
       <SidebarProvider>
         <AppSidebar />
         <SidebarInset className="min-h-0 h-full overflow-y-auto overflow-x-hidden">

@@ -35,6 +35,7 @@ const navItems = [
   { title: "Create Listing", url: "/create-listing", icon: Plus },
   { title: "Leads", url: "/leads", icon: Users },
   { title: "Sales Offer", url: "/sales-offer", icon: FileText },
+  { title: "Users", url: "/users", icon: Users },
 ];
 
 export function AppSidebar() {
@@ -51,6 +52,11 @@ export function AppSidebar() {
   const [imgError, setImgError] = useState(false);
   const [logoutMutation] = useLogoutMutation();
 
+  const filteredNavItems = navItems.filter(item => {
+    if (item.title === "Users" && user?.role !== 'admin') return false;
+    return true;
+  });
+
   const handleLogout = async () => {
     try {
       await logoutMutation({}).unwrap();
@@ -63,20 +69,21 @@ export function AppSidebar() {
   };
 
   const getPhotoUrl = (photo: string) => {
-    if (!photo) return "";
+    if (!photo) return undefined;
     if (photo.startsWith('http') || photo.startsWith('data:image')) return photo;
     const apiUrl = process.env.NEXT_PUBLIC_API_URL;
     return `${apiUrl}/${photo}`;
   };
 
   const getLogoUrl = (logo: string) => {
-    if (!logo) return "";
+    if (!logo) return undefined;
     if (logo.startsWith('http') || logo.startsWith('data:image')) return logo;
     const apiUrl = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api').replace('/api', '');
     return `${apiUrl}/storage/${logo}?v=${settingsLastUpdated}`;
   };
 
-  const nameParts = companyName.split(' ');
+  const logoUrl = getLogoUrl(companyLogo);
+  const nameParts = (companyName || 'Organization').split(' ');
   const firstPart = nameParts[0];
   const secondPart = nameParts.slice(1).join(' ');
 
@@ -94,11 +101,17 @@ export function AppSidebar() {
             {!collapsed ? (
               <>
                 <div className="relative w-full h-24 group/brand flex items-center justify-center rounded-2xl transition-all duration-300 dark:bg-white/[0.05] dark:backdrop-blur-md dark:border dark:border-white/[0.1] p-3 shadow-inner">
-                  <img
-                    src={getLogoUrl(companyLogo)}
-                    alt={companyName}
-                    className="object-contain transition-transform duration-700 group-hover/brand:scale-105 w-full h-full max-h-[70px] dark:drop-shadow-[0_0_10px_rgba(255,255,255,0.2)]"
-                  />
+                  {logoUrl ? (
+                    <img
+                      src={logoUrl}
+                      alt={companyName}
+                      className="object-contain transition-transform duration-700 group-hover/brand:scale-105 w-full h-full max-h-[70px] dark:drop-shadow-[0_0_10px_rgba(255,255,255,0.2)]"
+                    />
+                  ) : (
+                    <div className="flex flex-col items-center justify-center">
+                       <span className="text-xl font-black text-primary/40 uppercase tracking-[0.3em]">{firstPart.substring(0, 2)}</span>
+                    </div>
+                  )}
                 </div>
                 <div className="flex flex-col transition-all duration-500 delay-100 animate-in fade-in slide-in-from-bottom-2">
                   <span className="text-md font-black text-sidebar-foreground uppercase tracking-[0.25em] leading-none mb-1">
@@ -128,7 +141,7 @@ export function AppSidebar() {
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {navItems.map((item) => (
+              {filteredNavItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild isActive={pathname === item.url}>
                     <NavLink
@@ -147,6 +160,7 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+
       <SidebarFooter className="border-t border-sidebar-border/20 p-3 mt-auto">
         <SidebarMenu>
           <SidebarMenuItem>

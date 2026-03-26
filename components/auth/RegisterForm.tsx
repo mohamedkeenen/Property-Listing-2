@@ -28,11 +28,13 @@ export function RegisterForm() {
   const companyLogo = useSelector(selectCompanyLogo);
 
   const getLogoUrl = (logo: string) => {
-    if (!logo) return "";
+    if (!logo) return undefined;
     if (logo.startsWith('http') || logo.startsWith('data:image')) return logo;
     const apiUrl = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api').replace('/api', '');
     return `${apiUrl}/storage/${logo}`;
   };
+
+  const logoUrl = getLogoUrl(companyLogo);
 
   const {
     register: registerField,
@@ -45,6 +47,7 @@ export function RegisterForm() {
       full_name: "",
       email: "",
       phone: "",
+      company_name: "",
       password: "",
       password_confirmation: "",
     },
@@ -87,15 +90,21 @@ export function RegisterForm() {
     <div className="space-y-8 py-10">
       {/* Mobile Logo */}
       <div className="lg:hidden flex flex-col items-center gap-4 mb-8">
-        <Image 
-          src={getLogoUrl(companyLogo)}
-          alt={companyName}
-          width={120}
-          height={120}
-          className="object-contain"
-          unoptimized={companyLogo.startsWith('data:image')}
-        />
-        <h2 className="text-3xl font-black text-foreground uppercase tracking-tight text-center">{companyName}</h2>
+        {logoUrl ? (
+          <Image 
+            src={logoUrl}
+            alt={companyName || "Organization"}
+            width={120}
+            height={120}
+            className="object-contain"
+            unoptimized={companyLogo ? companyLogo.startsWith('data:image') : false}
+          />
+        ) : (
+          <div className="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center">
+            <Building2 className="h-10 w-10 text-primary" />
+          </div>
+        )}
+        <h2 className="text-3xl font-black text-foreground uppercase tracking-tight text-center">{companyName || "Our Portal"}</h2>
       </div>
 
       <div className="space-y-2 text-center">
@@ -182,6 +191,15 @@ export function RegisterForm() {
               value={watch("phone")}
               error={errors.phone?.message}
               flag={getFlagFromPhone(phone)}
+            />
+            <ModernField 
+              label="Company Name" 
+              icon={Building2} 
+              required 
+              placeholder="brand name" 
+              {...registerField("company_name")}
+              value={watch("company_name")}
+              error={errors.company_name?.message}
             />
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">

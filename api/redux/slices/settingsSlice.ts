@@ -8,8 +8,8 @@ interface SettingsState {
 }
 
 const initialState: SettingsState = {
-  companyName: 'Keen Enterprises',
-  logo: 'https://res.cloudinary.com/devht0mp5/image/upload/v1771906074/logoo_hsovz7.jpg',
+  companyName: '',
+  logo: '',
   lastUpdated: Date.now(),
 };
 
