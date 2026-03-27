@@ -1,6 +1,6 @@
 import { useState } from "react";
 import NextImage from "next/image";
-import { Search, MessageCircle, Mail, Phone, MoreHorizontal, Eye, ChevronLeft, ChevronRight, Globe, Facebook, Users, RefreshCw, ChevronDown } from "lucide-react";
+import { Search, MessageCircle, Mail, Phone, MoreHorizontal, Eye, ChevronLeft, ChevronRight, Globe, Facebook, Users, RefreshCw, ChevronDown, Trash2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -226,7 +226,7 @@ export function LeadsTable({
                 className="ml-auto rounded-xl gap-2 font-black text-[10px] uppercase tracking-wider h-10 px-4"
             >
                 <RefreshCw className={cn("h-3 w-3", isSyncing && "animate-spin")} />
-                {isSyncing ? "Syncing Bitrix..." : "Refresh Bitrix Data"}
+                {isSyncing ? "Syncing..." : "Refresh Bitrix"}
             </Button>
           </div>
         </div>

@@ -100,7 +100,7 @@ export function AppSidebar() {
           )}>
             {!collapsed ? (
               <>
-                <div className="relative w-full h-24 group/brand flex items-center justify-center rounded-2xl transition-all duration-300 dark:bg-white/[0.05] dark:backdrop-blur-md dark:border dark:border-white/[0.1] p-3 shadow-inner">
+                <div className="relative w-full h-24 group/brand flex items-center justify-center rounded-2xl transition-all duration-300 dark:bg-white/5 dark:backdrop-blur-md dark:border dark:border-white/10 p-3 shadow-inner">
                   {logoUrl ? (
                     <img
                       src={logoUrl}

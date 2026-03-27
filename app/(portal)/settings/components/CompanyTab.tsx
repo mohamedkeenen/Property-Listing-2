@@ -5,13 +5,35 @@ import {
   Building2, 
   Camera, 
   Save, 
-  Lock
+  Lock,
+  Globe,
+  Key,
+  Webhook,
+  MessageSquare,
+  Mail,
+  Phone,
+  LayoutGrid
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ModernField } from "@/components/ui/modern-field";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useDispatch, useSelector } from "react-redux";
-import { selectCompanyName, selectCompanyLogo, selectSettingsLastUpdated, setCompanySettings } from "@/api/redux/slices/settingsSlice";
+import { 
+  selectCompanyName, 
+  selectCompanyLogo, 
+  selectSettingsLastUpdated, 
+  selectBitrixWebhook,
+  selectPfApiKey,
+  selectPfApiSecret,
+  selectBayutApiKey,
+  selectBayutLeadSourceWhatsapp,
+  selectBayutLeadSourceEmail,
+  selectBayutLeadSourcePhone,
+  selectPfLeadSourceWhatsapp,
+  selectPfLeadSourceEmail,
+  selectPfLeadSourcePhone,
+  setCompanySettings 
+} from "@/api/redux/slices/settingsSlice";
 import { useUpdateCompanySettingsMutation } from "@/api/redux/services/settingsApi";
 import { toast } from "react-hot-toast";
 import { cn } from "@/lib/utils";
@@ -24,17 +46,61 @@ export function CompanyTab({ isAdmin }: CompanyTabProps) {
   const dispatch = useDispatch();
   const reduxCompanyName = useSelector(selectCompanyName);
   const reduxLogo = useSelector(selectCompanyLogo);
+  const reduxBitrixWebhook = useSelector(selectBitrixWebhook);
+  const reduxPfApiKey = useSelector(selectPfApiKey);
+  const reduxPfApiSecret = useSelector(selectPfApiSecret);
+  const reduxBayutApiKey = useSelector(selectBayutApiKey);
+  const reduxBayutLeadSourceWhatsapp = useSelector(selectBayutLeadSourceWhatsapp);
+  const reduxBayutLeadSourceEmail = useSelector(selectBayutLeadSourceEmail);
+  const reduxBayutLeadSourcePhone = useSelector(selectBayutLeadSourcePhone);
+  const reduxPfLeadSourceWhatsapp = useSelector(selectPfLeadSourceWhatsapp);
+  const reduxPfLeadSourceEmail = useSelector(selectPfLeadSourceEmail);
+  const reduxPfLeadSourcePhone = useSelector(selectPfLeadSourcePhone);
   const settingsLastUpdated = useSelector(selectSettingsLastUpdated);
   
   const [companyName, setCompanyName] = useState(reduxCompanyName);
   const [logo, setLogo] = useState<string>(reduxLogo);
+  const [bitrixWebhook, setBitrixWebhook] = useState(reduxBitrixWebhook);
+  const [pfApiKey, setPfApiKey] = useState(reduxPfApiKey);
+  const [pfApiSecret, setPfApiSecret] = useState(reduxPfApiSecret);
+  const [bayutApiKey, setBayutApiKey] = useState(reduxBayutApiKey);
+  const [bayutLeadSourceWhatsapp, setBayutLeadSourceWhatsapp] = useState(reduxBayutLeadSourceWhatsapp);
+  const [bayutLeadSourceEmail, setBayutLeadSourceEmail] = useState(reduxBayutLeadSourceEmail);
+  const [bayutLeadSourcePhone, setBayutLeadSourcePhone] = useState(reduxBayutLeadSourcePhone);
+  const [pfLeadSourceWhatsapp, setPfLeadSourceWhatsapp] = useState(reduxPfLeadSourceWhatsapp);
+  const [pfLeadSourceEmail, setPfLeadSourceEmail] = useState(reduxPfLeadSourceEmail);
+  const [pfLeadSourcePhone, setPfLeadSourcePhone] = useState(reduxPfLeadSourcePhone);
+
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [updateSettings, { isLoading }] = useUpdateCompanySettingsMutation();
 
   useEffect(() => {
     setCompanyName(reduxCompanyName || "");
     setLogo(reduxLogo || "");
-  }, [reduxCompanyName, reduxLogo]);
+    setBitrixWebhook(reduxBitrixWebhook || "");
+    setPfApiKey(reduxPfApiKey || "");
+    setPfApiSecret(reduxPfApiSecret || "");
+    setBayutApiKey(reduxBayutApiKey || "");
+    setBayutLeadSourceWhatsapp(reduxBayutLeadSourceWhatsapp || "");
+    setBayutLeadSourceEmail(reduxBayutLeadSourceEmail || "");
+    setBayutLeadSourcePhone(reduxBayutLeadSourcePhone || "");
+    setPfLeadSourceWhatsapp(reduxPfLeadSourceWhatsapp || "");
+    setPfLeadSourceEmail(reduxPfLeadSourceEmail || "");
+    setPfLeadSourcePhone(reduxPfLeadSourcePhone || "");
+  }, [
+    reduxCompanyName, 
+    reduxLogo, 
+    reduxBitrixWebhook, 
+    reduxPfApiKey, 
+    reduxPfApiSecret, 
+    reduxBayutApiKey,
+    reduxBayutLeadSourceWhatsapp,
+    reduxBayutLeadSourceEmail,
+    reduxBayutLeadSourcePhone,
+    reduxPfLeadSourceWhatsapp,
+    reduxPfLeadSourceEmail,
+    reduxPfLeadSourcePhone
+  ]);
 
   const getLogoUrl = (logoStr: string) => {
     if (!logoStr) return "";
@@ -52,7 +118,17 @@ export function CompanyTab({ isAdmin }: CompanyTabProps) {
     try {
       const result = await updateSettings({
         company_name: companyName,
-        logo: logo
+        logo: logo,
+        bitrix_webhook: bitrixWebhook,
+        pf_api_key: pfApiKey,
+        pf_api_secret: pfApiSecret,
+        bayut_api_key: bayutApiKey,
+        bayut_lead_source_whatsapp: bayutLeadSourceWhatsapp,
+        bayut_lead_source_email: bayutLeadSourceEmail,
+        bayut_lead_source_phone: bayutLeadSourcePhone,
+        pf_lead_source_whatsapp: pfLeadSourceWhatsapp,
+        pf_lead_source_email: pfLeadSourceEmail,
+        pf_lead_source_phone: pfLeadSourcePhone,
       }).unwrap();
       
       if (result.status === 'success') {
@@ -81,7 +157,7 @@ export function CompanyTab({ isAdmin }: CompanyTabProps) {
   };
 
   return (
-    <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-7">
+    <form id="settings-form" onSubmit={handleSave} className="grid gap-8 md:grid-cols-2 lg:grid-cols-7">
       <div className="col-span-4 space-y-8">
         <Card className="rounded-2xl border-border/50 shadow-xl overflow-hidden backdrop-blur-sm bg-card/50">
           <CardHeader className="border-b border-border/10 bg-muted/30 pb-4">
@@ -96,7 +172,7 @@ export function CompanyTab({ isAdmin }: CompanyTabProps) {
             </div>
           </CardHeader>
           <CardContent className="pt-8">
-            <form id="settings-form" onSubmit={handleSave} className="space-y-6">
+            <div className="space-y-6">
               <ModernField 
                 label="Company Name" 
                 placeholder="Keen Enterprises" 
@@ -105,7 +181,139 @@ export function CompanyTab({ isAdmin }: CompanyTabProps) {
                 onChange={(e) => setCompanyName(e.target.value)}
                 readOnly={!isAdmin}
               />
-            </form>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Integration Section */}
+        <Card className="rounded-2xl border-border/50 shadow-xl overflow-hidden backdrop-blur-sm bg-card/50">
+          <CardHeader className="border-b border-border/10 bg-muted/30 pb-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-primary/10 text-primary">
+                <Globe className="h-5 w-5" />
+              </div>
+              <div>
+                <CardTitle className="font-black text-xl">Integration</CardTitle>
+                <CardDescription className="font-medium">Configure external service connections. (Bitrix, Property Finder, Bayut)</CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="pt-8">
+            <div className="space-y-8">
+              {/* Bitrix Section */}
+              <div className="space-y-4">
+                <h3 className="text-sm font-black uppercase tracking-widest text-primary/70 flex items-center gap-2">
+                  <LayoutGrid className="h-4 w-4" />
+                  Bitrix24
+                </h3>
+                <ModernField 
+                  label="Bitrix Webhook URL" 
+                  placeholder="https://your-domain.bitrix24.com/rest/1/..." 
+                  icon={Webhook} 
+                  type="password"
+                  value={bitrixWebhook}
+                  onChange={(e) => setBitrixWebhook(e.target.value)}
+                  readOnly={!isAdmin}
+                />
+              </div>
+
+              {/* Property Finder Section */}
+              <div className="space-y-4">
+                <h3 className="text-sm font-black uppercase tracking-widest text-primary/70 flex items-center gap-2">
+                  <Building2 className="h-4 w-4" />
+                  Property Finder
+                </h3>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <ModernField 
+                    label="PF API Key" 
+                    placeholder="Enter PF API Key" 
+                    icon={Key} 
+                    type="password"
+                    value={pfApiKey}
+                    onChange={(e) => setPfApiKey(e.target.value)}
+                    readOnly={!isAdmin}
+                  />
+                  <ModernField 
+                    label="PF API Secret" 
+                    placeholder="Enter PF API Secret" 
+                    icon={Lock} 
+                    type="password"
+                    value={pfApiSecret}
+                    onChange={(e) => setPfApiSecret(e.target.value)}
+                    readOnly={!isAdmin}
+                  />
+                </div>
+                <div className="grid gap-4 md:grid-cols-3">
+                  <ModernField 
+                    label="PF Lead Source WhatsApp" 
+                    placeholder="Source ID" 
+                    icon={MessageSquare} 
+                    value={pfLeadSourceWhatsapp}
+                    onChange={(e) => setPfLeadSourceWhatsapp(e.target.value)}
+                    readOnly={!isAdmin}
+                  />
+                  <ModernField 
+                    label="PF Lead Source Email" 
+                    placeholder="Source ID" 
+                    icon={Mail} 
+                    value={pfLeadSourceEmail}
+                    onChange={(e) => setPfLeadSourceEmail(e.target.value)}
+                    readOnly={!isAdmin}
+                  />
+                  <ModernField 
+                    label="PF Lead Source Phone" 
+                    placeholder="Source ID" 
+                    icon={Phone} 
+                    value={pfLeadSourcePhone}
+                    onChange={(e) => setPfLeadSourcePhone(e.target.value)}
+                    readOnly={!isAdmin}
+                  />
+                </div>
+              </div>
+
+              {/* Bayut Section */}
+              <div className="space-y-4">
+                <h3 className="text-sm font-black uppercase tracking-widest text-primary/70 flex items-center gap-2">
+                  <Globe className="h-4 w-4" />
+                  Bayut
+                </h3>
+                <ModernField 
+                  label="Bayut API Key" 
+                  placeholder="Enter Bayut API Key" 
+                  icon={Key} 
+                  type="password"
+                  value={bayutApiKey}
+                  onChange={(e) => setBayutApiKey(e.target.value)}
+                  readOnly={!isAdmin}
+                />
+                <div className="grid gap-4 md:grid-cols-3">
+                  <ModernField 
+                    label="Bayut Lead Source WhatsApp" 
+                    placeholder="Source ID" 
+                    icon={MessageSquare} 
+                    value={bayutLeadSourceWhatsapp}
+                    onChange={(e) => setBayutLeadSourceWhatsapp(e.target.value)}
+                    readOnly={!isAdmin}
+                  />
+                  <ModernField 
+                    label="Bayut Lead Source Email" 
+                    placeholder="Source ID" 
+                    icon={Mail} 
+                    value={bayutLeadSourceEmail}
+                    onChange={(e) => setBayutLeadSourceEmail(e.target.value)}
+                    readOnly={!isAdmin}
+                  />
+                  <ModernField 
+                    label="Bayut Lead Source Phone" 
+                    placeholder="Source ID" 
+                    icon={Phone} 
+                    value={bayutLeadSourcePhone}
+                    onChange={(e) => setBayutLeadSourcePhone(e.target.value)}
+                    readOnly={!isAdmin}
+                  />
+                </div>
+              </div>
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -165,6 +373,6 @@ export function CompanyTab({ isAdmin }: CompanyTabProps) {
           </CardContent>
         </Card>
       </div>
-    </div>
+    </form>
   );
 }

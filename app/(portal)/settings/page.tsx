@@ -28,11 +28,11 @@ export default function SettingsPage() {
               <SettingsIcon className="h-6 w-6" />
             </div>
             <h2 className="text-4xl font-black tracking-tight text-foreground underline decoration-primary decoration-4 underline-offset-8">
-              Settings
+              Integrations
             </h2>
           </div>
           <p className="text-muted-foreground font-medium pt-2">
-            Manage your personal profile and application preferences.
+            Manage your personal profile, company info and service integrations.
           </p>
         </div>
 
@@ -78,7 +78,7 @@ export default function SettingsPage() {
               className="rounded-xl h-full px-8 data-[state=active]:bg-background data-[state=active]:shadow-lg data-[state=active]:text-primary font-black transition-all gap-2"
             >
               <Building2 className="h-4 w-4" />
-              Company Info
+              Integrations
             </TabsTrigger>
           )}
         </TabsList>

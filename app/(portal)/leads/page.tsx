@@ -14,7 +14,7 @@ import {
   Info as LucideInfo, 
   List as LucideList, 
   Search as LucideSearch, 
-  RefreshCw as LucideRefreshCw 
+  RefreshCw as LucideRefreshCw
 } from "lucide-react";
 
 export default function Leads() {
@@ -50,6 +50,7 @@ export default function Leads() {
       });
     }
   };
+
 
   const leads = data?.leads || [];
   const totalCount = data?.total || 0;
