@@ -83,12 +83,12 @@ export default function PropertyDetail({ params }: { params: Promise<{ id: strin
       </div>
 
        {/* Main Image Slider */}
-       <div className="relative rounded-2xl overflow-hidden bg-muted aspect-video group">
+       <div className="relative rounded-2xl overflow-hidden bg-black/95 aspect-video group">
         {imgs[activeImage] ? (
           <img
             src={imgs[activeImage]}
             alt={listing.title}
-            className="w-full h-full object-cover transition-all duration-500"
+            className="w-full h-full object-contain transition-all duration-500"
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-muted">
@@ -142,9 +142,9 @@ export default function PropertyDetail({ params }: { params: Promise<{ id: strin
                 i === activeImage ? "border-primary ring-2 ring-primary/30" : "border-transparent opacity-60 hover:opacity-100"
               }`}
             >
-              <div className="relative w-full h-full">
+              <div className="relative w-full h-full bg-black/90">
                 {img ? (
-                  <img src={img} alt={`Photo ${i + 1}`} className="w-full h-full object-cover" />
+                  <img src={img} alt={`Photo ${i + 1}`} className="w-full h-full object-contain" />
                 ) : (
                   <div className="w-full h-full bg-muted flex items-center justify-center">
                     <ImageIcon className="h-4 w-4 text-muted-foreground/20" />

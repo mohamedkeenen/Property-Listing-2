@@ -75,7 +75,7 @@ export function CompletedStep({ form }: Props) {
       is_on_pf: values.portals?.propertyFinder || false,
       is_on_bayut: values.portals?.bayutEnabled || false,
       is_on_website: values.portals?.officeWebsite || false,
-      is_on_dubizzle: values.portals?.primeZamWebsite || false,
+      is_on_dubizzle: values.portals?.dubizzleSelection || false,
       // Notes & Docs
       notes: values.notes,
       documents: values.documents,

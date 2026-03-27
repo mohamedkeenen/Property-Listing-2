@@ -25,7 +25,7 @@ export function LoginForm() {
   const companyLogo = useSelector(selectCompanyLogo);
 
   const getLogoUrl = (logo: string) => {
-    if (!logo) return "";
+    if (!logo) return null;
     if (logo.startsWith('http') || logo.startsWith('data:image')) return logo;
     const apiUrl = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api').replace('/api', '');
     return `${apiUrl}/storage/${logo}`;
@@ -63,14 +63,16 @@ export function LoginForm() {
     <div className="space-y-8">
       {/* Mobile Logo (Visible only on mobile) */}
       <div className="lg:hidden flex flex-col items-center gap-4 mb-8">
-        <Image 
-          src={getLogoUrl(companyLogo)}
-          alt={companyName}
-          width={120}
-          height={120}
-          className="object-contain"
-          unoptimized={companyLogo.startsWith('data:image')}
-        />
+        {getLogoUrl(companyLogo) && (
+          <Image 
+            src={getLogoUrl(companyLogo)!}
+            alt={companyName}
+            width={120}
+            height={120}
+            className="object-contain"
+            unoptimized={companyLogo.startsWith('data:image')}
+          />
+        )}
         <h2 className="text-3xl font-black text-foreground uppercase tracking-tight text-center">{companyName}</h2>
       </div>
 

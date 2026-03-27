@@ -241,7 +241,6 @@ export function UserDialog({ open, onOpenChange, user, onSubmit, isLoading }: Us
                   </SelectTrigger>
                   <SelectContent className="rounded-2xl border-border/10 shadow-2xl p-2 font-medium">
                     <SelectItem value="admin" className="rounded-xl px-4 py-3">Admin</SelectItem>
-                    <SelectItem value="agent" className="rounded-xl px-4 py-3">Agent</SelectItem>
                     <SelectItem value="employee" className="rounded-xl px-4 py-3">Employee</SelectItem>
                   </SelectContent>
                 </Select>

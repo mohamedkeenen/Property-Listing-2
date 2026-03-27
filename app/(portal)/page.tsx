@@ -8,19 +8,22 @@ import { ListingsFilters, FiltersState } from "@/components/dashboard/ListingsFi
 import { ListingsTable } from "@/components/dashboard/ListingsTable";
 import { PropertyDetailDialog } from "@/components/listings/PropertyDetailDialog";
 import { mockListings, PropertyListing } from "@/data/mockData";
-import { BarChart3, List, PieChart, Search, Info, Loader2 } from "lucide-react";
+import { BarChart3, List, PieChart, Search, Info, Loader2, RefreshCcw } from "lucide-react";
 import { useGetPropertiesQuery } from "@/api/redux/services/propertyApi";
 import { mapBackendPropertyToFrontend } from "@/lib/mappers";
+import { Button } from "@/components/ui/button";
+import { toast } from "react-hot-toast";
+import { cn } from "@/lib/utils";
 
 export default function Dashboard() {
   const router = useRouter();
   const [filters, setFilters] = useState<FiltersState | null>(null);
   const [selectedListing, setSelectedListing] = useState<PropertyListing | null>(null);
 
-  const { data: propertiesData, isLoading } = useGetPropertiesQuery({});
+  const { data: propertiesData, isLoading, refetch } = useGetPropertiesQuery({ limit: 100 });
 
   const listings = useMemo(() => {
-    return propertiesData?.data?.data?.map(mapBackendPropertyToFrontend) || [];
+    return propertiesData?.data?.map(mapBackendPropertyToFrontend) || [];
   }, [propertiesData]);
 
   const filtered = useMemo(() => {
@@ -49,14 +52,35 @@ export default function Dashboard() {
     });
   }, [filters, listings]);
 
+  const handleRefresh = async () => {
+    try {
+      await refetch().unwrap();
+      toast.success("Inventory synchronized!");
+    } catch {
+      toast.error("Failed to sync inventory.");
+    }
+  };
+
   return (
     <div className="flex flex-col flex-1 h-full min-w-0 overflow-hidden px-4 md:px-6 py-6">
-      <div className="flex flex-col gap-1 mb-10">
-        <h1 className="text-3xl font-black text-foreground tracking-tight flex items-center gap-3">
-          Dashboard
-          <div className="h-2 w-2 rounded-full bg-primary animate-pulse" />
-        </h1>
-        <p className="text-xs text-muted-foreground font-medium">Property listings overview & analytics</p>
+      <div className="flex items-center justify-between mb-10">
+        <div className="flex flex-col gap-1">
+          <h1 className="text-3xl font-black text-foreground tracking-tight flex items-center gap-3">
+            Dashboard
+            <div className="h-2 w-2 rounded-full bg-primary animate-pulse" />
+          </h1>
+          <p className="text-xs text-muted-foreground font-medium">Property listings overview & analytics</p>
+        </div>
+        <Button 
+          variant="outline" 
+          size="sm" 
+          onClick={handleRefresh}
+          disabled={isLoading}
+          className="rounded-xl font-bold text-[10px] uppercase tracking-wider py-5 px-6 gap-2"
+        >
+          <RefreshCcw className={cn("h-3.5 w-3.5", isLoading && "animate-spin")} />
+          Sync Data
+        </Button>
       </div>
 
       {/* Scrollable upper sections if needed, though you wanted it fixed */}

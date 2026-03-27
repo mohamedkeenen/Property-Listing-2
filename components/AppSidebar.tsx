@@ -34,8 +34,8 @@ const navItems = [
   { title: "Dashboard", url: "/", icon: LayoutDashboard },
   { title: "Create Listing", url: "/create-listing", icon: Plus },
   { title: "Leads", url: "/leads", icon: Users },
-  { title: "Sales Offer", url: "/sales-offer", icon: FileText },
   { title: "Users", url: "/users", icon: Users },
+  { title: "Sales Offer", url: "/sales-offer", icon: FileText },
 ];
 
 export function AppSidebar() {

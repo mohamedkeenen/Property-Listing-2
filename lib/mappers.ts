@@ -44,6 +44,7 @@ export const mapBackendPropertyToFrontend = (p: any): PropertyListing => {
     owner: p.owner?.name || "System Admin",
     ownerAvatar: p.owner?.photo ? getImageUrl(p.owner.photo) : "",
     ownerPhone: p.owner?.phone || "",
+    office: p.company?.company_name || "PRIME ZAM",
     portals: {
       pf: p.is_on_pf || false,
       bayut: p.is_on_bayut || false,

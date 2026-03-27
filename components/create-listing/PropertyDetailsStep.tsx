@@ -24,6 +24,7 @@ import { useGetProjectsQuery, useGetDevelopersQuery } from "@/api/redux/services
 import { useGetUsersQuery } from "@/api/redux/services/userApi";
 import { useSelector } from "react-redux";
 import { selectCompanyLogo, selectSettingsLastUpdated } from "@/api/redux/slices/settingsSlice";
+import { selectToken } from "@/api/redux/slices/authSlice";
 import { Upload, Image as ImageIcon, Video, RotateCw, QrCode, StickyNote } from "lucide-react";
 import { useRef, useEffect } from "react";
 
@@ -64,6 +65,7 @@ export function PropertyDetailsStep({ form }: Props) {
   [adminsData]);
 
   const companyLogo = useSelector(selectCompanyLogo);
+  const token = useSelector(selectToken);
   const settingsLastUpdated = useSelector(selectSettingsLastUpdated);
   const [activePreviewIndex, setActivePreviewIndex] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -73,11 +75,11 @@ export function PropertyDetailsStep({ form }: Props) {
   const documents = watch("documents") || [];
   const notes = watch("notes") || "";
 
-  const getLogoUrl = (logo: string) => {
-    if (!logo) return "";
-    if (logo.startsWith('http') || logo.startsWith('data:image')) return logo;
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
-    return `${apiUrl}/settings/logo?v=${settingsLastUpdated}`;
+  const getLogoUrl = (logoStr: string) => {
+    if (!logoStr) return null;
+    if (logoStr.startsWith('http') || logoStr.startsWith('data:image')) return logoStr;
+    const apiUrl = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api').replace('/api', '');
+    return `${apiUrl}/storage/${logoStr}?v=${settingsLastUpdated}`;
   };
 
   const applyWatermark = (base64Image: string, logoUrl: string): Promise<string> => {
@@ -90,25 +92,29 @@ export function PropertyDetailsStep({ form }: Props) {
         canvas.height = img.height;
         const ctx = canvas.getContext("2d");
         if (!ctx) return resolve(base64Image);
+        
         ctx.drawImage(img, 0, 0);
+        
         const logo = new Image();
-        logo.crossOrigin = "anonymous";
+        if (!logoUrl.startsWith('data:')) {
+           logo.crossOrigin = "anonymous";
+        }
         logo.onload = () => {
-          const logoTargetWidth = canvas.width * 0.35;
+          const logoTargetWidth = canvas.width * 0.4; // Slightly larger logo
           const logoTargetHeight = (logo.height / logo.width) * logoTargetWidth;
           const x = (canvas.width - logoTargetWidth) / 2;
           const y = (canvas.height - logoTargetHeight) / 2;
-          ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
-          ctx.globalAlpha = 0.6;
-          ctx.beginPath();
-          const padding = 20;
-          ctx.roundRect(x - padding, y - padding, logoTargetWidth + (padding * 2), logoTargetHeight + (padding * 2), 24);
-          ctx.fill();
-          ctx.globalAlpha = 1.0;
+          
+          ctx.save();
+          ctx.globalAlpha = 0.4; // 40% opacity for the logo itself
           ctx.drawImage(logo, x, y, logoTargetWidth, logoTargetHeight);
-          resolve(canvas.toDataURL("image/jpeg", 0.95));
+          ctx.restore();
+          resolve(canvas.toDataURL("image/jpeg", 0.8));
         };
-        logo.onerror = () => resolve(base64Image);
+        logo.onerror = () => {
+          console.warn("Watermark logo failed to load", logoUrl);
+          resolve(base64Image);
+        };
         logo.src = logoUrl;
       };
       img.onerror = () => resolve(base64Image);
@@ -116,19 +122,56 @@ export function PropertyDetailsStep({ form }: Props) {
     });
   };
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
-    if (!files) return;
-    Array.from(files).forEach((file) => {
-      const reader = new FileReader();
-      reader.onloadend = async () => {
-        const base64String = reader.result as string;
-        const watermarked = await applyWatermark(base64String, getLogoUrl(companyLogo));
-        const currentImages = watch("images") || [];
-        setValue("images", [...currentImages, watermarked], { shouldValidate: true });
-      };
-      reader.readAsDataURL(file);
-    });
+    if (!files || files.length === 0) return;
+
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+    
+    // 1. Fetch the logo as data URL first to avoid CORS issues in canvas
+    let watermarkedLogoUrl: string | null = null;
+    if (token) {
+      try {
+        const response = await fetch(`${apiUrl}/settings/logo`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (response.ok) {
+          const blob = await response.blob();
+          watermarkedLogoUrl = await new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result as string);
+            reader.readAsDataURL(blob);
+          });
+        }
+      } catch (error) {
+        console.error("Failed to fetch watermark logo:", error);
+      }
+    }
+
+    // 2. Process all images sequentially/batched
+    const filesArray = Array.from(files);
+    const newProcessedImages: string[] = [];
+
+    for (const file of filesArray) {
+      const base64FromFile = await new Promise<string>((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result as string);
+        reader.readAsDataURL(file);
+      });
+
+      const processed = watermarkedLogoUrl 
+        ? await applyWatermark(base64FromFile, watermarkedLogoUrl) 
+        : base64FromFile;
+      
+      newProcessedImages.push(processed);
+    }
+
+    // 3. Update the form state once with all images
+    const currentImages = watch("images") || [];
+    setValue("images", [...currentImages, ...newProcessedImages], { shouldValidate: true });
+    
+    // Clear input so same file can be uploaded again if needed
+    if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
   const removeImage = (index: number) => {
