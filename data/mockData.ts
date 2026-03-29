@@ -1,6 +1,7 @@
 export interface PropertyListing {
   id: string;
   reference: string;
+  agentEmail?: string;
   title: string;
   location: string;
   pfLocation?: string;

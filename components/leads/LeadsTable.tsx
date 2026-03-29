@@ -36,6 +36,9 @@ const statusColors: Record<string, string> = {
 const sourceTabs = ["All", "Property Finder", "Bayut", "Facebook", "Skyloov", "Website"];
 const statusTabs = ["All Statuses", "New", "Contacted", "Qualified", "Lost"];
 
+import { useGetPropertiesQuery } from "@/api/redux/services/propertyApi";
+import { mapBackendPropertyToFrontend } from "@/lib/mappers";
+
 interface LeadsTableProps {
   leads?: any[];
   onPageChange?: (page: number) => void;
@@ -75,7 +78,10 @@ export function LeadsTable({
   const [selectedLead, setSelectedLead] = useState<any | null>(null);
   const totalPages = Math.ceil(totalCount / limit);
 
-  const getProperty = (ref: string) => mockListings.find((l) => l.reference === ref);
+  const { data: propertiesData } = useGetPropertiesQuery({});
+  const properties = propertiesData?.data?.map(mapBackendPropertyToFrontend) || [];
+
+  const getProperty = (ref: string) => properties.find((l: any) => l.reference === ref);
 
   const property = selectedLead ? getProperty(selectedLead.property) : null;
 
@@ -493,6 +499,15 @@ export function LeadsTable({
                   </div>
                 </div>
               </div>
+
+              {selectedLead.comments && (
+                <div className="space-y-3 pt-4 border-t border-border/50">
+                  <h4 className="font-black text-[10px] uppercase tracking-widest text-muted-foreground">Lead message & comments</h4>
+                  <div className="bg-muted/10 rounded-2xl p-4 border border-border/10">
+                    <p className="text-xs text-foreground/80 whitespace-pre-wrap leading-relaxed font-medium">{selectedLead.comments}</p>
+                  </div>
+                </div>
+              )}
 
               {property && (
                 <div className="space-y-3 pt-4 border-t border-border/50">

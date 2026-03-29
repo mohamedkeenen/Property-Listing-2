@@ -12,7 +12,7 @@ import { filterOptions } from "@/data/mockData";
 import { cn } from "@/lib/utils";
 import {
   Home, Building2, BedDouble, Bath, Car, Maximize, Tag, DollarSign, FileText, Sparkles,
-  Calendar, User, Hash, CalendarCheck, Info, X, PlusCircle, CheckCircle2, AlertCircle
+  Calendar, User, Hash, CalendarCheck, Info, X, PlusCircle, CheckCircle2, AlertCircle, Mail
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ModernField } from "@/components/ui/modern-field";
@@ -403,6 +403,7 @@ export function PropertyDetailsStep({ form }: Props) {
             </div>
 
             <ModernField label="Unit No" icon={Hash} required {...register("unitNo")} error={fieldError("unitNo")} value={watch("unitNo")} />
+            <ModernField label="Location ID (PF)" icon={Hash} type="number" {...register("locationId")} value={watch("locationId")} />
             
             <NumberSearchSelect 
               label="Bedrooms" 
@@ -432,12 +433,33 @@ export function PropertyDetailsStep({ form }: Props) {
             <ModernField label="No of parking spaces" icon={Car} type="number" {...register("parking")} value={watch("parking")} />
 
             <ModernSelect 
-              label="Select furnished" 
+              label="Furnishing" 
               icon={Sparkles} 
-              value={watch("furnished")} 
-              onValueChange={(v) => setValue("furnished", v, { shouldValidate: true })}
-              options={filterOptions.furnished}
+              value={watch("furnishingType")} 
+              onValueChange={(v) => setValue("furnishingType", v, { shouldValidate: true })}
+              options={[
+                { label: "Unfurnished", value: "unfurnished" },
+                { label: "Semi-furnished", value: "partly-furnished" },
+                { label: "Furnished", value: "furnished" }
+              ]}
             />
+
+            <ModernSelect 
+              label="Project Status" 
+              icon={Building2} 
+              value={watch("projectStatus")} 
+              onValueChange={(v) => setValue("projectStatus", v, { shouldValidate: true })}
+              options={[
+                { label: "Completed", value: "completed" },
+                { label: "Off-plan", value: "off-plan" },
+                { label: "Under Construction", value: "under-construction" }
+              ]}
+            />
+
+            <ModernField label="Floor Number" icon={Hash} type="number" {...register("floorNumber")} value={watch("floorNumber")} />
+            <ModernField label="Total Floors" icon={Hash} type="number" {...register("numberOfFloors")} value={watch("numberOfFloors")} />
+            <ModernField label="Property Age" icon={Calendar} type="number" {...register("age")} value={watch("age")} />
+            <ModernField label="Minimal Rental Period" icon={CalendarCheck} type="number" {...register("minimalRentalPeriod")} value={watch("minimalRentalPeriod")} />
 
             <ModernField label="Total Land Area" icon={Maximize} type="number" {...register("landArea")} value={watch("landArea")} />
             <ModernField label="Built-up Area" icon={Maximize} type="number" {...register("builtUpArea")} value={watch("builtUpArea")} />
@@ -492,6 +514,66 @@ export function PropertyDetailsStep({ form }: Props) {
               onValueChange={(v) => setValue("finishingType", v, { shouldValidate: true })}
               options={filterOptions.finishingTypes}
             />
+          </div>
+        </section>
+
+        {/* Section: Facilities & Compliance */}
+        <section className="space-y-6">
+          <div className="flex items-center gap-3">
+             <div className="p-2 rounded-xl bg-indigo-500/10 text-indigo-500">
+                <Sparkles className="h-4 w-4" />
+             </div>
+             <h3 className="text-sm font-bold text-foreground">Facilities & Compliance</h3>
+             <div className="h-px flex-1 bg-border/20" />
+             <CheckCircle2 className="h-4 w-4 text-muted-foreground/30" />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 bg-card/30 p-8 rounded-4xl border border-border/20">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between p-4 bg-muted/20 rounded-2xl border border-border/40">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-500">
+                    <Sparkles className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <Label className="text-xs font-bold">Has Garden</Label>
+                    <p className="text-[10px] text-muted-foreground">Private or community garden</p>
+                  </div>
+                </div>
+                <Switch checked={!!watch("hasGarden")} onCheckedChange={(v) => setValue("hasGarden", v, { shouldValidate: true })} />
+              </div>
+
+              <div className="flex items-center justify-between p-4 bg-muted/20 rounded-2xl border border-border/40">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-orange-500/10 text-orange-500">
+                    <Sparkles className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <Label className="text-xs font-bold">Has Kitchen</Label>
+                    <p className="text-[10px] text-muted-foreground">Ready kitchen installation</p>
+                  </div>
+                </div>
+                <Switch checked={!!watch("hasKitchen")} onCheckedChange={(v) => setValue("hasKitchen", v, { shouldValidate: true })} />
+              </div>
+
+              <div className="flex items-center justify-between p-4 bg-muted/20 rounded-2xl border border-border/40">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-blue-500/10 text-blue-500">
+                    <Car className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <Label className="text-xs font-bold">Has Parking</Label>
+                    <p className="text-[10px] text-muted-foreground">On-site dedicated parking</p>
+                  </div>
+                </div>
+                <Switch checked={!!watch("hasParking")} onCheckedChange={(v) => setValue("hasParking", v, { shouldValidate: true })} />
+              </div>
+            </div>
+
+            <div className="space-y-6">
+              <ModernField label="License No" icon={Hash} {...register("licenseNo")} value={watch("licenseNo")} />
+              <ModernField label="Ad Issue Date" icon={Calendar} type="date" {...register("adIssueDate")} value={watch("adIssueDate")} />
+            </div>
           </div>
         </section>
 
@@ -933,21 +1015,6 @@ export function PropertyDetailsStep({ form }: Props) {
             </CardTitle>
           </CardHeader>
           <CardContent className="p-6 space-y-6">
-            <div className="space-y-2">
-              <Label className="text-[10px] text-muted-foreground font-black uppercase tracking-widest ml-1">Reference</Label>
-              <div className="bg-muted/20 h-10 rounded-xl border border-border/40 flex items-center px-4 font-black text-primary text-xs tracking-widest">REF-48291</div>
-            </div>
-
-            <ModernSelect 
-              label="Listing Agent" 
-              icon={User} 
-              required 
-              value={watch("listingAgent")} 
-              onValueChange={(v) => setValue("listingAgent", v, { shouldValidate: true })}
-              options={agentOptions}
-              error={fieldError("listingAgent")}
-            />
-
             <ModernSelect 
               label="Listing Owner" 
               icon={User} 
