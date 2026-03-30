@@ -158,70 +158,22 @@ export function CompletedStep({ form }: Props) {
                 </div>
             </div>
 
-            <Card className="rounded-4xl border-2 border-primary/10 overflow-hidden shadow-2xl shadow-primary/5 bg-linear-to-b from-card to-muted/20">
-                <CardContent className="p-10 space-y-8">
-                    <div className="space-y-4">
-                        <div className="flex items-center gap-3">
-                            <div className="p-2 rounded-xl bg-orange-500/10 text-orange-500 shadow-sm">
-                                <LinkIcon className="h-4 w-4" />
-                            </div>
-                            <h3 className="text-[11px] font-black uppercase tracking-widest text-foreground/80">Bayut XML Feed Link</h3>
-                        </div>
-                        
-                        <div className="relative group">
-                            <div className="absolute -inset-1 bg-linear-to-r from-orange-500/20 to-primary/20 rounded-2xl blur opacity-0 group-hover:opacity-100 transition duration-500" />
-                            <div className="relative flex items-center bg-muted/30 border border-border/40 rounded-2xl overflow-hidden backdrop-blur-md">
-                                <div className="p-4 bg-muted/50 border-r border-border/40 text-[10px] font-black uppercase text-muted-foreground tracking-widest bg-linear-to-b from-muted/50 to-muted/20">
-                                    Official
-                                </div>
-                                <div className="flex-1 px-5 py-4 min-w-0 overflow-x-auto no-scrollbar font-mono text-[11px] text-muted-foreground/80 whitespace-nowrap">
-                                    {submittedLink}
-                                </div>
-                                <div className="p-2 flex gap-1 pr-3">
-                                    <Button 
-                                        variant="outline" 
-                                        size="icon" 
-                                        className="h-10 w-10 rounded-xl bg-background hover:bg-muted/50 transition-all shadow-sm border-border/20 group"
-                                        onClick={handleCopy}
-                                    >
-                                        {copied ? <Check className="h-4 w-4 text-emerald-500" /> : <Copy className="h-4 w-4 text-muted-foreground" />}
-                                    </Button>
-                                    <Button 
-                                        variant="outline" 
-                                        size="icon" 
-                                        className="h-10 w-10 rounded-xl bg-background hover:bg-muted/50 transition-all shadow-sm border-border/20"
-                                        asChild
-                                    >
-                                        <a href={submittedLink} target="_blank" rel="noopener noreferrer">
-                                            <ExternalLink className="h-4 w-4 text-muted-foreground" />
-                                        </a>
-                                    </Button>
-                                </div>
-                            </div>
-                        </div>
-                        <p className="text-[10px] text-muted-foreground/60 font-medium px-1 leading-relaxed">
-                           Copy this URL and provide it to the Bayut technical support team to enable real-time synchronization for your property inventory.
-                        </p>
-                    </div>
-
-                    <div className="flex flex-col gap-4 pt-4">
-                         <Button 
-                            className="h-14 rounded-2xl font-black text-[11px] uppercase tracking-[0.2em] bg-primary shadow-xl shadow-primary/20 hover:scale-105 transition-all"
-                            onClick={() => router.push("/")}
-                         >
-                            Return to Properties Dashboard
-                         </Button>
-                         <Button 
-                            variant="ghost"
-                            className="h-14 rounded-2xl font-black text-[11px] uppercase tracking-[0.2em] text-muted-foreground hover:bg-muted"
-                            onClick={() => setSubmitted(null)}
-                         >
-                            Add Another Property
-                            <ArrowLeft className="h-4 w-4 ml-3" />
-                         </Button>
-                    </div>
-                </CardContent>
-            </Card>
+            <div className="flex flex-col gap-4 pt-10">
+                 <Button 
+                    className="h-14 rounded-2xl font-black text-[11px] uppercase tracking-[0.2em] bg-primary shadow-xl shadow-primary/20 hover:scale-105 transition-all"
+                    onClick={() => router.push("/")}
+                 >
+                    Return to Properties Dashboard
+                 </Button>
+                 <Button 
+                    variant="ghost"
+                    className="h-14 rounded-2xl font-black text-[11px] uppercase tracking-[0.2em] text-muted-foreground hover:bg-muted"
+                    onClick={() => setSubmitted(null)}
+                 >
+                    Add Another Property
+                    <ArrowLeft className="h-4 w-4 ml-3" />
+                 </Button>
+            </div>
         </div>
     );
   }

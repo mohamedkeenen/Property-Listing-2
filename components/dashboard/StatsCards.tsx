@@ -1,13 +1,18 @@
-import { Globe, Key, Tag } from "lucide-react";
+import { Globe, Key, Tag, FileText } from "lucide-react";
 import { cn } from "@/lib/utils";
 import NextImage from "next/image";
 import { PropertyListing } from "@/data/mockData";
+import { useGetCompanySettingsQuery } from "@/api/redux/services/settingsApi";
+import { ExternalLink, Copy, Check } from "lucide-react";
+import { useState } from "react";
+import { toast } from "react-hot-toast";
 
 interface Props {
   listings: PropertyListing[];
 }
 
 export function StatsCards({ listings }: Props) {
+  const { data: companySettings } = useGetCompanySettingsQuery();
   const sales = listings.filter((l) => l.purpose === "Sale");
   const rents = listings.filter((l) => l.purpose === "Rent");
   const pf = listings.filter((l) => l.portals.pf);
@@ -107,12 +112,60 @@ export function StatsCards({ listings }: Props) {
       {stats.map((s) => (
         <div 
           key={s.label} 
-          className={cn(
-            "relative bg-card rounded-xl shadow-sm border border-border border-r-[3px] overflow-hidden transition-all hover:shadow-md",
-            s.borderColor,
-            s.label === "Skyloov" && "opacity-60 grayscale-[0.5]"
-          )}
+          className="flex flex-col gap-2"
         >
+          {s.label === "Website" ? (
+            <div className="flex items-center justify-between px-1">
+               <div className="flex items-center gap-1.5 overflow-hidden">
+                <Globe className="h-3 w-3 text-cyan-600 shrink-0" />
+                <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground whitespace-nowrap">API Endpoint</span>
+               </div>
+               {companySettings?.data?.id && (
+                 <button 
+                  onClick={() => {
+                    const url = `${process.env.NEXT_PUBLIC_API_URL}/properties/website/${companySettings.data.id}`;
+                    navigator.clipboard.writeText(url);
+                    toast.success("API URL copied!");
+                  }}
+                  className="flex items-center gap-1 text-[9px] font-bold text-cyan-600 hover:text-cyan-700 transition-colors uppercase tracking-tight"
+                 >
+                   <Copy className="h-2.5 w-2.5" />
+                   Copy URL
+                 </button>
+               )}
+            </div>
+          ) : s.label === "Bayut & Dubizzle" ? (
+            <div className="flex items-center justify-between px-1">
+               <div className="flex items-center gap-1.5 overflow-hidden">
+                <FileText className="h-3 w-3 text-emerald-600 shrink-0" />
+                <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground whitespace-nowrap">XML Feed</span>
+               </div>
+               {companySettings?.data?.id && (
+                 <button 
+                  onClick={() => {
+                    const baseUrl = process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || "http://localhost:8000";
+                    const url = `${baseUrl}/api/feeds/${companySettings.data.id}/bayut.xml`;
+                    navigator.clipboard.writeText(url);
+                    toast.success("Feed URL copied!");
+                  }}
+                  className="flex items-center gap-1 text-[9px] font-bold text-emerald-600 hover:text-emerald-700 transition-colors uppercase tracking-tight"
+                 >
+                   <Copy className="h-2.5 w-2.5" />
+                   Copy URL
+                 </button>
+               )}
+            </div>
+          ) : (
+            <div className="h-[26px]" /> // Updated height to match flex container
+          )}
+
+          <div 
+            className={cn(
+              "relative bg-card rounded-xl shadow-sm border border-border border-r-[3px] overflow-hidden transition-all hover:shadow-md h-full",
+              s.borderColor,
+              s.label === "Skyloov" && "opacity-60 grayscale-[0.5]"
+            )}
+          >
           {s.label === "Skyloov" && (
             <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/20 backdrop-blur-[1px] group">
               <span className="bg-primary/90 text-white text-[8px] font-black uppercase tracking-[0.2em] px-2 py-1 rounded shadow-lg transform -rotate-12 transition-transform group-hover:rotate-0">
@@ -182,6 +235,7 @@ export function StatsCards({ listings }: Props) {
                 style={{ width: `${Math.max((s.commercial / s.total) * 100, 10)}%` }} 
               />
             </div>
+          </div>
           </div>
         </div>
       ))}
