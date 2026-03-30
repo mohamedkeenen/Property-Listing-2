@@ -5,6 +5,7 @@ import { settingsApi } from './services/settingsApi';
 import { userApi } from './services/userApi';
 import { propertyApi } from './services/propertyApi';
 import { leadsApi } from './services/leadsApi';
+import { salesOfferApi } from './services/salesOfferApi';
 import authReducer from './slices/authSlice';
 import settingsReducer from './slices/settingsSlice';
 
@@ -15,6 +16,7 @@ export const store = configureStore({
     [userApi.reducerPath]: userApi.reducer,
     [propertyApi.reducerPath]: propertyApi.reducer,
     [leadsApi.reducerPath]: leadsApi.reducer,
+    [salesOfferApi.reducerPath]: salesOfferApi.reducer,
     auth: authReducer,
     settings: settingsReducer,
   },
@@ -24,7 +26,8 @@ export const store = configureStore({
       settingsApi.middleware, 
       userApi.middleware, 
       propertyApi.middleware,
-      leadsApi.middleware
+      leadsApi.middleware,
+      salesOfferApi.middleware
     ),
 });
 

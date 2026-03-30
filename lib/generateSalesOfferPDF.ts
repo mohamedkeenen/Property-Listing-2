@@ -42,7 +42,9 @@ export const generateSalesOfferPDF = async (formData: any, images: any) => {
   };
 
   const addImage = (img: string, x: number, y: number, w: number, h: number) => {
-    const format = img.includes("png") ? "PNG" : "JPEG";
+    const isPng = img.toLowerCase().includes("png") || img.startsWith("data:image/png");
+    const isWebp = img.toLowerCase().includes("webp") || img.startsWith("data:image/webp");
+    const format = isPng ? "PNG" : (isWebp ? "WEBP" : "JPEG");
     doc.addImage(img, format, x, y, w, h);
   };
 
@@ -58,9 +60,14 @@ export const generateSalesOfferPDF = async (formData: any, images: any) => {
 
   // Cinematic Dark Overlay
   doc.setFillColor(0, 0, 0);
-  (doc as any).setGState(new (doc as any).GState({ opacity: 0.25 }));
+  const GState = (doc as any).GState;
+  if (GState) {
+    (doc as any).setGState(new GState({ opacity: 0.25 }));
+  }
   doc.rect(0, 0, pageWidth, pageHeight, "F");
-  (doc as any).setGState(new (doc as any).GState({ opacity: 1.0 }));
+  if (GState) {
+    (doc as any).setGState(new GState({ opacity: 1.0 }));
+  }
 
   doc.setTextColor(255, 255, 255);
   
@@ -191,9 +198,18 @@ export const generateSalesOfferPDF = async (formData: any, images: any) => {
   doc.text((formData.title || "LOCATION").toUpperCase(), pageWidth / 2, 40, { align: "center" });
 
   // Two Images Stacked
-  const highlights = images.highlights.filter(Boolean).slice(0, 2);
-  highlights.forEach((img: string, i: number) => {
-    addImage(img, 20, 55 + i * 85, pageWidth - 40, 75);
+  const allHighlights = (images.highlights || []).filter(Boolean);
+  allHighlights.forEach((img: string, i: number) => {
+    // Every 2 images, move to new page
+    if (i > 0 && i % 2 === 0) {
+       doc.addPage();
+       drawBackground();
+       doc.setTextColor(...primaryColor);
+       doc.setFontSize(22); doc.setFont("helvetica", "bold");
+       doc.text(projRaw, pageWidth / 2, 30, { align: "center" });
+    }
+    const idx = i % 2;
+    addImage(img, 20, 55 + idx * 85, pageWidth - 40, 75);
   });
 
   // Footer Disclaimer
@@ -355,17 +371,18 @@ export const generateSalesOfferPDF = async (formData: any, images: any) => {
     rows.forEach((row) => {
       const isTotal = String(row[0]).includes("Total");
       
-      if (isTotal) {
-        doc.setFillColor(...primaryColor);
-        doc.setGState(new (doc as any).GState({ opacity: 0.9 }));
-        doc.rect(15, y, pageWidth - 30, rowH, "F");
-        doc.setGState(new (doc as any).GState({ opacity: 1.0 }));
-        doc.setTextColor(255, 255, 255);
-        doc.setFont("helvetica", "bold");
+      const GStateInner = (doc as any).GState;
+      if (isTotal && GStateInner) {
+         doc.setFillColor(...primaryColor);
+         (doc as any).setGState(new GStateInner({ opacity: 0.9 }));
+         doc.rect(15, y, pageWidth - 30, rowH, "F");
+         (doc as any).setGState(new GStateInner({ opacity: 1.0 }));
+         doc.setTextColor(255, 255, 255);
+         doc.setFont("helvetica", "bold");
       } else {
-        doc.setDrawColor(180, 180, 180);
-        doc.setLineWidth(0.1);
-        doc.rect(15, y, pageWidth - 30, rowH);
+         doc.setDrawColor(180, 180, 180);
+         doc.setLineWidth(0.1);
+         doc.rect(15, y, pageWidth - 30, rowH);
       }
       
       let rowX = 15;
@@ -386,19 +403,35 @@ export const generateSalesOfferPDF = async (formData: any, images: any) => {
   };
 
   // Pre-Registration
+  const formatDate = (val: any) => {
+    if (!val || val === "-" || String(val).trim() === "") return "-";
+    try {
+      const d = new Date(String(val));
+      if (isNaN(d.getTime())) return String(val);
+      return d.toLocaleDateString("en-GB", { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\//g, '-');
+    } catch (e) {
+      return String(val);
+    }
+  };
+
+  const formatFin = (val: any) => {
+    const num = parseFloat(String(val || "0").replace(/,/g, '')) || 0;
+    return num.toLocaleString(undefined, { minimumFractionDigits: 2 }) + " AED";
+  };
+
   const preRegRows = [
-    ["DLD Charges", formData.preReg.dld.date, formData.preReg.dld.percentage, formData.preReg.dld.amount + " AED"],
-    ["Administration Fee", formData.preReg.admin.date, formData.preReg.admin.percentage, formData.preReg.admin.amount + " AED"],
+    ["DLD Charges", formatDate(formData.preReg.dld.date), formData.preReg.dld.percentage, formatFin(formData.preReg.dld.amount)],
+    ["Administration Fee", formatDate(formData.preReg.admin.date), formData.preReg.admin.percentage, formatFin(formData.preReg.admin.amount)],
   ];
-  const dldNum = parseFloat(formData.preReg.dld.amount.replace(/,/g, '')) || 0;
-  const adminNum = parseFloat(formData.preReg.admin.amount.replace(/,/g, '')) || 0;
-  preRegRows.push(["Total", "", "", (dldNum + adminNum).toLocaleString(undefined, { minimumFractionDigits: 2 }) + " AED"]);
+  const dldNum = parseFloat(String(formData.preReg.dld.amount || "0").replace(/,/g, '')) || 0;
+  const adminNum = parseFloat(String(formData.preReg.admin.amount || "0").replace(/,/g, '')) || 0;
+  preRegRows.push(["Total", "", "", formatFin(dldNum + adminNum)]);
 
   let py = drawStyledTable(75, "PRE - REGISTRATION", ["Description", "Date", "Percentage", "Amount"], preRegRows, [50, 45, 40, 45]);
 
   // Payment Plan
-  const payRows = formData.paymentPlan.map((r: any) => [r.date, r.installment, r.percentage, r.price + " AED"]);
-  const totalPay = formData.paymentPlan.reduce((acc: number, r: any) => acc + (parseFloat(r.price.replace(/,/g, '')) || 0), 0);
+  const payRows = (formData.paymentPlan || []).map((r: any) => [formatDate(r.date), r.installment, r.percentage, (r.price || "0") + " AED"]);
+  const totalPay = (formData.paymentPlan || []).reduce((acc: number, r: any) => acc + (parseFloat(String(r.price || "0").replace(/,/g, '')) || 0), 0);
   payRows.push(["Total", "", "100.00%", totalPay.toLocaleString(undefined, { minimumFractionDigits: 2 }) + " AED"]);
 
   drawStyledTable(py + 15, "PAYMENT PLAN", ["Date", "Installment", "Percentage%", "Price"], payRows, [45, 55, 35, 45]);

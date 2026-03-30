@@ -32,6 +32,8 @@ import {
   selectPfLeadSourceWhatsapp,
   selectPfLeadSourceEmail,
   selectPfLeadSourcePhone,
+  selectSalesOfferWebhook,
+  selectSalesOfferEntityTypeId,
   setCompanySettings 
 } from "@/api/redux/slices/settingsSlice";
 import { useUpdateCompanySettingsMutation } from "@/api/redux/services/settingsApi";
@@ -57,6 +59,8 @@ export function CompanyTab({ isAdmin }: CompanyTabProps) {
   const reduxPfLeadSourceEmail = useSelector(selectPfLeadSourceEmail);
   const reduxPfLeadSourcePhone = useSelector(selectPfLeadSourcePhone);
   const settingsLastUpdated = useSelector(selectSettingsLastUpdated);
+  const reduxSalesOfferWebhook = useSelector(selectSalesOfferWebhook);
+  const reduxSalesOfferEntityTypeId = useSelector(selectSalesOfferEntityTypeId);
   
   const [companyName, setCompanyName] = useState(reduxCompanyName);
   const [logo, setLogo] = useState<string>(reduxLogo);
@@ -70,6 +74,8 @@ export function CompanyTab({ isAdmin }: CompanyTabProps) {
   const [pfLeadSourceWhatsapp, setPfLeadSourceWhatsapp] = useState(reduxPfLeadSourceWhatsapp);
   const [pfLeadSourceEmail, setPfLeadSourceEmail] = useState(reduxPfLeadSourceEmail);
   const [pfLeadSourcePhone, setPfLeadSourcePhone] = useState(reduxPfLeadSourcePhone);
+  const [salesOfferWebhook, setSalesOfferWebhook] = useState(reduxSalesOfferWebhook);
+  const [salesOfferEntityTypeId, setSalesOfferEntityTypeId] = useState(reduxSalesOfferEntityTypeId);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [updateSettings, { isLoading }] = useUpdateCompanySettingsMutation();
@@ -87,6 +93,8 @@ export function CompanyTab({ isAdmin }: CompanyTabProps) {
     setPfLeadSourceWhatsapp(reduxPfLeadSourceWhatsapp || "");
     setPfLeadSourceEmail(reduxPfLeadSourceEmail || "");
     setPfLeadSourcePhone(reduxPfLeadSourcePhone || "");
+    setSalesOfferWebhook(reduxSalesOfferWebhook || "");
+    setSalesOfferEntityTypeId(reduxSalesOfferEntityTypeId || "");
   }, [
     reduxCompanyName, 
     reduxLogo, 
@@ -99,7 +107,9 @@ export function CompanyTab({ isAdmin }: CompanyTabProps) {
     reduxBayutLeadSourcePhone,
     reduxPfLeadSourceWhatsapp,
     reduxPfLeadSourceEmail,
-    reduxPfLeadSourcePhone
+    reduxPfLeadSourcePhone,
+    reduxSalesOfferWebhook,
+    reduxSalesOfferEntityTypeId
   ]);
 
   const getLogoUrl = (logoStr: string) => {
@@ -129,6 +139,8 @@ export function CompanyTab({ isAdmin }: CompanyTabProps) {
         pf_lead_source_whatsapp: pfLeadSourceWhatsapp,
         pf_lead_source_email: pfLeadSourceEmail,
         pf_lead_source_phone: pfLeadSourcePhone,
+        sales_offer_webhook: salesOfferWebhook,
+        sales_offer_entity_type_id: salesOfferEntityTypeId,
       }).unwrap();
       
       if (result.status === 'success') {
@@ -213,6 +225,23 @@ export function CompanyTab({ isAdmin }: CompanyTabProps) {
                   type="password"
                   value={bitrixWebhook}
                   onChange={(e) => setBitrixWebhook(e.target.value)}
+                  readOnly={!isAdmin}
+                />
+                <ModernField 
+                  label="Sales Offer Webhook URL" 
+                  placeholder="https://your-domain.bitrix24.com/rest/1/..." 
+                  icon={Webhook} 
+                  type="password"
+                  value={salesOfferWebhook}
+                  onChange={(e) => setSalesOfferWebhook(e.target.value)}
+                  readOnly={!isAdmin}
+                />
+                <ModernField 
+                  label="Sales Offer SPA Entity ID" 
+                  placeholder="e.g. 1058" 
+                  icon={LayoutGrid} 
+                  value={salesOfferEntityTypeId}
+                  onChange={(e) => setSalesOfferEntityTypeId(e.target.value)}
                   readOnly={!isAdmin}
                 />
               </div>
