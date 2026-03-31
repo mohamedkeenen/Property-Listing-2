@@ -1,7 +1,8 @@
 import React from "react";
 import { toast as hotToast } from "react-hot-toast";
 
-type ToastProps = {
+export type ToastProps = {
+  id?: string;
   title?: React.ReactNode;
   description?: React.ReactNode;
   variant?: "default" | "destructive" | "success";
@@ -16,6 +17,7 @@ export const toast = (props: ToastProps) => {
   );
 
   const options = {
+    id: props.id,
     duration: 4000,
     style: {
       borderRadius: '1rem',
@@ -25,16 +27,21 @@ export const toast = (props: ToastProps) => {
     },
   };
 
+  let id: string;
   if (props.variant === "destructive") {
-    return hotToast.error(content, options);
-  }
-  
-  if (props.variant === "success") {
-    return hotToast.success(content, options);
+    id = hotToast.error(content, options);
+  } else if (props.variant === "success") {
+    id = hotToast.success(content, options);
+  } else {
+    // default / unspecified
+    id = hotToast(content, options);
   }
 
-  // default / unspecified
-  return hotToast(content, options);
+  return {
+    id,
+    dismiss: () => hotToast.dismiss(id),
+    update: (newProps: ToastProps) => toast({ ...newProps, id }),
+  };
 };
 
 export function useToast() {

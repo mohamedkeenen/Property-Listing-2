@@ -30,9 +30,39 @@ export const settingsApi = createApi({
       query: () => '/settings/projects',
       providesTags: ['Projects'],
     }),
+    addProject: builder.mutation<any, { name: string }>({
+      query: (data) => ({
+        url: '/settings/projects',
+        method: 'POST',
+        body: data,
+      }),
+      invalidatesTags: ['Projects'],
+    }),
+    deleteProject: builder.mutation<any, string | number>({
+      query: (id) => ({
+        url: `/settings/projects/${id}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['Projects'],
+    }),
     getDevelopers: builder.query<any, void>({
       query: () => '/settings/developers',
       providesTags: ['Developers'],
+    }),
+    addDeveloper: builder.mutation<any, { name: string }>({
+      query: (data) => ({
+        url: '/settings/developers',
+        method: 'POST',
+        body: data,
+      }),
+      invalidatesTags: ['Developers'],
+    }),
+    deleteDeveloper: builder.mutation<any, string | number>({
+      query: (id) => ({
+        url: `/settings/developers/${id}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['Developers'],
     }),
   }),
 });
@@ -41,5 +71,9 @@ export const {
   useGetCompanySettingsQuery, 
   useUpdateCompanySettingsMutation,
   useGetProjectsQuery,
-  useGetDevelopersQuery
+  useAddProjectMutation,
+  useDeleteProjectMutation,
+  useGetDevelopersQuery,
+  useAddDeveloperMutation,
+  useDeleteDeveloperMutation
 } = settingsApi;

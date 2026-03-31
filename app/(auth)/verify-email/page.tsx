@@ -41,9 +41,9 @@ function VerifyEmailContent() {
 
   return (
     <div className="flex flex-col space-y-4 w-full max-w-[400px]">
-      <Card className="border-emerald-100 shadow-xl shadow-emerald-900/5">
+      <Card className="border-blue-100 shadow-xl shadow-blue-900/5">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold text-emerald-900">Email Verification</CardTitle>
+          <CardTitle className="text-2xl font-bold text-blue-900">Email Verification</CardTitle>
           <CardDescription>
             {status === "loading" && "Verifying your email address..."}
             {status === "success" && "Your account has been activated!"}
@@ -52,10 +52,10 @@ function VerifyEmailContent() {
         </CardHeader>
         <CardContent className="flex flex-col items-center justify-center py-8">
           {status === "loading" && (
-            <Loader2 className="h-16 w-16 text-emerald-500 animate-spin" />
+            <Loader2 className="h-16 w-16 text-blue-500 animate-spin" />
           )}
           {status === "success" && (
-            <CheckCircle2 className="h-16 w-16 text-emerald-500" />
+            <CheckCircle2 className="h-16 w-16 text-blue-500" />
           )}
           {status === "error" && (
             <XCircle className="h-16 w-16 text-destructive" />
@@ -63,12 +63,12 @@ function VerifyEmailContent() {
         </CardContent>
         <CardFooter className="flex flex-col space-y-4">
           {status === "success" && (
-            <Button asChild className="w-full bg-emerald-600 hover:bg-emerald-700">
+            <Button asChild className="w-full bg-blue-600 hover:bg-blue-700">
               <Link href="/login">Go to Login</Link>
             </Button>
           )}
           {status === "error" && (
-            <Button asChild variant="outline" className="w-full border-emerald-200 text-emerald-700 hover:bg-emerald-50">
+            <Button asChild variant="outline" className="w-full border-blue-200 text-blue-700 hover:bg-blue-50">
               <Link href="/register">Back to Register</Link>
             </Button>
           )}
@@ -85,8 +85,8 @@ export default function VerifyEmailPage() {
   return (
     <Suspense fallback={
       <div className="flex flex-col items-center justify-center min-h-[400px]">
-        <Loader2 className="h-12 w-12 text-emerald-500 animate-spin" />
-        <p className="mt-4 text-emerald-700 font-medium">Loading verification...</p>
+        <Loader2 className="h-12 w-12 text-blue-500 animate-spin" />
+        <p className="mt-4 text-blue-700 font-medium">Loading verification...</p>
       </div>
     }>
       <VerifyEmailContent />

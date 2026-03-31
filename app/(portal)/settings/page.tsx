@@ -6,12 +6,14 @@ import {
   User as UserIcon,
   Settings as SettingsIcon,
   Save,
+  List as ListIcon
 } from "lucide-react";
 import { useSelector } from "react-redux";
 import { selectCurrentUser } from "@/api/redux/slices/authSlice";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ProfileTab } from "./components/ProfileTab";
 import { CompanyTab } from "./components/CompanyTab";
+import { InputsTab } from "./components/InputsTab";
 import { Button } from "@/components/ui/button";
 
 export default function SettingsPage() {
@@ -28,11 +30,11 @@ export default function SettingsPage() {
               <SettingsIcon className="h-6 w-6" />
             </div>
             <h2 className="text-4xl font-black tracking-tight text-foreground underline decoration-primary decoration-4 underline-offset-8">
-              Integrations
+              Settings
             </h2>
           </div>
           <p className="text-muted-foreground font-medium pt-2">
-            Manage your personal profile, company info and service integrations.
+            Manage your personal profile, company info, inputs and service integrations.
           </p>
         </div>
 
@@ -47,7 +49,7 @@ export default function SettingsPage() {
               Update Profile
               <UserIcon className="ml-2 h-4 w-4" />
             </Button>
-          ) : (
+          ) : activeTab === "company" ? (
             isAdmin && (
               <Button 
                 form="settings-form"
@@ -59,7 +61,7 @@ export default function SettingsPage() {
                 <Save className="ml-2 h-4 w-4" />
               </Button>
             )
-          )}
+          ) : null}
         </div>
       </div>
 
@@ -73,13 +75,22 @@ export default function SettingsPage() {
             My Profile
           </TabsTrigger>
           {isAdmin && (
-            <TabsTrigger 
-              value="company" 
-              className="rounded-xl h-full px-8 data-[state=active]:bg-background data-[state=active]:shadow-lg data-[state=active]:text-primary font-black transition-all gap-2"
-            >
-              <Building2 className="h-4 w-4" />
-              Integrations
-            </TabsTrigger>
+            <>
+              <TabsTrigger 
+                value="company" 
+                className="rounded-xl h-full px-8 data-[state=active]:bg-background data-[state=active]:shadow-lg data-[state=active]:text-primary font-black transition-all gap-2"
+              >
+                <Building2 className="h-4 w-4" />
+                Integrations
+              </TabsTrigger>
+              <TabsTrigger 
+                value="inputs" 
+                className="rounded-xl h-full px-8 data-[state=active]:bg-background data-[state=active]:shadow-lg data-[state=active]:text-primary font-black transition-all gap-2"
+              >
+                <ListIcon className="h-4 w-4" />
+                Inputs
+              </TabsTrigger>
+            </>
           )}
         </TabsList>
 
@@ -88,9 +99,14 @@ export default function SettingsPage() {
         </TabsContent>
 
         {isAdmin && (
-          <TabsContent value="company" className="mt-0 focus-visible:outline-none focus-visible:ring-0">
-            <CompanyTab isAdmin={isAdmin} />
-          </TabsContent>
+          <>
+            <TabsContent value="company" className="mt-0 focus-visible:outline-none focus-visible:ring-0">
+              <CompanyTab isAdmin={isAdmin} />
+            </TabsContent>
+            <TabsContent value="inputs" className="mt-0 focus-visible:outline-none focus-visible:ring-0">
+              <InputsTab isAdmin={isAdmin} />
+            </TabsContent>
+          </>
         )}
       </Tabs>
     </div>

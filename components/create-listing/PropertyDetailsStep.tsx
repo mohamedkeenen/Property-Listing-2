@@ -49,11 +49,11 @@ export function PropertyDetailsStep({ form }: Props) {
   const { data: adminsData } = useGetUsersQuery({ role: 'admin' });
 
   const projectOptions = useMemo(() => 
-    projectsData?.data?.map((p: any) => ({ label: p.name, value: p.id.toString() })) || [], 
+    projectsData?.data?.map((p: any) => ({ label: p.name, value: p.name })) || [], 
   [projectsData]);
 
   const developerOptions = useMemo(() => 
-    developersData?.data?.map((d: any) => ({ label: d.name, value: d.id.toString() })) || [], 
+    developersData?.data?.map((d: any) => ({ label: d.name, value: d.name })) || [], 
   [developersData]);
 
   const agentOptions = useMemo(() => 
@@ -209,7 +209,7 @@ export function PropertyDetailsStep({ form }: Props) {
   const fieldError = (name: string) => errors[name]?.message as string | undefined;
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-8">
+    <div className="max-w-6xl mx-auto">
       <div className="space-y-8 pb-20">
         {/* Section 1: Property Type */}
         <section className="space-y-6">
@@ -978,43 +978,19 @@ export function PropertyDetailsStep({ form }: Props) {
             </ModernField>
           </div>
         </section>
-      </div>
 
-      {/* RIGHT SIDEBAR */}
-      <aside className="space-y-6">
-        {/* Draft Property Card */}
-        <Card className="rounded-4xl border-border/40 shadow-sm overflow-hidden bg-card transition-all hover:shadow-xl group">
-          <CardHeader className="bg-muted/5 border-b border-border/20 py-4 px-6">
-            <CardTitle className="text-xs font-bold text-foreground flex items-center gap-2">
-              <Sparkles className="h-3.5 w-3.5 text-amber-500 animate-pulse" />
-              Draft Details
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-6 space-y-5">
-            <div className="space-y-2">
-              <Label className="text-[10px] text-muted-foreground font-black uppercase tracking-widest ml-1">Last updated</Label>
-              <div className="bg-muted/20 h-10 rounded-xl border border-border/40 flex items-center px-4 font-bold text-foreground text-xs">
-                {new Date().toLocaleDateString('en-AE', { day: '2-digit', month: 'short', year: 'numeric' })}
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Label className="text-[10px] text-muted-foreground font-black uppercase tracking-widest ml-1">Creation Date</Label>
-              <div className="bg-muted/20 h-10 rounded-xl border border-border/40 flex items-center px-4 font-bold text-foreground text-xs">
-                 10 Mar 2026
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        {/* Section 9: Administrative Details */}
+        <section className="space-y-6">
+          <div className="flex items-center gap-3">
+             <div className="p-2 rounded-xl bg-primary/10 text-primary">
+                <User className="h-4 w-4" />
+             </div>
+             <h3 className="text-sm font-bold text-foreground">Administrative Details</h3>
+             <div className="h-px flex-1 bg-border/20" />
+             <Info className="h-4 w-4 text-muted-foreground/30" />
+          </div>
 
-        {/* Management Card */}
-        <Card className="rounded-4xl border-border/40 shadow-sm overflow-hidden bg-card transition-all hover:shadow-xl">
-          <CardHeader className="bg-muted/5 border-b border-border/20 py-4 px-6">
-            <CardTitle className="text-[10px] font-black text-foreground uppercase tracking-[0.2em] flex items-center gap-2">
-              <User className="h-3.5 w-3.5 text-primary" />
-              Management
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-6 space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 bg-card/30 p-8 rounded-4xl border border-border/20">
             <ModernSelect 
               label="Listing Admin" 
               icon={User} 
@@ -1034,10 +1010,10 @@ export function PropertyDetailsStep({ form }: Props) {
               options={["John Miller"]}
               error={fieldError("landlord")}
             />
-          </CardContent>
-        </Card>
+          </div>
+        </section>
+      </div>
 
-      </aside>
     </div>
   );
 }

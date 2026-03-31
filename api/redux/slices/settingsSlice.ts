@@ -17,6 +17,8 @@ interface SettingsState {
   pf_lead_source_email: string;
   pf_lead_source_phone: string;
   sales_offer_entity_type_id: string;
+  developers: string[];
+  projectNames: string[];
 }
 
 const initialState: SettingsState = {
@@ -35,6 +37,8 @@ const initialState: SettingsState = {
   pf_lead_source_email: '',
   pf_lead_source_phone: '',
   sales_offer_entity_type_id: '',
+  developers: [],
+  projectNames: [],
 };
 
 const settingsSlice = createSlice({
@@ -42,9 +46,9 @@ const settingsSlice = createSlice({
   initialState,
   reducers: {
     setCompanySettings: (state, action: PayloadAction<any>) => {
-      state.companyName = action.payload.company_name;
+      state.companyName = action.payload.company_name || action.payload.companyName;
       state.logo = action.payload.logo;
-      state.bitrix_webhook = action.payload.bitrix_webhook || '';
+      state.bitrix_webhook = action.payload.bitrix_webhook || action.payload.bitrix_webhook || '';
       state.sales_offer_webhook = action.payload.sales_offer_webhook || '';
       state.pf_api_key = action.payload.pf_api_key || '';
       state.pf_api_secret = action.payload.pf_api_secret || '';
@@ -56,12 +60,22 @@ const settingsSlice = createSlice({
       state.pf_lead_source_email = action.payload.pf_lead_source_email || '';
       state.pf_lead_source_phone = action.payload.pf_lead_source_phone || '';
       state.sales_offer_entity_type_id = action.payload.sales_offer_entity_type_id || '';
+      state.developers = action.payload.developers || [];
+      state.projectNames = action.payload.projectNames || action.payload.project_names || [];
       state.lastUpdated = Date.now();
     },
+    updateDevelopers: (state, action: PayloadAction<string[]>) => {
+      state.developers = action.payload;
+      state.lastUpdated = Date.now();
+    },
+    updateProjectNames: (state, action: PayloadAction<string[]>) => {
+      state.projectNames = action.payload;
+      state.lastUpdated = Date.now();
+    }
   },
 });
 
-export const { setCompanySettings } = settingsSlice.actions;
+export const { setCompanySettings, updateDevelopers, updateProjectNames } = settingsSlice.actions;
 
 export default settingsSlice.reducer;
 
@@ -80,3 +94,5 @@ export const selectPfLeadSourceEmail = (state: RootState) => state.settings.pf_l
 export const selectPfLeadSourcePhone = (state: RootState) => state.settings.pf_lead_source_phone;
 export const selectSalesOfferWebhook = (state: RootState) => state.settings.sales_offer_webhook;
 export const selectSalesOfferEntityTypeId = (state: RootState) => state.settings.sales_offer_entity_type_id;
+export const selectDevelopers = (state: RootState) => state.settings.developers;
+export const selectProjectNames = (state: RootState) => state.settings.projectNames;

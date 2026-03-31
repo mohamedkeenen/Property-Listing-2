@@ -75,12 +75,28 @@ export function ListingsTable({ listings, onViewDetails, onEdit }: Props) {
   };
 
   const handleDownloadPDF = async (listing: PropertyListing) => {
-    toast({ title: "Generating PDF...", description: "Please wait while we prepare your document." });
+    const { id, dismiss, update } = toast({ 
+      title: "Generating PDF...", 
+      description: "Please wait while we prepare your document.",
+    });
+
     try {
       await generatePropertyPDF(listing);
-      toast({ title: "PDF Downloaded", description: `${listing.reference}.pdf has been saved.` });
-    } catch {
-      toast({ title: "Error", description: "Failed to generate PDF.", variant: "destructive" });
+      update({
+        id,
+        title: "PDF Downloaded",
+        description: `${listing.reference}.pdf has been saved.`,
+        variant: "success",
+      });
+      // Automatically dismiss after 3 seconds
+      setTimeout(() => dismiss(), 3000);
+    } catch (err) {
+      update({
+        id,
+        title: "Error",
+        description: "Failed to generate PDF.",
+        variant: "destructive",
+      });
     }
   };
 
