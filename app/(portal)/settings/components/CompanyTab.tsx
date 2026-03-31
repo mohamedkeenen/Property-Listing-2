@@ -115,7 +115,7 @@ export function CompanyTab({ isAdmin }: CompanyTabProps) {
   const getLogoUrl = (logoStr: string) => {
     if (!logoStr) return "";
     if (logoStr.startsWith('http') || logoStr.startsWith('data:image')) return logoStr;
-    const apiUrl = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api').replace('/api', '');
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://property-listing.keenenter.com/api';
     return `${apiUrl}/storage/${logoStr}?v=${settingsLastUpdated}`;
   };
 

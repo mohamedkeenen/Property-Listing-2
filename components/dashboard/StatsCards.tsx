@@ -143,7 +143,7 @@ export function StatsCards({ listings }: Props) {
                {companySettings?.data?.id && (
                  <button 
                   onClick={() => {
-                    const baseUrl = process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || "http://localhost:8000";
+                    const baseUrl = process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || "https://property-listing.keenenter.com";
                     const url = `${baseUrl}/api/feeds/${companySettings.data.id}/bayut.xml`;
                     navigator.clipboard.writeText(url);
                     toast.success("Feed URL copied!");

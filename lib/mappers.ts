@@ -4,7 +4,7 @@ export const mapBackendPropertyToFrontend = (p: any): PropertyListing => {
   const getImageUrl = (path: string) => {
     if (!path) return "";
     if (path.startsWith('http') || path.startsWith('data:image')) return path;
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'http://localhost:8000';
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://property-listing.keenenter.com/api';
     return `${apiUrl}/storage/${path}`;
   };
 
@@ -80,7 +80,7 @@ export const mapBackendPropertyToFormValues = (p: any): any => {
   const getImageUrl = (path: string) => {
     if (!path) return "";
     if (path.startsWith('http') || path.startsWith('data:image')) return path;
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'http://localhost:8000';
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://property-listing.keenenter.com/api';
     return `${apiUrl}/storage/${path}`;
   };
 

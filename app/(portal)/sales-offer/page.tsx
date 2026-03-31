@@ -280,7 +280,7 @@ export default function SalesOfferPage() {
                               src={(() => {
                                 const raw = offer.image?.downloadUrl || offer.image;
                                 if (!raw) return "";
-                                const baseUrl = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000').replace(/\/api$/, '').replace(/\/$/, '');
+                                const baseUrl = (process.env.NEXT_PUBLIC_API_URL || 'https://property-listing.keenenter.com').replace(/\/api$/, '').replace(/\/$/, '');
                                 
                                 // Case 1: Already points to our API proxy - just add base URL
                                 if (raw.startsWith('/api/')) {

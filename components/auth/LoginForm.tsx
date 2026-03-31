@@ -27,7 +27,7 @@ export function LoginForm() {
   const getLogoUrl = (logo: string) => {
     if (!logo) return null;
     if (logo.startsWith('http') || logo.startsWith('data:image')) return logo;
-    const apiUrl = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api').replace('/api', '');
+    const apiUrl = (process.env.NEXT_PUBLIC_API_URL || 'https://property-listing.keenenter.com/api').replace('/api', '');
     return `${apiUrl}/storage/${logo}`;
   };
 

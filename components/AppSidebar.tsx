@@ -72,13 +72,13 @@ export function AppSidebar() {
     if (!photo) return undefined;
     if (photo.startsWith('http') || photo.startsWith('data:image')) return photo;
     const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-    return `${apiUrl}/${photo}`;
+    return `${apiUrl}/storage/${photo}`;
   };
 
   const getLogoUrl = (logo: string) => {
     if (!logo) return undefined;
     if (logo.startsWith('http') || logo.startsWith('data:image')) return logo;
-    const apiUrl = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api').replace('/api', '');
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://property-listing.keenenter.com/api';
     return `${apiUrl}/storage/${logo}?v=${settingsLastUpdated}`;
   };
 

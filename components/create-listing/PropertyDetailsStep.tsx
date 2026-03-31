@@ -78,7 +78,7 @@ export function PropertyDetailsStep({ form }: Props) {
   const getLogoUrl = (logoStr: string) => {
     if (!logoStr) return null;
     if (logoStr.startsWith('http') || logoStr.startsWith('data:image')) return logoStr;
-    const apiUrl = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api').replace('/api', '');
+    const apiUrl = (process.env.NEXT_PUBLIC_API_URL || 'https://property-listing.keenenter.com/api').replace('/api', '');
     return `${apiUrl}/storage/${logoStr}?v=${settingsLastUpdated}`;
   };
 
@@ -126,7 +126,7 @@ export function PropertyDetailsStep({ form }: Props) {
     const files = e.target.files;
     if (!files || files.length === 0) return;
 
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://property-listing.keenenter.com/api';
     
     // 1. Fetch the logo as data URL first to avoid CORS issues in canvas
     let watermarkedLogoUrl: string | null = null;

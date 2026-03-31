@@ -118,7 +118,7 @@ export function CompletedStep({ form }: Props) {
       }
       
       const companyId = response?.data?.company_id || (form.getValues() as any).company_id;
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://property-listing.keenenter.com/api";
       const feedUrl = `${apiUrl.replace('/api', '')}/feeds/${companyId}/bayut.xml`;
 
       toast({
