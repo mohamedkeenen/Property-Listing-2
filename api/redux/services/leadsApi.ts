@@ -1,5 +1,4 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import { Lead } from '@/data/mockData';
 
 export const leadsApi = createApi({
   reducerPath: 'leadsApi',
