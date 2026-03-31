@@ -18,7 +18,7 @@ export const salesOfferApi = createApi({
       query: () => '/sales-offers',
       providesTags: ['SalesOffer'],
     }),
-    getSalesOfferDetail: builder.query<{ data: any }, string | number>({
+    getSalesOfferDetail: builder.query<{ data: any, mapped: any }, string | number>({
       query: (id) => `/sales-offers/${id}`,
     }),
   }),

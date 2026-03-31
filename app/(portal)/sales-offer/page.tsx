@@ -57,54 +57,58 @@ export default function SalesOfferPage() {
     try {
       const result = await triggerFetchDetail(offerId).unwrap();
       const item = result.data;
+      const mapped = result.mapped || {};
 
-      const cleanBitrixValue = (val: any) => {
+      const cleanVal = (val: any) => {
         if (!val) return "";
         return String(val).split("|")[0].trim();
       };
       
-      // MAPPING FROM BITRIX TO FORM DATA
       const mappedData = {
-        title: item.ufCrm16_1774897825 || "Sales Offer",
-        titleArabic: "", // Not in bitrix images
-        projectName: cleanBitrixValue(item.ufCrm16_1774894675) || "N/A",
-        projectNameOfficial: cleanBitrixValue(item.ufCrm16_1774894675) || "N/A",
-        location: cleanBitrixValue(item.ufCrm16_1774897911),
-        propertyType: cleanBitrixValue(item.ufCrm16_1774898199),
-        unitNumber: cleanBitrixValue(item.ufCrm16_1774898869),
-        bedrooms: cleanBitrixValue(item.ufCrm16_1774898914),
-        level: cleanBitrixValue(item.ufCrm16_1774899080),
-        unitArea: cleanBitrixValue(item.ufCrm16_1774899115),
-        sellingPrice: cleanBitrixValue(item.ufCrm16_1774899176),
-        developerName: item.ufCrm16_1774898152 || "",
-        salesConsultant: item.ufCrm16_1774899199 || "",
-        headOfSales: "Management", // PlaceHolder
-        website: item.ufCrm16_1774897856 || "",
-        referenceToken: cleanBitrixValue(item.ufCrm16_1774898869) || `SO-${offerId}`,
-        suiteArea: cleanBitrixValue(item.ufCrm16_1774899115),
-        terraceArea: "0",
-        totalArea: cleanBitrixValue(item.ufCrm16_1774899115),
-        themeColor: "#0000",
+        title: mapped['Title'] || "Sales Offer",
+        titleArabic: "",
+        projectName: cleanVal(mapped['Project Name']) || "N/A",
+        projectNameOfficial: cleanVal(mapped['Project Name']) || "N/A",
+        location: cleanVal(mapped['Location']),
+        propertyType: cleanVal(mapped['Property Type']),
+        unitNumber: cleanVal(mapped['Unit Reference']),
+        bedrooms: cleanVal(mapped['BedRoom']),
+        level: cleanVal(mapped['Level / Floor']),
+        unitArea: cleanVal(mapped['Average Area (SQ.FT)']),
+        sellingPrice: cleanVal(mapped['Price']),
+        developerName: mapped['Developer Name'] || "",
+        salesConsultant: mapped['Assigned Consultant'] || "",
+        headOfSales: mapped['Approval Authority'] || "Management",
+        website: mapped['WebSite Link'] || "",
+        referenceToken: cleanVal(mapped['Unit Reference']) || `SO-${offerId}`,
+        suiteArea: cleanVal(mapped['Average Area (SQ.FT)']) || "0",
+        terraceArea: cleanVal(mapped['Terrace']) || "0",
+        totalArea: (() => {
+          const suite = parseFloat(cleanVal(mapped['Average Area (SQ.FT)']).replace(/,/g, '')) || 0;
+          const terrace = parseFloat(cleanVal(mapped['Terrace']).replace(/,/g, '')) || 0;
+          return (suite + terrace).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+        })(),
+        themeColor: "#3D5434",
         preReg: {
           dld: { 
             description: "DLD Charges", 
-            date: item.ufCrm16_1774900612 || "", 
-            percentage: `${item.ufCrm16_1774900627 || 4}%`, 
-            amount: cleanBitrixValue(item.ufCrm16_1774900641) 
+            date: mapped['dld_date'] || "", 
+            percentage: `${mapped['dld_percentage'] || 4}%`, 
+            amount: cleanVal(mapped['dld_amount']) 
           },
           admin: { 
             description: "Administration Fee", 
-            date: item.ufCrm16_1774900659 || "", 
-            percentage: `${item.ufCrm16_1774900671 || 0}%`, 
-            amount: cleanBitrixValue(item.ufCrm16_1774900686) || "5,000.00" 
+            date: mapped['admin_date'] || "", 
+            percentage: `${mapped['admin_percentage'] || 0}%`, 
+            amount: cleanVal(mapped['admin_amount']) || "5,000.00" 
           },
         },
         paymentPlan: [] as any[],
-        paymentPlanStartDate: item.ufCrm16_1774900723 || "",
-        paymentPlanDuration: item.ufCrm16_1774900752?.toString() || "10",
-        paymentPlanPeriodType: item.ufCrm16_1774900783 || "month",
-        firstInstallmentPercentage: item.ufCrm16_1774900852?.toString() || "20",
-        lastInstallmentPercentage: item.ufCrm16_1774901002?.toString() || "30",
+        paymentPlanStartDate: mapped['Start Date'] || "",
+        paymentPlanDuration: mapped['Duration']?.toString() || "10",
+        paymentPlanPeriodType: mapped['Period Type']?.toLowerCase() || "month",
+        firstInstallmentPercentage: mapped['First Install']?.toString() || "20",
+        lastInstallmentPercentage: mapped['Last Install']?.toString() || "30",
       };
 
       // AUTO-CALC PAYMENT PLAN
@@ -122,7 +126,7 @@ export default function SalesOfferPage() {
 
         for (let i = 0; i < duration; i++) {
           const currentDate = new Date(startDate);
-          if (mappedData.paymentPlanPeriodType === 'month') {
+          if (mappedData.paymentPlanPeriodType.includes('month')) {
             currentDate.setMonth(startDate.getMonth() + i);
           } else {
             currentDate.setDate(startDate.getDate() + (i * 7));
@@ -136,7 +140,7 @@ export default function SalesOfferPage() {
             label = "1st Instalment";
           } else if (i === duration - 1) {
             p = lastP;
-            label = mappedData.paymentPlanPeriodType === 'month' ? "On project completion" : "Final Settlement";
+            label = mappedData.paymentPlanPeriodType.includes('month') ? "On project completion" : "Final Settlement";
           } else {
             p = middleP;
             const idx = i + 1;
@@ -149,7 +153,7 @@ export default function SalesOfferPage() {
           const rowPrice = (price * p) / 100;
           
           newPlan.push({
-            date: i === duration - 1 && mappedData.paymentPlanPeriodType === 'month' ? "On project completion" : currentDate.toISOString().split('T')[0],
+            date: i === duration - 1 && mappedData.paymentPlanPeriodType.includes('month') ? "On project completion" : currentDate.toISOString().split('T')[0],
             installment: label,
             percentage: p.toFixed(2) + "%",
             price: rowPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
@@ -159,24 +163,19 @@ export default function SalesOfferPage() {
       }
 
       // IMAGE MAPPING
-      // Note: Bitrix result can be an object with .url or .downloadUrl
       const getImg = (f: any) => {
         if (!f) return null;
-        if (typeof f === 'string') return f;
-        // Bitrix file objects often have these properties
-        const url = f.showUrl || f.url || f.downloadUrl;
-        if (!url) return null;
-        return url;
+        return f.showUrl || f.url || f.downloadUrl || (typeof f === 'string' ? f : null);
       };
 
       const mappedImages = {
-        cover: getImg(item.ufCrm16_1774897520),
-        banner: getImg(item.ufCrm16_1774897971),
+        cover: getImg(mapped['Upload Cover Image']),
+        banner: getImg(mapped['Upload Banner Image']),
         qrCode: null,
-        unitDetail: getImg(item.ufCrm16_1774899490),
-        highlights: (Array.isArray(item.ufCrm16_1774899312) 
-          ? item.ufCrm16_1774899312.map(getImg)
-          : [getImg(item.ufCrm16_1774899312)]).filter(Boolean).slice(0, 4),
+        unitDetail: getImg(mapped['Layout Image']),
+        highlights: (Array.isArray(mapped['Project Images']) 
+          ? mapped['Project Images'].map(getImg)
+          : [getImg(mapped['Project Images'])]).filter(Boolean).slice(0, 10),
       };
 
       toast.loading("Generating PDF...", { id: loadingToast });
