@@ -39,6 +39,7 @@ import {
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
+import { API_BASE_URL } from "@/api/redux/apiConfig";
 
 const userSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -113,8 +114,7 @@ export function UserDialog({ open, onOpenChange, user, onSubmit, isLoading }: Us
   const getPhotoUrl = (photo: string) => {
     if (!photo) return null;
     if (photo.startsWith('http') || photo.startsWith('data:image')) return photo;
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-    return `${apiUrl}/${photo}`;
+    return `${API_BASE_URL}/storage/${photo}`;
   };
 
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -145,7 +145,7 @@ export function UserDialog({ open, onOpenChange, user, onSubmit, isLoading }: Us
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px] p-0 overflow-hidden border-border/20 shadow-[0_25px_70px_rgba(0,0,0,0.5)] bg-background/95 backdrop-blur-3xl rounded-[2.5rem]">
-        <div className="relative h-24 w-full bg-gradient-to-r from-primary to-primary/60 p-6 flex items-center justify-between">
+        <div className="relative h-24 w-full bg-linear-to-r from-primary to-primary/60 p-6 flex items-center justify-between">
             <div className="space-y-1">
                 <DialogTitle className="text-2xl font-black text-white tracking-tight underline decoration-white-400 decoration-4 underline-offset-8">
                     {isEdit ? "Edit Profile" : "Create User"}
@@ -160,7 +160,7 @@ export function UserDialog({ open, onOpenChange, user, onSubmit, isLoading }: Us
         <form onSubmit={handleSubmit(onFormSubmit)} className="p-8 space-y-8 pt-10">
           {/* Photo Section */}
           <div className="flex flex-col items-center justify-center space-y-4">
-            <div className="relative group p-1 rounded-4xl bg-gradient-to-tr from-primary/20 via-primary/5 to-purple-500/20 shadow-xl ring-1 ring-border/20">
+            <div className="relative group p-1 rounded-4xl bg-linear-to-tr from-primary/20 via-primary/5 to-purple-500/20 shadow-xl ring-1 ring-border/20">
               <Avatar className="h-28 w-28 rounded-3xl border-4 border-background shadow-2xl transition-transform duration-500 group-hover:scale-[1.02]">
                 <AvatarImage src={photoPreview || ""} className="object-cover" />
                 <AvatarFallback className="bg-primary/10 text-primary font-black text-3xl">

@@ -12,6 +12,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { selectCompanyName, selectCompanyLogo } from "@/api/redux/slices/settingsSlice";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
+import { API_BASE_URL } from "@/api/redux/apiConfig";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { registerSchema, RegisterValues } from "@/validation/authSchema";
@@ -30,8 +31,7 @@ export function RegisterForm() {
   const getLogoUrl = (logo: string) => {
     if (!logo) return undefined;
     if (logo.startsWith('http') || logo.startsWith('data:image')) return logo;
-    const apiUrl = (process.env.NEXT_PUBLIC_API_URL || 'https://property-listing.keenenter.com/api').replace('/api', '');
-    return `${apiUrl}/storage/${logo}`;
+    return `${API_BASE_URL}/storage/${logo}`;
   };
 
   const logoUrl = getLogoUrl(companyLogo);

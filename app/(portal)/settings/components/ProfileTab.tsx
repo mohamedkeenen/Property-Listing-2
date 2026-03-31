@@ -17,6 +17,7 @@ import { useUpdateProfileMutation, useUpdatePasswordMutation } from "@/api/redux
 import { useDispatch, useSelector } from "react-redux";
 import { setCredentials, selectToken } from "@/api/redux/slices/authSlice";
 import { Badge } from "@/components/ui/badge";
+import { API_BASE_URL } from "@/api/redux/apiConfig";
 
 interface ProfileTabProps {
   user: any;
@@ -49,8 +50,7 @@ export function ProfileTab({ user }: ProfileTabProps) {
   const getPhotoUrl = (photoStr: string) => {
     if (!photoStr) return "";
     if (photoStr.startsWith('http') || photoStr.startsWith('data:image')) return photoStr;
-    const apiUrl = (process.env.NEXT_PUBLIC_API_URL || 'https://property-listing.keenenter.com/api').replace('/api', '');
-    return `${apiUrl}/storage/${photoStr}`;
+    return `${API_BASE_URL}/storage/${photoStr}`;
   };
 
   const handleProfileUpdate = async (e: React.FormEvent) => {

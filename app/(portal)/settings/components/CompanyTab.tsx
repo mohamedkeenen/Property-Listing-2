@@ -39,6 +39,7 @@ import {
 import { useUpdateCompanySettingsMutation } from "@/api/redux/services/settingsApi";
 import { toast } from "react-hot-toast";
 import { cn } from "@/lib/utils";
+import { API_BASE_URL } from "@/api/redux/apiConfig";
 
 interface CompanyTabProps {
   isAdmin: boolean;
@@ -115,8 +116,7 @@ export function CompanyTab({ isAdmin }: CompanyTabProps) {
   const getLogoUrl = (logoStr: string) => {
     if (!logoStr) return "";
     if (logoStr.startsWith('http') || logoStr.startsWith('data:image')) return logoStr;
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://property-listing.keenenter.com/api';
-    return `${apiUrl}/storage/${logoStr}?v=${settingsLastUpdated}`;
+    return `${API_BASE_URL}/storage/${logoStr}?v=${settingsLastUpdated}`;
   };
 
   const handleSave = async (e: React.FormEvent) => {

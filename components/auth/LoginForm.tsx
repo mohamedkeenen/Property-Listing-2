@@ -12,6 +12,7 @@ import { setCredentials } from "@/api/redux/slices/authSlice";
 import { selectCompanyName, selectCompanyLogo } from "@/api/redux/slices/settingsSlice";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
+import { API_BASE_URL } from "@/api/redux/apiConfig";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema, LoginValues } from "@/validation/authSchema";
@@ -27,8 +28,7 @@ export function LoginForm() {
   const getLogoUrl = (logo: string) => {
     if (!logo) return null;
     if (logo.startsWith('http') || logo.startsWith('data:image')) return logo;
-    const apiUrl = (process.env.NEXT_PUBLIC_API_URL || 'https://property-listing.keenenter.com/api').replace('/api', '');
-    return `${apiUrl}/storage/${logo}`;
+    return `${API_BASE_URL}/storage/${logo}`;
   };
 
   const {
