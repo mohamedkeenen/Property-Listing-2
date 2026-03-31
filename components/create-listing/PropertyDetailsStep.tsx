@@ -60,7 +60,7 @@ export function PropertyDetailsStep({ form }: Props) {
     usersData?.data?.map((u: any) => ({ label: u.name, value: u.id.toString() })) || [], 
   [usersData]);
 
-  const ownerOptions = useMemo(() => 
+  const adminOptions = useMemo(() => 
     adminsData?.data?.map((u: any) => ({ label: u.name, value: u.id.toString() })) || [], 
   [adminsData]);
 
@@ -1016,12 +1016,12 @@ export function PropertyDetailsStep({ form }: Props) {
           </CardHeader>
           <CardContent className="p-6 space-y-6">
             <ModernSelect 
-              label="Listing Owner" 
+              label="Listing Admin" 
               icon={User} 
               required 
               value={watch("listingOwner")} 
               onValueChange={(v) => setValue("listingOwner", v, { shouldValidate: true })}
-              options={ownerOptions}
+              options={adminOptions}
               error={fieldError("listingOwner")}
             />
 

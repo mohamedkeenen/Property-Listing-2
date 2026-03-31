@@ -31,10 +31,11 @@ import {
   Shield, 
   PhoneCall, 
   Trash2, 
-  X, 
   Loader2,
   CheckCircle2,
-  Info
+  Info,
+  Eye,
+  EyeOff
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
@@ -68,6 +69,7 @@ interface UserDialogProps {
 
 export function UserDialog({ open, onOpenChange, user, onSubmit, isLoading }: UserDialogProps) {
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const isEdit = !!user;
 
@@ -83,7 +85,7 @@ export function UserDialog({ open, onOpenChange, user, onSubmit, isLoading }: Us
       name: "",
       email: "",
       phone: "",
-      role: "employee",
+      role: "agent",
       password: "",
     },
   });
@@ -101,7 +103,7 @@ export function UserDialog({ open, onOpenChange, user, onSubmit, isLoading }: Us
         name: "",
         email: "",
         phone: "",
-        role: "employee",
+        role: "agent",
         password: "",
       });
       setPhotoPreview(null);
@@ -152,9 +154,7 @@ export function UserDialog({ open, onOpenChange, user, onSubmit, isLoading }: Us
                     {isEdit ? "Configure security and roles for this user" : "Register a new member to your organization"}
                 </DialogDescription>
             </div>
-            <button onClick={() => onOpenChange(false)} className="h-8 w-8 rounded-full bg-white/20 flex items-center justify-center text-white hover:bg-white/30 transition-all">
-                <X className="h-4 w-4" />
-            </button>
+
         </div>
 
         <form onSubmit={handleSubmit(onFormSubmit)} className="p-8 space-y-8 pt-10">
@@ -194,25 +194,11 @@ export function UserDialog({ open, onOpenChange, user, onSubmit, isLoading }: Us
                   id="name"
                   placeholder="John Doe"
                   className="pl-11 h-12 rounded-xl bg-muted/50 border-border/50 focus:bg-background focus:ring-primary/20 transition-all font-medium"
+                  autoComplete="off"
                   {...register("name")}
                 />
               </div>
               {errors.name && <p className="text-[10px] text-destructive font-bold px-1 uppercase tracking-wider">{errors.name.message}</p>}
-            </div>
-
-            <div className="space-y-3">
-              <Label htmlFor="email" className="text-[10px] uppercase tracking-[0.2em] font-black text-muted-foreground pl-1">Email Address</Label>
-              <div className="relative group">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="john@example.com"
-                  className="pl-11 h-12 rounded-xl bg-muted/50 border-border/50 focus:bg-background focus:ring-primary/20 transition-all font-medium"
-                  {...register("email")}
-                />
-              </div>
-              {errors.email && <p className="text-[10px] text-destructive font-bold px-1 uppercase tracking-wider">{errors.email.message}</p>}
             </div>
 
             <div className="space-y-3">
@@ -228,11 +214,27 @@ export function UserDialog({ open, onOpenChange, user, onSubmit, isLoading }: Us
               </div>
             </div>
 
+            <div className="space-y-3 md:col-span-2">
+              <Label htmlFor="email" className="text-[10px] uppercase tracking-[0.2em] font-black text-muted-foreground pl-1">Email Address</Label>
+              <div className="relative group">
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="john@example.com"
+                  className="pl-11 h-12 rounded-xl bg-muted/50 border-border/50 focus:bg-background focus:ring-primary/20 transition-all font-medium"
+                  autoComplete="off"
+                  {...register("email")}
+                />
+              </div>
+              {errors.email && <p className="text-[10px] text-destructive font-bold px-1 uppercase tracking-wider">{errors.email.message}</p>}
+            </div>
+
             <div className="space-y-3">
               <Label htmlFor="role" className="text-[10px] uppercase tracking-[0.2em] font-black text-muted-foreground pl-1">System Role</Label>
               <div className="relative">
                 <Select
-                  defaultValue="employee"
+                  defaultValue="agent"
                   onValueChange={(val) => setValue("role", val)}
                   value={isEdit ? user.role : undefined}
                 >
@@ -241,7 +243,7 @@ export function UserDialog({ open, onOpenChange, user, onSubmit, isLoading }: Us
                   </SelectTrigger>
                   <SelectContent className="rounded-2xl border-border/10 shadow-2xl p-2 font-medium">
                     <SelectItem value="admin" className="rounded-xl px-4 py-3">Admin</SelectItem>
-                    <SelectItem value="employee" className="rounded-xl px-4 py-3">Employee</SelectItem>
+                    <SelectItem value="agent" className="rounded-xl px-4 py-3">Agent</SelectItem>
                   </SelectContent>
                 </Select>
                 <Shield className="absolute right-10 top-1/2 -translate-y-1/2 h-3 w-3 text-muted-foreground/30" />
@@ -249,7 +251,7 @@ export function UserDialog({ open, onOpenChange, user, onSubmit, isLoading }: Us
               {errors.role && <p className="text-[10px] text-destructive font-bold px-1 uppercase tracking-wider">{errors.role.message}</p>}
             </div>
             
-            <div className={cn("space-y-3", isEdit ? "md:col-span-1" : "md:col-span-2")}>
+            <div className="space-y-3">
               <Label htmlFor="password" className="text-[10px] uppercase tracking-[0.2em] font-black text-muted-foreground pl-1">
                 {isEdit ? "New Password (optional)" : "Secure Password"}
               </Label>
@@ -257,11 +259,19 @@ export function UserDialog({ open, onOpenChange, user, onSubmit, isLoading }: Us
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
                 <Input
                   id="password"
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   placeholder="••••••••"
-                  className="pl-11 h-12 rounded-xl bg-muted/50 border-border/50 focus:bg-background focus:ring-primary/20 transition-all font-medium"
+                  className="pl-11 pr-11 h-12 rounded-xl bg-muted/50 border-border/50 focus:bg-background focus:ring-primary/20 transition-all font-medium"
+                  autoComplete="new-password"
                   {...register("password")}
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground hover:text-primary transition-colors focus:outline-none"
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
               </div>
               {errors.password && <p className="text-[10px] text-destructive font-bold px-1 uppercase tracking-wider">{errors.password.message}</p>}
             </div>
@@ -272,7 +282,7 @@ export function UserDialog({ open, onOpenChange, user, onSubmit, isLoading }: Us
                 <Info className="h-4 w-4 text-primary" />
               </div>
               <div className="space-y-1">
-                <p className="text-xs font-black text-foreground uppercase tracking-widest">Employee Security</p>
+                <p className="text-xs font-black text-foreground uppercase tracking-widest">Agent Security</p>
                 <p className="text-[11px] text-muted-foreground/80 leading-relaxed font-medium">
                     Users added by administrators are pre-verified. Ensure the email address is correct as they will use it to sign in.
                 </p>

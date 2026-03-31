@@ -13,7 +13,7 @@ export const userApi = createApi({
       return headers;
     },
   }),
-  tagTypes: ['User', 'Employee'],
+  tagTypes: ['User', 'Agent'],
   endpoints: (builder) => ({
     getUsers: builder.query<any, { role?: string } | void>({
       query: (params) => ({
@@ -22,42 +22,42 @@ export const userApi = createApi({
       }),
       providesTags: ['User'],
     }),
-    getEmployees: builder.query<any, void>({
-      query: () => '/employees',
-      providesTags: ['Employee'],
+    getAgents: builder.query<any, void>({
+      query: () => '/agents',
+      providesTags: ['Agent'],
     }),
-    createEmployee: builder.mutation<any, any>({
+    createAgent: builder.mutation<any, any>({
       query: (data) => ({
-        url: '/employees',
+        url: '/agents',
         method: 'POST',
         body: data,
       }),
-      invalidatesTags: ['Employee', 'User'],
+      invalidatesTags: ['Agent', 'User'],
     }),
-    updateEmployee: builder.mutation<any, { id: number; data: any }>({
+    updateAgent: builder.mutation<any, { id: number; data: any }>({
       query: ({ id, data }) => ({
-        url: `/employees/${id}`,
+        url: `/agents/${id}`,
         method: 'POST', // Use POST for multipart form-data if photo is included, or handle in component
         body: data,
         params: { _method: 'PUT' }, // Laravel SPOOFING
       }),
-      invalidatesTags: ['Employee', 'User'],
+      invalidatesTags: ['Agent', 'User'],
     }),
-    deleteEmployee: builder.mutation<any, number>({
+    deleteAgent: builder.mutation<any, number>({
       query: (id) => ({
-        url: `/employees/${id}`,
+        url: `/agents/${id}`,
         method: 'DELETE',
       }),
-      invalidatesTags: ['Employee', 'User'],
+      invalidatesTags: ['Agent', 'User'],
     }),
   }),
 });
 
 export const { 
   useGetUsersQuery, 
-  useGetEmployeesQuery, 
-  useCreateEmployeeMutation, 
-  useUpdateEmployeeMutation, 
-  useDeleteEmployeeMutation 
+  useGetAgentsQuery, 
+  useCreateAgentMutation, 
+  useUpdateAgentMutation, 
+  useDeleteAgentMutation 
 } = userApi;
 

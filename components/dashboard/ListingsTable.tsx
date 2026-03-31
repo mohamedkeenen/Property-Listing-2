@@ -200,7 +200,7 @@ export function ListingsTable({ listings, onViewDetails, onEdit }: Props) {
               </TableHead>
               <TableHead>
                 <div className="flex items-center gap-2">
-                  <ArrowUpDown className="h-3 w-3" /> Owner
+                  <ArrowUpDown className="h-3 w-3" /> Admin
                 </div>
               </TableHead>
               <TableHead>

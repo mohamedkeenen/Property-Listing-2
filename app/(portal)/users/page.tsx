@@ -1,10 +1,10 @@
 "use client";
 
 import { 
-  useGetEmployeesQuery, 
-  useCreateEmployeeMutation, 
-  useUpdateEmployeeMutation, 
-  useDeleteEmployeeMutation 
+  useGetAgentsQuery, 
+  useCreateAgentMutation, 
+  useUpdateAgentMutation, 
+  useDeleteAgentMutation 
 } from "@/api/redux/services/userApi";
 import { UserTable } from "./components/UserTable";
 import { UserDialog } from "./components/UserDialog";
@@ -30,10 +30,10 @@ import { useSelector } from "react-redux";
 import { selectCurrentUser } from "@/api/redux/slices/authSlice";
 
 export default function UsersPage() {
-  const { data, isLoading, isError, refetch, isFetching } = useGetEmployeesQuery();
-  const [createEmployee, { isLoading: isCreating }] = useCreateEmployeeMutation();
-  const [updateEmployee, { isLoading: isUpdating }] = useUpdateEmployeeMutation();
-  const [deleteEmployee] = useDeleteEmployeeMutation();
+  const { data, isLoading, isError, refetch, isFetching } = useGetAgentsQuery();
+  const [createAgent, { isLoading: isCreating }] = useCreateAgentMutation();
+  const [updateAgent, { isLoading: isUpdating }] = useUpdateAgentMutation();
+  const [deleteAgent] = useDeleteAgentMutation();
   const currentUser = useSelector(selectCurrentUser);
 
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -59,7 +59,7 @@ export default function UsersPage() {
   const handleDelete = async (id: number) => {
     if (confirm("Are you sure you want to delete this user? This action cannot be undone.")) {
       try {
-        await deleteEmployee(id).unwrap();
+        await deleteAgent(id).unwrap();
         toast.success("User removed successfully", {
             style: {
                 borderRadius: '1rem',
@@ -80,7 +80,7 @@ export default function UsersPage() {
   const handleSubmit = async (formData: any) => {
     try {
       if (selectedUser) {
-        const res = await updateEmployee({ id: selectedUser.id, data: formData }).unwrap();
+        const res = await updateAgent({ id: selectedUser.id, data: formData }).unwrap();
         toast.success(res.message || "Profile Updated", {
             style: {
                 borderRadius: '1rem',
@@ -90,7 +90,7 @@ export default function UsersPage() {
             }
         });
       } else {
-        const res = await createEmployee(formData).unwrap();
+        const res = await createAgent(formData).unwrap();
         toast.success(res.message || "New Member Added", {
             style: {
                 borderRadius: '1rem',
@@ -131,7 +131,7 @@ export default function UsersPage() {
               <UsersIcon className="h-7 w-7" />
             </div>
             <div>
-              <h1 className="text-5xl font-black tracking-tight text-foreground relative underline decoration-primary decoration-4 underline-offset-[12px]">
+              <h1 className="text-5xl font-black tracking-tight text-foreground relative underline decoration-primary decoration-4 underline-offset-12">
                 Users
                 <div className="absolute -top-1 -right-4 h-3 w-3 rounded-full bg-primary animate-ping opacity-75" />
               </h1>
@@ -165,13 +165,13 @@ export default function UsersPage() {
               { label: "Total Members", value: users.length, icon: UsersIcon, color: "text-primary", bg: "bg-primary/10" },
               { label: "Administrative", value: users.filter((u: any) => u.role === 'admin').length, icon: ShieldCheck, color: "text-emerald-500", bg: "bg-emerald-500/10" },
               { label: "Active Agents", value: users.filter((u: any) => u.role === 'agent').length, icon: LayoutGrid, color: "text-purple-500", bg: "bg-purple-500/10" },
-              { label: "System Service", value: users.filter((u: any) => u.role === 'employee').length, icon: ChevronRight, color: "text-orange-500", bg: "bg-orange-500/10" },
+              { label: "Verified Access", value: users.length, icon: ChevronRight, color: "text-orange-500", bg: "bg-orange-500/10" },
           ].map((stat, i) => (
               <div 
                 key={i} 
                 className="group relative bg-card/60 backdrop-blur-2xl rounded-[2.5rem] border border-border/40 p-6 flex items-center gap-6 transition-all hover:shadow-2xl hover:-translate-y-1 cursor-default ornament-grid"
               >
-                  <div className={cn("h-16 w-16 rounded-[1.5rem] flex items-center justify-center shadow-lg transition-transform group-hover:scale-110 duration-500", stat.bg)}>
+                  <div className={cn("h-16 w-16 rounded-3xl flex items-center justify-center shadow-lg transition-transform group-hover:scale-110 duration-500", stat.bg)}>
                       <stat.icon className={cn("h-8 w-8", stat.color)} />
                   </div>
                   <div className="space-y-1">

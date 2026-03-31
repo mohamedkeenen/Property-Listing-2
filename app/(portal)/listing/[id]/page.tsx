@@ -287,7 +287,7 @@ export default function PropertyDetail({ params }: { params: Promise<{ id: strin
           </div>
         </div>
 
-         {/* Right sidebar: Agent & Owner */}
+         {/* Right sidebar: Agent & Admin */}
          <div className="space-y-4">
           {/* Agent card */}
           <div className="bg-card border border-border rounded-xl p-5 space-y-4">
@@ -317,7 +317,7 @@ export default function PropertyDetail({ params }: { params: Promise<{ id: strin
 
            {/* Owner card */}
            <div className="bg-card border border-border rounded-xl p-5 space-y-4">
-            <h3 className="font-semibold text-foreground text-sm">Owner</h3>
+            <h3 className="font-semibold text-foreground text-sm">Admin</h3>
             <div className="flex items-center gap-3">
               <div className="relative h-12 w-12 shrink-0">
                 {listing.ownerAvatar ? (
