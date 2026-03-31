@@ -123,7 +123,8 @@ export function StatsCards({ listings }: Props) {
                {companySettings?.data?.id && (
                  <button 
                   onClick={() => {
-                    const url = `${process.env.NEXT_PUBLIC_API_URL}/properties/website/${companySettings.data.id}`;
+                    const baseUrl = process.env.NEXT_PUBLIC_API_URL || "https://property-listing.keenenter.com/api";
+                    const url = `${baseUrl}/properties/website/${companySettings.data.id}`;
                     navigator.clipboard.writeText(url);
                     toast.success("API URL copied!");
                   }}
