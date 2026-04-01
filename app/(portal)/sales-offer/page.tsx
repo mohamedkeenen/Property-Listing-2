@@ -35,6 +35,7 @@ interface SalesOffer {
   image?: any;
   reference: string;
   project_name: string;
+  client_name: string;
   price: string | number;
   created_at?: string;
 }
@@ -47,6 +48,7 @@ export default function SalesOfferPage() {
 
   const filteredOffers: SalesOffer[] = (offers as any)?.data?.filter((offer: SalesOffer) => 
     offer.project_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (offer.client_name && offer.client_name.toLowerCase().includes(searchTerm.toLowerCase())) ||
     offer.reference.toLowerCase().includes(searchTerm.toLowerCase())
   ) || [];
 
@@ -68,6 +70,7 @@ export default function SalesOfferPage() {
         title: mapped['Title'] || "Sales Offer",
         titleArabic: "",
         projectName: cleanVal(mapped['Project Name']) || "N/A",
+        clientName: cleanVal(mapped['Client Name']) || "N/A",
         projectNameOfficial: cleanVal(mapped['Project Name']) || "N/A",
         location: cleanVal(mapped['Location']),
         propertyType: cleanVal(mapped['Property Type']),
@@ -265,6 +268,7 @@ export default function SalesOfferPage() {
                     <TableHead className="w-[100px] h-14 pl-6 font-black text-xs uppercase tracking-wider text-muted-foreground">Image</TableHead>
                     <TableHead className="h-14 font-black text-xs uppercase tracking-wider text-muted-foreground">Reference</TableHead>
                     <TableHead className="h-14 font-black text-xs uppercase tracking-wider text-muted-foreground">Project Name</TableHead>
+                    <TableHead className="h-14 font-black text-xs uppercase tracking-wider text-muted-foreground">Client Name</TableHead>
                     <TableHead className="h-14 font-black text-xs uppercase tracking-wider text-muted-foreground text-center">Price</TableHead>
                     <TableHead className="h-14 font-black text-xs uppercase tracking-wider text-muted-foreground text-center">Created At</TableHead>
                     <TableHead className="h-14 pr-6 text-right font-black text-xs uppercase tracking-wider text-muted-foreground">Action</TableHead>
@@ -314,6 +318,11 @@ export default function SalesOfferPage() {
                         <div className="flex items-center gap-2 font-black text-foreground/80">
                           <Building2 className="h-4 w-4 text-primary" />
                           {offer.project_name}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="font-bold text-primary">
+                          {offer.client_name || "N/A"}
                         </div>
                       </TableCell>
                       <TableCell className="text-center">

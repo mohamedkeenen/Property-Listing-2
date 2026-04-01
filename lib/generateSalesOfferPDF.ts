@@ -153,6 +153,7 @@ export const generateSalesOfferPDF = async (formData: any, images: any) => {
   let sy = 75;
   drawSpecRow(sy, "Developer Name :", formData.developerName); sy += 10;
   drawSpecRow(sy, "Project Name :", formData.projectName); sy += 10;
+  drawSpecRow(sy, "Client Name :", formData.clientName); sy += 10;
   drawSpecRow(sy, "Location :", formData.location); sy += 10;
   drawSpecRow(sy, "Property Type :", formData.propertyType); sy += 10;
   drawSpecRow(sy, "Unit Number :", formData.unitNumber); sy += 10;
