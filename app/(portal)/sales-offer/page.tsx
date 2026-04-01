@@ -12,7 +12,8 @@ import {
   Hash,
   DollarSign,
   Image as ImageIcon,
-  Loader2
+  Loader2,
+  CircleUser
 } from "lucide-react";
 import { format } from "date-fns";
 import { generateSalesOfferPDF } from "@/lib/generateSalesOfferPDF";
@@ -265,10 +266,10 @@ export default function SalesOfferPage() {
               <Table>
                 <TableHeader className="bg-muted/30">
                   <TableRow className="hover:bg-transparent">
-                    <TableHead className="w-[100px] h-14 pl-6 font-black text-xs uppercase tracking-wider text-muted-foreground">Image</TableHead>
+                    <TableHead className="h-14 pl-6 font-black text-xs uppercase tracking-wider text-muted-foreground">Client Name</TableHead>
+                    <TableHead className="w-[100px] h-14 font-black text-xs uppercase tracking-wider text-muted-foreground">Image</TableHead>
                     <TableHead className="h-14 font-black text-xs uppercase tracking-wider text-muted-foreground">Reference</TableHead>
                     <TableHead className="h-14 font-black text-xs uppercase tracking-wider text-muted-foreground">Project Name</TableHead>
-                    <TableHead className="h-14 font-black text-xs uppercase tracking-wider text-muted-foreground">Client Name</TableHead>
                     <TableHead className="h-14 font-black text-xs uppercase tracking-wider text-muted-foreground text-center">Price</TableHead>
                     <TableHead className="h-14 font-black text-xs uppercase tracking-wider text-muted-foreground text-center">Created At</TableHead>
                     <TableHead className="h-14 pr-6 text-right font-black text-xs uppercase tracking-wider text-muted-foreground">Action</TableHead>
@@ -278,6 +279,12 @@ export default function SalesOfferPage() {
                   {filteredOffers.map((offer: SalesOffer) => (
                     <TableRow key={offer.id} className="hover:bg-muted/20 transition-colors border-border/20 group">
                       <TableCell className="pl-6 py-4">
+                        <div className="flex items-center gap-2 font-black text-foreground">
+                          <CircleUser className="h-4 w-4 text-primary" />
+                          {offer.client_name || "N/A"}
+                        </div>
+                      </TableCell>
+                      <TableCell className="py-4">
                         <div className="w-14 h-14 rounded-xl border border-border/30 bg-muted/50 overflow-hidden shadow-inner group-hover:shadow-md transition-all">
                           {offer.image ? (
                             <img 
@@ -318,11 +325,6 @@ export default function SalesOfferPage() {
                         <div className="flex items-center gap-2 font-black text-foreground/80">
                           <Building2 className="h-4 w-4 text-primary" />
                           {offer.project_name}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="font-bold text-primary">
-                          {offer.client_name || "N/A"}
                         </div>
                       </TableCell>
                       <TableCell className="text-center">
