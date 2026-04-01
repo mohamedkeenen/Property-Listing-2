@@ -113,18 +113,18 @@ export function RegisterForm() {
       </div>
 
       {isSuccess ? (
-        <div className="bg-emerald-50 border border-emerald-100 rounded-3xl p-10 text-center space-y-6">
-          <div className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mx-auto">
-            <Mail className="h-10 w-10 text-emerald-600" />
+        <div className="bg-primary/5 border border-primary/20 rounded-3xl p-10 text-center space-y-6">
+          <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
+            <Mail className="h-10 w-10 text-primary" />
           </div>
           <div className="space-y-2">
-            <h3 className="text-2xl font-black text-emerald-900">Check Your Email</h3>
-            <p className="text-emerald-700 font-medium">
+            <h3 className="text-2xl font-black text-primary">Check Your Email</h3>
+            <p className="text-muted-foreground font-medium">
               We've sent a verification link to <span className="font-bold underline decoration-2">{email}</span>. 
               Please click the link to activate your account.
             </p>
           </div>
-          <Button asChild variant="outline" className="border-emerald-200 text-emerald-700 hover:bg-emerald-100">
+          <Button asChild variant="outline" className="border-primary/20 text-primary hover:bg-primary/10">
             <Link href="/login">Return to Sign In</Link>
           </Button>
         </div>
