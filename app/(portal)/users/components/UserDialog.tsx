@@ -111,9 +111,12 @@ export function UserDialog({ open, onOpenChange, user, onSubmit, isLoading }: Us
     }
   }, [user, setValue, reset, open]);
 
+  const baseUrl = 'https://property-listing.keenenter.com';
+
   const getPhotoUrl = (photo: string) => {
     if (!photo) return null;
     if (photo.startsWith('http') || photo.startsWith('data:image')) return photo;
+    if (photo.startsWith('/api/')) return `${baseUrl}${photo}`;
     return `${API_BASE_URL}/storage/${photo}`;
   };
 

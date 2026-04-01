@@ -100,8 +100,8 @@
   --popover: #0f172a;
   --popover-foreground: #f1f5f9;
 
-  /* أزرق أهدى وأريح للعين - أقل saturation */
-  --primary: #5b9bd5;
+  /* A richer, vibrant blue */
+  --primary: #3b82f6;
   --primary-foreground: #ffffff;
 
   --secondary: #334155;
@@ -110,31 +110,31 @@
   --muted: #1e293b;
   --muted-foreground: #8da4b8;
 
-  --accent: #7cb3d4;
-  --accent-foreground: #f8fafc;
+  --accent: #3b82f6;
+  --accent-foreground: #ffffff;
 
   --destructive: #ef4444;
   --destructive-foreground: #ffffff;
 
   --border: #334155;
   --input: #334155;
-  --ring: #4d8fc7;
+  --ring: #3b82f6;
 
   /* Brand */
   --brand-dark: #f1f5f9;
   --brand-light: #0f172a;
-  --brand-gradient-start: #3a6db5;
-  --brand-gradient-end: #2d7dd2;
+  --brand-gradient-start: #2563eb;
+  --brand-gradient-end: #3b82f6;
 
   /* Sidebar */
   --sidebar-background: #0f172a;
   --sidebar-foreground: #f1f5f9;
-  --sidebar-primary: #5b9bd5;
+  --sidebar-primary: #3b82f6;
   --sidebar-primary-foreground: #ffffff;
   --sidebar-accent: #1e293b;
   --sidebar-accent-foreground: #f1f5f9;
   --sidebar-border: #334155;
-  --sidebar-ring: #4d8fc7;
+  --sidebar-ring: #3b82f6;
 }
 
 .font-arabic {

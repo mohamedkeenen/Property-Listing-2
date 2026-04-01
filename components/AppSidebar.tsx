@@ -69,15 +69,19 @@ export function AppSidebar() {
     }
   };
 
+  const baseUrl = 'https://property-listing.keenenter.com';
+
   const getPhotoUrl = (photo: string) => {
     if (!photo) return undefined;
     if (photo.startsWith('http') || photo.startsWith('data:image')) return photo;
+    if (photo.startsWith('/api/')) return `${baseUrl}${photo}`;
     return `${API_BASE_URL}/storage/${photo}`;
   };
 
   const getLogoUrl = (logo: string) => {
     if (!logo) return undefined;
     if (logo.startsWith('http') || logo.startsWith('data:image')) return logo;
+    if (logo.startsWith('/api/')) return `${baseUrl}${logo}?v=${settingsLastUpdated}`;
     return `${API_BASE_URL}/storage/${logo}?v=${settingsLastUpdated}`;
   };
 

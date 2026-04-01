@@ -255,7 +255,7 @@ function CreateListingContent() {
                 </Button>
                 <Button 
                   onClick={handleNext}
-                  className="h-11 rounded-[1.25rem] font-black text-[10px] uppercase tracking-widest px-12 shadow-xl shadow-primary/40 hover:shadow-primary/60 hover:-translate-y-0.5 active:translate-y-0 transition-all bg-primary"
+                  className="h-11 rounded-[1.25rem] font-black text-[10px] uppercase tracking-widest px-12 shadow-xl shadow-indigo-500/20 hover:shadow-indigo-500/40 hover:-translate-y-0.5 active:translate-y-0 transition-all bg-linear-to-r from-primary to-indigo-600 text-white"
                   type="button"
                 >
                   Save & Continue <ChevronRight className="h-4 w-4 ml-1" />

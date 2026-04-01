@@ -47,9 +47,12 @@ export function ProfileTab({ user }: ProfileTabProps) {
     }
   }, [user]);
 
+  const baseUrl = 'https://property-listing.keenenter.com';
+
   const getPhotoUrl = (photoStr: string) => {
     if (!photoStr) return "";
     if (photoStr.startsWith('http') || photoStr.startsWith('data:image')) return photoStr;
+    if (photoStr.startsWith('/api/')) return `${baseUrl}${photoStr}`;
     return `${API_BASE_URL}/storage/${photoStr}`;
   };
 

@@ -46,9 +46,12 @@ interface UserTableProps {
 }
 
 export function UserTable({ users, onEdit, onDelete, onView }: UserTableProps) {
+  const baseUrl = 'https://property-listing.keenenter.com';
+
   const getPhotoUrl = (photo: string) => {
     if (!photo) return "";
     if (photo.startsWith('http') || photo.startsWith('data:image')) return photo;
+    if (photo.startsWith('/api/')) return `${baseUrl}${photo}`;
     const apiUrl = process.env.NEXT_PUBLIC_API_URL;
     return `${apiUrl}/${photo}`;
   };
@@ -94,7 +97,7 @@ export function UserTable({ users, onEdit, onDelete, onView }: UserTableProps) {
               </TableRow>
             ) : (
               users.map((user) => (
-                <TableRow key={user.id} className="group border-border/40 hover:bg-primary/[0.02] transition-colors">
+                <TableRow key={user.id} className="group border-border/40 hover:bg-primary/5 transition-colors">
                   <TableCell className="py-4 px-6">
                     <Avatar className="h-12 w-12 rounded-2xl border-2 border-background ring-4 ring-primary/5 shadow-lg group-hover:scale-110 transition-transform duration-500">
                       <AvatarImage src={getPhotoUrl(user.photo || '')} alt={user.name} className="object-cover" />
