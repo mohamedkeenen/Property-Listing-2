@@ -46,7 +46,6 @@ export function PropertyDetailsStep({ form }: Props) {
   const { data: projectsData } = useGetProjectsQuery();
   const { data: developersData } = useGetDevelopersQuery();
   const { data: usersData } = useGetUsersQuery();
-  const { data: adminsData } = useGetUsersQuery({ role: 'admin' });
 
   const projectOptions = useMemo(() => 
     projectsData?.data?.map((p: any) => ({ label: p.name, value: p.name })) || [], 
@@ -59,10 +58,6 @@ export function PropertyDetailsStep({ form }: Props) {
   const agentOptions = useMemo(() => 
     usersData?.data?.map((u: any) => ({ label: u.name, value: u.id.toString() })) || [], 
   [usersData]);
-
-  const adminOptions = useMemo(() => 
-    adminsData?.data?.map((u: any) => ({ label: u.name, value: u.id.toString() })) || [], 
-  [adminsData]);
 
   const companyLogo = useSelector(selectCompanyLogo);
   const token = useSelector(selectToken);
@@ -976,40 +971,6 @@ export function PropertyDetailsStep({ form }: Props) {
                 placeholder="Internal notes only, not visible to clients..."
               />
             </ModernField>
-          </div>
-        </section>
-
-        {/* Section 9: Administrative Details */}
-        <section className="space-y-6">
-          <div className="flex items-center gap-3">
-             <div className="p-2 rounded-xl bg-primary/10 text-primary">
-                <User className="h-4 w-4" />
-             </div>
-             <h3 className="text-sm font-bold text-foreground">Administrative Details</h3>
-             <div className="h-px flex-1 bg-border/20" />
-             <Info className="h-4 w-4 text-muted-foreground/30" />
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 bg-card/30 p-8 rounded-4xl border border-border/20">
-            <ModernSelect 
-              label="Listing Admin" 
-              icon={User} 
-              required 
-              value={watch("listingOwner")} 
-              onValueChange={(v) => setValue("listingOwner", v, { shouldValidate: true })}
-              options={adminOptions}
-              error={fieldError("listingOwner")}
-            />
-
-            <ModernSelect 
-              label="Select Landlord" 
-              icon={User} 
-              required 
-              value={watch("landlord")} 
-              onValueChange={(v) => setValue("landlord", v, { shouldValidate: true })}
-              options={["John Miller"]}
-              error={fieldError("landlord")}
-            />
           </div>
         </section>
       </div>
