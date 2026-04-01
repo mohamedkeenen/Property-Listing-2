@@ -193,7 +193,7 @@ export default function SalesOfferPage() {
   };
 
   return (
-    <div className="flex-1 space-y-8 p-8 pt-6 overflow-y-auto bg-[#fafafa]">
+    <div className="flex-1 space-y-8 p-8 pt-6 overflow-y-auto bg-transparent">
       {/* Header section with refined aesthetics */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
@@ -217,7 +217,7 @@ export default function SalesOfferPage() {
               placeholder="Search reference or project..." 
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 h-11 rounded-xl border-border/50 bg-white/50 backdrop-blur-sm focus:ring-primary/20 transition-all font-medium"
+              className="pl-10 h-11 rounded-xl border-border/50 bg-background/50 backdrop-blur-sm focus:ring-primary/20 transition-all font-medium"
             />
           </div>
           <Button 
@@ -232,7 +232,7 @@ export default function SalesOfferPage() {
         </div>
       </div>
 
-      <Card className="rounded-2xl border-border/40 shadow-xl shadow-black/5 overflow-hidden bg-white/70 backdrop-blur-md">
+      <Card className="rounded-2xl border-border/40 shadow-xl shadow-black/5 overflow-hidden bg-card/70 backdrop-blur-md">
         <CardContent className="p-0">
           <div className="relative min-h-[400px]">
             {isLoading ? (
@@ -317,7 +317,7 @@ export default function SalesOfferPage() {
                         </div>
                       </TableCell>
                       <TableCell className="text-center">
-                        <Badge variant="secondary" className="font-black px-3 py-1 bg-green-50 text-green-700 border-green-100/50">
+                        <Badge variant="secondary" className="font-black px-3 py-1 bg-green-50 text-green-700 border-green-100/50 dark:bg-green-900/20 dark:text-green-400 dark:border-green-900/50">
                           <DollarSign className="h-3 w-3 mr-0.5" />
                           {Number(offer.price).toLocaleString()}
                         </Badge>
