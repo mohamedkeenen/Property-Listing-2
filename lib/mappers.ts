@@ -5,7 +5,19 @@ export const mapBackendPropertyToFrontend = (p: any): PropertyListing => {
   const getImageUrl = (path: string) => {
     if (!path) return "";
     if (path.startsWith('http') || path.startsWith('data:image')) return path;
-    return `${API_BASE_URL}/storage/${path}`;
+    
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL 
+      ? process.env.NEXT_PUBLIC_API_URL.replace(/\/api\/?$/, '') 
+      : 'https://property-listing.keenenter.com';
+
+    if (path.startsWith('/api/storage/')) return `${baseUrl}${path}`;
+    if (path.startsWith('api/storage/')) return `${baseUrl}/${path}`;
+    
+    // For older properties or paths without the prefix:
+    let cleanPath = path.startsWith('/') ? path.substring(1) : path;
+    cleanPath = cleanPath.replace(/^(api\/storage\/|storage\/)+/, '');
+    
+    return `${baseUrl}/api/storage/${cleanPath}`;
   };
 
   const imagesList = p.images || [];
@@ -80,7 +92,19 @@ export const mapBackendPropertyToFormValues = (p: any): any => {
   const getImageUrl = (path: string) => {
     if (!path) return "";
     if (path.startsWith('http') || path.startsWith('data:image')) return path;
-    return `${API_BASE_URL}/storage/${path}`;
+    
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL 
+      ? process.env.NEXT_PUBLIC_API_URL.replace(/\/api\/?$/, '') 
+      : 'https://property-listing.keenenter.com';
+
+    if (path.startsWith('/api/storage/')) return `${baseUrl}${path}`;
+    if (path.startsWith('api/storage/')) return `${baseUrl}/${path}`;
+    
+    // For older properties or paths without the prefix:
+    let cleanPath = path.startsWith('/') ? path.substring(1) : path;
+    cleanPath = cleanPath.replace(/^(api\/storage\/|storage\/)+/, '');
+    
+    return `${baseUrl}/api/storage/${cleanPath}`;
   };
 
   const getPrice = () => {
