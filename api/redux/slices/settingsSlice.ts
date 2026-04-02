@@ -19,6 +19,7 @@ interface SettingsState {
   sales_offer_entity_type_id: string;
   developers: string[];
   projectNames: string[];
+  outbound_handler_token: string;
 }
 
 const initialState: SettingsState = {
@@ -39,6 +40,7 @@ const initialState: SettingsState = {
   sales_offer_entity_type_id: '',
   developers: [],
   projectNames: [],
+  outbound_handler_token: '',
 };
 
 const settingsSlice = createSlice({
@@ -62,6 +64,7 @@ const settingsSlice = createSlice({
       state.sales_offer_entity_type_id = action.payload.sales_offer_entity_type_id || '';
       state.developers = action.payload.developers || [];
       state.projectNames = action.payload.projectNames || action.payload.project_names || [];
+      state.outbound_handler_token = action.payload.outbound_handler_token || '';
       state.lastUpdated = Date.now();
     },
     updateDevelopers: (state, action: PayloadAction<string[]>) => {
@@ -96,3 +99,4 @@ export const selectSalesOfferWebhook = (state: RootState) => state.settings.sale
 export const selectSalesOfferEntityTypeId = (state: RootState) => state.settings.sales_offer_entity_type_id;
 export const selectDevelopers = (state: RootState) => state.settings.developers;
 export const selectProjectNames = (state: RootState) => state.settings.projectNames;
+export const selectOutboundHandlerToken = (state: RootState) => state.settings.outbound_handler_token;

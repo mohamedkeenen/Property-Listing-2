@@ -118,8 +118,9 @@ export function CompletedStep({ form }: Props) {
       }
       
       const companyId = response?.data?.company_id || (form.getValues() as any).company_id;
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://property-listing.keenenter.com/api";
-      const feedUrl = `${apiUrl.replace('/api', '')}/feeds/${companyId}/bayut.xml`;
+      const baseUrl = (process.env.NEXT_PUBLIC_API_URL || "https://property-listing.keenenter.com/api").replace('/api', '');
+      const feedToken = (response as any)?.data?.company?.outbound_handler_token || response?.data?.company_id || companyId;
+      const feedUrl = `${baseUrl}/api/feeds/${feedToken}/bayut.xml`;
 
       toast({
         title: "Success! 🎉",

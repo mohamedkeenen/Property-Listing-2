@@ -124,7 +124,8 @@ export function StatsCards({ listings }: Props) {
                  <button 
                   onClick={() => {
                     const baseUrl = process.env.NEXT_PUBLIC_API_URL || "https://property-listing.keenenter.com/api";
-                    const url = `${baseUrl}/properties/website/${companySettings.data.id}`;
+                    const feedToken = companySettings?.data?.outbound_handler_token || companySettings?.data?.id;
+                    const url = `${baseUrl}/properties/website/${feedToken}`;
                     navigator.clipboard.writeText(url);
                     toast.success("API URL copied!");
                   }}
@@ -144,8 +145,9 @@ export function StatsCards({ listings }: Props) {
                {companySettings?.data?.id && (
                  <button 
                   onClick={() => {
-                    const baseUrl = process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || "https://property-listing.keenenter.com";
-                    const url = `${baseUrl}/api/feeds/${companySettings.data.id}/bayut.xml`;
+                    const baseUrl = (process.env.NEXT_PUBLIC_API_URL || "https://property-listing.keenenter.com/api").replace('/api', '');
+                    const feedToken = companySettings?.data?.outbound_handler_token || companySettings?.data?.id;
+                    const url = `${baseUrl}/api/feeds/${feedToken}/bayut.xml`;
                     navigator.clipboard.writeText(url);
                     toast.success("Feed URL copied!");
                   }}

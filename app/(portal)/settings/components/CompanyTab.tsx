@@ -34,6 +34,7 @@ import {
   selectPfLeadSourcePhone,
   selectSalesOfferWebhook,
   selectSalesOfferEntityTypeId,
+  selectOutboundHandlerToken,
   setCompanySettings 
 } from "@/api/redux/slices/settingsSlice";
 import { useUpdateCompanySettingsMutation } from "@/api/redux/services/settingsApi";
@@ -62,6 +63,7 @@ export function CompanyTab({ isAdmin }: CompanyTabProps) {
   const settingsLastUpdated = useSelector(selectSettingsLastUpdated);
   const reduxSalesOfferWebhook = useSelector(selectSalesOfferWebhook);
   const reduxSalesOfferEntityTypeId = useSelector(selectSalesOfferEntityTypeId);
+  const reduxOutboundHandlerToken = useSelector(selectOutboundHandlerToken);
   
   const [companyName, setCompanyName] = useState(reduxCompanyName);
   const [logo, setLogo] = useState<string>(reduxLogo);
@@ -227,6 +229,35 @@ export function CompanyTab({ isAdmin }: CompanyTabProps) {
                   onChange={(e) => setBitrixWebhook(e.target.value)}
                   readOnly={!isAdmin}
                 />
+                
+                {/* Bitrix Inbound Webhook URL (Read only with copy) */}
+                <div className="space-y-2 mt-2 pb-6 border-b border-border/10">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-primary/70 flex items-center gap-2">
+                    System Callback URL (Paste this into Bitrix24)
+                  </p>
+                  <div className="flex items-center gap-2 p-3 bg-muted/20 rounded-xl border border-border/20 group">
+                    <Webhook className="h-4 w-4 text-primary shrink-0 opacity-60" />
+                    <code className="text-[11px] text-muted-foreground font-mono flex-1 truncate">
+                      {`${API_BASE_URL}/webhooks/bitrix/${reduxOutboundHandlerToken || 'loading...'}`}
+                    </code>
+                    <button 
+                      type="button"
+                      onClick={() => {
+                        const url = `${API_BASE_URL}/webhooks/bitrix/${reduxOutboundHandlerToken}`;
+                        navigator.clipboard.writeText(url);
+                        toast.success("Webhook URL copied!");
+                      }}
+                      className="p-1.5 hover:bg-muted rounded-lg transition-all active:scale-95"
+                      title="Copy URL"
+                    >
+                      <Save className="h-3.5 w-3.5 text-primary" />
+                    </button>
+                  </div>
+                  <p className="text-[9px] text-muted-foreground/60 italic px-1">
+                    Set this as the 'Handler URL' in your Bitrix24 outbound webhook settings.
+                  </p>
+                </div>
+
                 <ModernField 
                   label="Sales Offer Webhook URL" 
                   placeholder="https://your-domain.bitrix24.com/rest/1/..." 
