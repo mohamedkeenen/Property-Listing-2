@@ -15,6 +15,15 @@ function HydrationWrapper({ children }: { children: React.ReactNode }) {
   
   useEffect(() => {
     if (typeof window !== "undefined") {
+      // Call Bitrix24 init if script is present
+      const BX24 = (window as any).BX24;
+      if (BX24) {
+        console.log("Calling BX24.init()");
+        BX24.init(() => {
+          console.log("BX24 SDK initialized successfully");
+        });
+      }
+
       const search = window.location.search;
 
       if (!search) {

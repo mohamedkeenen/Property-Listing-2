@@ -14,10 +14,11 @@ const nextConfig: NextConfig = {
       {
         source: '/(.*)',
         headers: [
-          { key: 'Content-Security-Policy', value: 'frame-ancestors https://*.bitrix24.com https://*.bitrix24.ru' },
-          { key: 'Access-Control-Allow-Origin', value: process.env.NODE_ENV === 'development' ? '*' : 'https://*.bitrix24.com' },
+          { key: 'Content-Security-Policy', value: "frame-ancestors 'self' https://*.bitrix24.com https://*.bitrix24.ru https://*.bitrix24.eu https://*.bitrix24.de" },
+          { key: 'Access-Control-Allow-Origin', value: '*' },
           { key: 'Access-Control-Allow-Methods', value: 'GET, POST, OPTIONS' },
-          { key: 'Access-Control-Allow-Headers', value: 'X-Requested-With, Content-Type, Authorization' },
+          { key: 'Access-Control-Allow-Headers', value: 'X-Requested-With, Content-Type, Authorization, X-Bitrix-24' },
+          { key: 'X-Frame-Options', value: 'ALLOWALL' }, // Note: ALLOWALL is not a standard value but often used to bypass SAMEORIGIN in some environments, though CSP is preferred.
         ],
       },
     ];

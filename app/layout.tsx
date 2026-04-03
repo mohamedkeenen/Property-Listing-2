@@ -31,6 +31,8 @@ export const metadata: Metadata = {
   },
 };
 
+import Script from "next/script";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -38,6 +40,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <Script 
+          src="https://api.bitrix24.com/api/v1/" 
+          strategy="beforeInteractive"
+        />
+      </head>
       <body className={`${geistSans.variable} ${geistMono.variable} ${cairo.variable} antialiased font-sans`} suppressHydrationWarning>
         <Providers>
           {children}

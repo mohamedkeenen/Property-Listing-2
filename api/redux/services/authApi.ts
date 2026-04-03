@@ -13,6 +13,15 @@ export const authApi = createApi({
         headers.set('authorization', `Bearer ${token}`);
       }
 
+      // Standardize Bitrix headers for all requests
+      if (typeof window !== 'undefined') {
+        const bitrixDomain = localStorage.getItem("bitrix_domain");
+        const bitrixAuthId = localStorage.getItem("bitrix_auth_id");
+        
+        if (bitrixDomain) headers.set('X-Bitrix-Domain', bitrixDomain);
+        if (bitrixAuthId) headers.set('X-Bitrix-Auth-Id', bitrixAuthId);
+      }
+
       headers.set('accept', 'application/json');
       return headers;
     },
