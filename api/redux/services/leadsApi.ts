@@ -6,7 +6,7 @@ export const leadsApi = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: API_BASE_URL,
     prepareHeaders: (headers, { getState }) => {
-      const token = (getState() as any).auth.token;
+      const token = (getState() as any).auth?.token;
       if (token) {
         headers.set('authorization', `Bearer ${token}`);
       }

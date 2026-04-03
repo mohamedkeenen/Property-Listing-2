@@ -14,7 +14,43 @@ function HydrationWrapper({ children }: { children: React.ReactNode }) {
   const dispatch = useDispatch();
   
   useEffect(() => {
-    dispatch(initialize());
+    if (typeof window !== "undefined") {
+      const search = window.location.search;
+
+      if (!search) {
+        dispatch(initialize());
+        return;
+      }
+
+      const urlParams = new URLSearchParams(search);
+      const domain = urlParams.get("DOMAIN");
+      const authId = urlParams.get("AUTH_ID");
+      const refreshId = urlParams.get("REFRESH_ID");
+      const memberId = urlParams.get("MEMBER_ID");
+      const lang = urlParams.get("LANG");
+      const placement = urlParams.get("PLACEMENT");
+
+      console.log("Bitrix Params:", {
+        domain,
+        authId,
+        refreshId,
+      });
+
+      if (domain && authId) {
+        dispatch(initialize({
+          domain,
+          authId,
+          refreshId,
+          memberId,
+          lang,
+          placement
+        }));
+      } else {
+        dispatch(initialize());
+      }
+    } else {
+      dispatch(initialize());
+    }
   }, [dispatch]);
 
   return <>{children}</>;

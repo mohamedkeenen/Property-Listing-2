@@ -50,9 +50,20 @@ const authSlice = createSlice({
         }));
       }
     },
-    initialize: (state) => {
+    initialize: (state, action: PayloadAction<{ domain: string; authId: string; refreshId?: string | null; memberId?: string | null; lang?: string | null; placement?: string | null; } | undefined>) => {
       state.isHydrated = true;
       if (typeof window !== 'undefined') {
+        // If Bitrix parameters are provided via the URL wrapper, save them to localStorage
+        const payload = action.payload;
+        if (payload?.domain && payload?.authId) {
+          localStorage.setItem("bitrix_domain", payload.domain);
+          localStorage.setItem("bitrix_auth_id", payload.authId);
+          if (payload.refreshId) localStorage.setItem("bitrix_refresh_id", payload.refreshId);
+          if (payload.memberId) localStorage.setItem("bitrix_member_id", payload.memberId);
+          if (payload.lang) localStorage.setItem("bitrix_lang", payload.lang);
+          if (payload.placement) localStorage.setItem("bitrix_placement", payload.placement);
+        }
+
         const savedState = localStorage.getItem('authState');
         if (savedState) {
           const parsed = JSON.parse(savedState);
