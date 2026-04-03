@@ -64,6 +64,7 @@ export const mapBackendPropertyToFrontend = (p: any): PropertyListing => {
       skyloov: false, 
       dubizzle: p.is_on_dubizzle || false,
     },
+    pfStatus: p.pf_status || null,
     updatedAt: p.updated_at || new Date().toISOString(),
     description: p.description_en || "",
     descriptionAr: p.description_ar || "",

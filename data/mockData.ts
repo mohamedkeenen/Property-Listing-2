@@ -31,6 +31,7 @@ export interface PropertyListing {
   ownerAvatar: string;
   ownerPhone: string;
   portals: { pf: boolean; bayut: boolean; website: boolean; skyloov: boolean; dubizzle: boolean };
+  pfStatus: string | null;
   updatedAt: string;
   description: string;
   descriptionAr: string;

@@ -262,7 +262,20 @@ export function ListingsTable({ listings, onViewDetails, onEdit }: Props) {
                   </TableCell>
                   <TableCell>
                     <div className="flex gap-1">
-                      {l.portals.pf && <Badge variant="outline" className="text-[10px] px-1 py-0 bg-red-500/10 text-red-600 dark:text-red-400 border-red-200 dark:border-red-500/30">PF</Badge>}
+                      {l.portals.pf && (
+                        <Badge 
+                          variant="outline" 
+                          className={cn(
+                            "text-[10px] px-1 py-0",
+                            l.pfStatus === 'Failed' 
+                              ? "bg-red-500/10 text-red-600 dark:text-red-400 border-red-500" 
+                              : "bg-red-500/10 text-red-600 dark:text-red-400 border-red-200 dark:border-red-500/30"
+                          )}
+                          title={l.pfStatus === 'Failed' ? 'Property Finder Sync Failed' : 'Property Finder'}
+                        >
+                          PF {l.pfStatus === 'Failed' ? '❌' : (l.pfStatus === 'Synced' ? '✅' : '')}
+                        </Badge>
+                      )}
                       {l.portals.bayut && <Badge variant="outline" className="text-[10px] px-1 py-0 bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-200 dark:border-orange-500/30">BY</Badge>}
                       {l.portals.dubizzle && <Badge variant="outline" className="text-[10px] px-1 py-0 bg-[#CC0000]/10 text-[#CC0000] dark:text-[#FF3333] border-[#CC0000]/20">DB</Badge>}
                       {l.portals.website && <Badge variant="outline" className="text-[10px] px-1 py-0 bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-500/30">WB</Badge>}
