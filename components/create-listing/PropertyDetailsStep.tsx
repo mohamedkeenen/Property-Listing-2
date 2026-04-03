@@ -40,8 +40,6 @@ export function PropertyDetailsStep({ form }: Props) {
 
   const AMENITIES_LIST = filterOptions.amenities;
   const pricePeriod = watch("pricePeriod");
-  const availabilityStatus = watch("availabilityStatus");
-  const licenseType = watch("licenseType");
 
   const { data: projectsData } = useGetProjectsQuery();
   const { data: developersData } = useGetDevelopersQuery();
