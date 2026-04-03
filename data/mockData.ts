@@ -64,6 +64,8 @@ export interface Lead {
 
 
 
+export const mockListings: PropertyListing[] = [];
+export const mockLeads: Lead[] = [];
 
 export const amenitiesMap = {
   "Maids Room": "maids-room",

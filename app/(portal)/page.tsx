@@ -7,7 +7,7 @@ import { DashboardCharts } from "@/components/dashboard/DashboardCharts";
 import { ListingsFilters, FiltersState } from "@/components/dashboard/ListingsFilters";
 import { ListingsTable } from "@/components/dashboard/ListingsTable";
 import { PropertyDetailDialog } from "@/components/listings/PropertyDetailDialog";
-import { mockListings, PropertyListing } from "@/data/mockData";
+import {  PropertyListing } from "@/data/mockData";
 import { BarChart3, List, PieChart, Search, Info, Loader2, RefreshCcw } from "lucide-react";
 import { useGetPropertiesQuery } from "@/api/redux/services/propertyApi";
 import { mapBackendPropertyToFrontend } from "@/lib/mappers";
