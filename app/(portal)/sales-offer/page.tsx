@@ -177,9 +177,9 @@ export default function SalesOfferPage() {
         banner: getImg(mapped['Upload Banner Image']),
         qrCode: null,
         unitDetail: getImg(mapped['Layout Image']),
-        highlights: (Array.isArray(mapped['Project Images']) 
-          ? mapped['Project Images'].map(getImg)
-          : [getImg(mapped['Project Images'])]).filter(Boolean).slice(0, 10),
+        highlights: (Array.isArray(mapped['Project Images Only-2'] || mapped['project_images_only-2'] || mapped['Project Images']) 
+          ? (mapped['Project Images Only-2'] || mapped['project_images_only-2'] || mapped['Project Images']).map(getImg)
+          : [getImg(mapped['Project Images Only-2'] || mapped['project_images_only-2'] || mapped['Project Images'])]).filter(Boolean).slice(0, 10),
       };
 
       toast.loading("Generating PDF...", { id: loadingToast });

@@ -43,6 +43,7 @@ export interface PropertyListing {
   finishingType?: string;
   currency?: string;
   office?: string;
+  uaeEmirate?: string;
   notes?: any[];
   documents?: any[];
 }

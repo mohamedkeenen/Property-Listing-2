@@ -143,12 +143,7 @@ function CreateListingContent() {
     let fields: (keyof ListingFormValues)[] = [];
     
     if (stepIndex === 0) { // Property Details (+ Media)
-      const images = form.getValues("images" as any) || [];
-      if (images.length === 0) {
-        toast({ title: "Photos Required", description: "At least one photo is required.", variant: "destructive" });
-        return false;
-      }
-      fields = ["category", "purpose", "type", "unitNo", "bedrooms", "bathrooms", "size", "price", "title", "listingAgent"];
+      fields = ["category", "purpose", "type", "unitNo", "bedrooms", "bathrooms", "size", "price", "title", "listingAgent", "images"];
     } else if (stepIndex === 1) { // Location
       return true;
     } else if (stepIndex === 2) { // Publishing
@@ -189,14 +184,14 @@ function CreateListingContent() {
     for (let i = currentStep; i < stepIndex; i++) {
       const isValid = await validateStep(i);
       if (!isValid) {
-        // validateStep handles its own toast for portal selection/media
-        if (i !== 3 && i !== 1) {
-          toast({
-            title: "Step Incomplete",
-            description: `Please complete the required fields in "${STEPS[i]}" before proceeding.`,
-            variant: "destructive",
-          });
-        }
+        const errors = form.formState.errors;
+        const messages = Object.values(errors).map((e: any) => e.message).filter(Boolean);
+        
+        toast({
+          title: "Step Incomplete",
+          description: messages.length > 0 ? messages.join(", ") : `Please complete the required fields in "${STEPS[i]}" before proceeding.`,
+          variant: "destructive",
+        });
         setCurrentStep(i);
         return;
       }

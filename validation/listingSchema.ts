@@ -63,6 +63,7 @@ export const listingSchema = z.object({
   bayutCommunity: z.string().optional(),
   bayutSubCommunity: z.string().optional(),
   bayutBuilding: z.string().optional(),
+  uaeEmirate: z.string().optional().default("dubai"),
   reference: z.string().optional(),
   agentEmail: z.string().optional(),
   portals: z.object({
@@ -83,7 +84,7 @@ export const listingSchema = z.object({
   notes: z.string().optional(),
   titleAr: z.string().optional(),
   descriptionAr: z.string().optional(),
-  images: z.array(z.string()).optional(),
+  images: z.array(z.string()).min(1, "At least one photo is required."),
   documents: z.array(z.string()).optional(),
   publishStatus: z.string().optional(),
 });

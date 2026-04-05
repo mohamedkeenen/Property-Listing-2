@@ -199,6 +199,30 @@ export function PropertyDetailsStep({ form }: Props) {
     setValue("documents", newList, { shouldValidate: true });
   };
 
+  const handleDragStart = (e: React.DragEvent, index: number) => {
+    e.dataTransfer.setData("draggedIndex", index.toString());
+    const target = e.currentTarget as HTMLElement;
+    target.style.opacity = "0.5";
+  };
+
+  const handleDragEnd = (e: React.DragEvent) => {
+    const target = e.currentTarget as HTMLElement;
+    target.style.opacity = "1";
+  };
+
+  const handleDrop = (e: React.DragEvent, targetIndex: number) => {
+    e.preventDefault();
+    const sourceIndex = parseInt(e.dataTransfer.getData("draggedIndex"));
+    if (isNaN(sourceIndex) || sourceIndex === targetIndex) return;
+
+    const newImages = [...images];
+    const [movedItem] = newImages.splice(sourceIndex, 1);
+    newImages.splice(targetIndex, 0, movedItem);
+
+    setValue("images", newImages, { shouldValidate: true });
+    setActivePreviewIndex(targetIndex);
+  };
+
   const fieldError = (name: string) => errors[name]?.message as string | undefined;
 
   return (
@@ -861,9 +885,14 @@ export function PropertyDetailsStep({ form }: Props) {
             <div className="flex flex-wrap gap-4 min-h-[120px]">
               {images.map((url: string, i: number) => (
                 <div 
-                  key={i} 
+                  key={`${url}-${i}`} 
+                  draggable
+                  onDragStart={(e) => handleDragStart(e, i)}
+                  onDragEnd={handleDragEnd}
+                  onDragOver={(e) => e.preventDefault()}
+                  onDrop={(e) => handleDrop(e, i)}
                   className={cn(
-                    "relative group w-28 h-28 rounded-2xl overflow-hidden shadow-sm border border-border/40 transition-all hover:shadow-lg hover:-translate-y-1 cursor-pointer",
+                    "relative group w-28 h-28 rounded-2xl overflow-hidden shadow-sm border border-border/40 transition-all hover:shadow-lg hover:-translate-y-1 cursor-move active:scale-95",
                     activePreviewIndex === i ? "ring-2 ring-primary" : ""
                   )}
                   onClick={() => setActivePreviewIndex(i)}

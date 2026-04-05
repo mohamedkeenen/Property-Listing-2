@@ -40,6 +40,20 @@ export function LocationStep({ form }: Props) {
           </CardHeader>
           <CardContent className="p-8 space-y-6">
             <ModernSelect 
+              label="Emirate" 
+              value={watch("uaeEmirate")}
+              onValueChange={(v) => setValue("uaeEmirate", v, { shouldValidate: true })}
+              options={[
+                { label: "Dubai", value: "dubai" },
+                { label: "Abu Dhabi", value: "abu-dhabi" },
+                { label: "Northern Emirates", value: "northern-emirates" },
+              ]}
+              icon={Globe}
+              required
+              error={fieldError("uaeEmirate")}
+            />
+
+            <ModernSelect 
               label="Property Finder Location" 
               value={watch("pfLocation")}
               onValueChange={(v) => {

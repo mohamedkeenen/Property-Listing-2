@@ -100,6 +100,7 @@ export function CompletedStep({ form }: Props) {
       has_garden: !!values.hasGarden,
       has_kitchen: !!values.hasKitchen,
       has_parking: !!values.hasParking,
+      uae_emirate: values.uaeEmirate,
       minimal_rental_period: values.minimalRentalPeriod ? parseInt(values.minimalRentalPeriod) : null,
       cheques: values.cheques ? parseInt(values.cheques) : null,
       reference: values.reference || null,
