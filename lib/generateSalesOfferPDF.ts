@@ -74,7 +74,7 @@ export const generateSalesOfferPDF = async (formData: any, images: any) => {
     });
   };
 
-  const getCroppedImage = async (imgUrl: string, targetRatio: number) => {
+  const getCroppedImage = async (imgUrl: string, targetRatio: number, addGradient: boolean = false) => {
     return new Promise<string>((resolve) => {
       const img = new Image();
       img.crossOrigin = "anonymous";
@@ -101,6 +101,16 @@ export const generateSalesOfferPDF = async (formData: any, images: any) => {
         canvas.width = sw;
         canvas.height = sh;
         ctx.drawImage(img, sx, sy, sw, sh, 0, 0, sw, sh);
+
+        if (addGradient) {
+          const gradient = ctx.createLinearGradient(0, 0, 0, sh);
+          gradient.addColorStop(0, "rgba(0,0,0,0)");
+          gradient.addColorStop(0.3, "rgba(0,0,0,0.1)");
+          gradient.addColorStop(1, "rgba(0,0,0,0.7)");
+          ctx.fillStyle = gradient;
+          ctx.fillRect(0, 0, sw, sh);
+        }
+
         resolve(canvas.toDataURL("image/jpeg", 0.9));
       };
       img.onerror = () => resolve(imgUrl);
@@ -176,7 +186,7 @@ export const generateSalesOfferPDF = async (formData: any, images: any) => {
 
   // Banner
   if (images.banner) {
-    const croppedBanner = await getCroppedImage(images.banner, (pageWidth - 30) / 45);
+    const croppedBanner = await getCroppedImage(images.banner, (pageWidth - 30) / 45, true);
     addImage(croppedBanner, 15, 15, pageWidth - 30, 45);
     
     // Banner Overlays
@@ -289,7 +299,7 @@ export const generateSalesOfferPDF = async (formData: any, images: any) => {
 
   // 1. Banner (Consistent Branding)
   if (images.banner) {
-    const croppedBannerPage4 = await getCroppedImage(images.banner, (pageWidth - 30) / 45);
+    const croppedBannerPage4 = await getCroppedImage(images.banner, (pageWidth - 30) / 45, true);
     addImage(croppedBannerPage4, 15, 15, pageWidth - 30, 45);
     
     // Banner Overlays
@@ -412,7 +422,7 @@ export const generateSalesOfferPDF = async (formData: any, images: any) => {
 
   // 1. Banner (Consistent Branding)
   if (images.banner) {
-    const croppedBannerPage5 = await getCroppedImage(images.banner, (pageWidth - 30) / 45);
+    const croppedBannerPage5 = await getCroppedImage(images.banner, (pageWidth - 30) / 45, true);
     addImage(croppedBannerPage5, 15, 15, pageWidth - 30, 45);
     
     // Banner Overlays
