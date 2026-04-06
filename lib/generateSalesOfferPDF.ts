@@ -30,10 +30,11 @@ export const generateSalesOfferPDF = async (formData: any, images: any) => {
 
     const date = new Date().toLocaleString("en-GB", { 
       day: '2-digit', month: 'long', year: 'numeric', 
-      hour: '2-digit', minute: '2-digit', second: '2-digit' 
+      hour: '2-digit', minute: '2-digit', second: '2-digit',
+      hour12: true
     });
 
-    const ref = formData.referenceToken || "SOF-6-588413-8005a5f3-524e-42ca-bbc8-318c0523e73f";
+    const ref = formData.referenceToken
 
     doc.text(`Print Date: ${date}`, 15, pageHeight - 5);
     doc.text(formData.website || "www.binghatti.com", pageWidth / 2, pageHeight - 7, { align: "center" });
@@ -45,7 +46,66 @@ export const generateSalesOfferPDF = async (formData: any, images: any) => {
     const isPng = img.toLowerCase().includes("png") || img.startsWith("data:image/png");
     const isWebp = img.toLowerCase().includes("webp") || img.startsWith("data:image/webp");
     const format = isPng ? "PNG" : (isWebp ? "WEBP" : "JPEG");
-    doc.addImage(img, format, x, y, w, h);
+    doc.addImage(img, format, x, y, w, h, undefined, 'MEDIUM');
+  };
+
+  const getCircularImage = async (imgUrl: string) => {
+    return new Promise<string>((resolve) => {
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+        if (!ctx) { resolve(imgUrl); return; }
+
+        const size = Math.min(img.width, img.height);
+        canvas.width = size;
+        canvas.height = size;
+
+        ctx.beginPath();
+        ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
+        ctx.clip();
+
+        ctx.drawImage(img, (img.width - size) / 2, (img.height - size) / 2, size, size, 0, 0, size, size);
+        resolve(canvas.toDataURL("image/png"));
+      };
+      img.onerror = () => resolve(imgUrl);
+      img.src = imgUrl;
+    });
+  };
+
+  const getCroppedImage = async (imgUrl: string, targetRatio: number) => {
+    return new Promise<string>((resolve) => {
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+        if (!ctx) { resolve(imgUrl); return; }
+
+        const imgRatio = img.width / img.height;
+        let sw, sh, sx, sy;
+
+        if (imgRatio > targetRatio) {
+          sh = img.height;
+          sw = img.height * targetRatio;
+          sx = (img.width - sw) / 2;
+          sy = 0;
+        } else {
+          sw = img.width;
+          sh = img.width / targetRatio;
+          sx = 0;
+          sy = (img.height - sh) / 2;
+        }
+
+        canvas.width = sw;
+        canvas.height = sh;
+        ctx.drawImage(img, sx, sy, sw, sh, 0, 0, sw, sh);
+        resolve(canvas.toDataURL("image/jpeg", 0.9));
+      };
+      img.onerror = () => resolve(imgUrl);
+      img.src = imgUrl;
+    });
   };
 
   const drawBackground = () => {
@@ -55,7 +115,8 @@ export const generateSalesOfferPDF = async (formData: any, images: any) => {
 
   // ================= PAGE 1 (COVER) =================
   if (images.cover) {
-    addImage(images.cover, 0, 0, pageWidth, pageHeight);
+    const croppedCover = await getCroppedImage(images.cover, pageWidth / pageHeight);
+    addImage(croppedCover, 0, 0, pageWidth, pageHeight);
   }
 
   // Cinematic Dark Overlay
@@ -115,7 +176,8 @@ export const generateSalesOfferPDF = async (formData: any, images: any) => {
 
   // Banner
   if (images.banner) {
-    addImage(images.banner, 15, 15, pageWidth - 30, 45);
+    const croppedBanner = await getCroppedImage(images.banner, (pageWidth - 30) / 45);
+    addImage(croppedBanner, 15, 15, pageWidth - 30, 45);
     
     // Banner Overlays
     doc.setTextColor(255, 255, 255);
@@ -200,7 +262,8 @@ export const generateSalesOfferPDF = async (formData: any, images: any) => {
 
   // Two Images Stacked
   const allHighlights = (images.highlights || []).filter(Boolean);
-  allHighlights.forEach((img: string, i: number) => {
+  for (let i = 0; i < allHighlights.length; i++) {
+    const img = allHighlights[i];
     // Every 2 images, move to new page
     if (i > 0 && i % 2 === 0) {
        doc.addPage();
@@ -210,8 +273,10 @@ export const generateSalesOfferPDF = async (formData: any, images: any) => {
        doc.text(projRaw, pageWidth / 2, 30, { align: "center" });
     }
     const idx = i % 2;
-    addImage(img, 20, 55 + idx * 85, pageWidth - 40, 75);
-  });
+    const hRatio = (pageWidth - 40) / 100;
+    const croppedHighlight = await getCroppedImage(img, hRatio);
+    addImage(croppedHighlight, 20, 55 + idx * 110, pageWidth - 40, 100);
+  }
 
   // Footer Disclaimer
   doc.setTextColor(150, 150, 150);
@@ -224,7 +289,8 @@ export const generateSalesOfferPDF = async (formData: any, images: any) => {
 
   // 1. Banner (Consistent Branding)
   if (images.banner) {
-    addImage(images.banner, 15, 15, pageWidth - 30, 45);
+    const croppedBannerPage4 = await getCroppedImage(images.banner, (pageWidth - 30) / 45);
+    addImage(croppedBannerPage4, 15, 15, pageWidth - 30, 45);
     
     // Banner Overlays
     doc.setTextColor(255, 255, 255);
@@ -293,7 +359,30 @@ export const generateSalesOfferPDF = async (formData: any, images: any) => {
     doc.setLineWidth(0.1);
     doc.rect(15, imgY - 5, pageWidth - 30, imgH + 10, "FD");
     
-    addImage(images.unitDetail, 20, imgY, pageWidth - 40, imgH);
+    // For unit detail (floor plans), we use object-fit: contain logic to avoid losing details
+    const dimensions = await new Promise<{w: number, h: number}>(r => {
+      const im = new Image(); im.onload = () => r({w: im.width, h: im.height}); im.onerror=() => r({w:0,h:0}); im.src = images.unitDetail;
+    });
+
+    if (dimensions.w > 0) {
+      const imgRatio = dimensions.w / dimensions.h;
+      const boxRatio = (pageWidth - 40) / imgH;
+      let renderW, renderH, renderX, renderY;
+      if (imgRatio > boxRatio) {
+        renderW = pageWidth - 40;
+        renderH = renderW / imgRatio;
+        renderX = 20;
+        renderY = imgY + (imgH - renderH) / 2;
+      } else {
+        renderH = imgH;
+        renderW = imgH * imgRatio;
+        renderX = 20 + ((pageWidth - 40) - renderW) / 2;
+        renderY = imgY;
+      }
+      addImage(images.unitDetail, renderX, renderY, renderW, renderH);
+    } else {
+      addImage(images.unitDetail, 20, imgY, pageWidth - 40, imgH);
+    }
   }
 
   // Disclaimer & Expiry
@@ -323,7 +412,8 @@ export const generateSalesOfferPDF = async (formData: any, images: any) => {
 
   // 1. Banner (Consistent Branding)
   if (images.banner) {
-    addImage(images.banner, 15, 15, pageWidth - 30, 45);
+    const croppedBannerPage5 = await getCroppedImage(images.banner, (pageWidth - 30) / 45);
+    addImage(croppedBannerPage5, 15, 15, pageWidth - 30, 45);
     
     // Banner Overlays
     doc.setTextColor(255, 255, 255);
@@ -438,9 +528,123 @@ export const generateSalesOfferPDF = async (formData: any, images: any) => {
   drawStyledTable(py + 15, "PAYMENT PLAN", ["Date", "Installment", "Percentage%", "Price"], payRows, [45, 55, 35, 45]);
 
 
+  // ================= PAGE 6 (AGENT DETAILS) =================
+  if (formData.agentDetails) {
+    doc.addPage();
+    drawBackground();
+
+    const agent = formData.agentDetails;
+    
+    // Header
+    doc.setTextColor(...primaryColor);
+    doc.setFontSize(26);
+    doc.setFont("helvetica", "bold");
+    doc.text("CONTACT CONSULTANT", pageWidth / 2, 40, { align: "center" });
+    
+    doc.setDrawColor(...primaryColor);
+    doc.setLineWidth(0.5);
+    doc.line(pageWidth / 2 - 20, 45, pageWidth / 2 + 20, 45);
+
+    // Card background - Centered and more elegant
+    const cardW = pageWidth - 60;
+    const cardH = 60;
+    const cardX = 30;
+    const cardY = 65;
+    
+    // Subtle shadow / Border
+    doc.setFillColor(255, 255, 255);
+    doc.setDrawColor(200, 200, 200);
+    doc.roundedRect(cardX, cardY, cardW, cardH, 5, 5, "FD");
+
+    // Agent Image (Circular, Overlapping the Card edge)
+    if (agent.image) {
+      const imgSize = 50;
+      const circleImg = await getCircularImage(agent.image);
+      // Positioned so it's 50% outside the left edge of the card
+      const imgX = cardX - (imgSize / 2);
+      const imgY = cardY + (cardH - imgSize) / 2;
+      
+      // Draw a white circle background first for the overlap
+      doc.setFillColor(255, 255, 255);
+      doc.circle(imgX + imgSize/2, imgY + imgSize/2, imgSize/2 + 1, "F");
+      
+      addImage(circleImg, imgX, imgY, imgSize, imgSize);
+    }
+
+    // Agent Details (Right of the circular image)
+    let dX = cardX + 35;
+    let dY = cardY + 15;
+    
+    const drawAgentDetail = (label: string, value: string, iconY: number, type?: 'phone' | 'whatsapp' | 'email') => {
+      doc.setTextColor(...primaryColor);
+      doc.setFontSize(11);
+      doc.setFont("helvetica", "bold");
+      doc.text(label, dX, iconY);
+      
+      const labelW = doc.getTextWidth(label);
+      const valX = dX + labelW + 2; 
+
+      doc.setTextColor(50, 50, 50);
+      doc.setFont("helvetica", "normal");
+      doc.text(value || "-", valX, iconY);
+
+      // Subtle Underline
+      doc.setDrawColor(235, 235, 235);
+      doc.setLineWidth(0.1);
+      doc.line(dX, iconY + 2, dX + 110, iconY + 2);
+
+      if (type && value && value !== "-") {
+        let url = "";
+        if (type === 'whatsapp') {
+          const clean = value.replace(/\D/g, '');
+          url = "https://wa.me/" + (clean.startsWith('0') ? '971' + clean.slice(1) : clean);
+        } else if (type === 'phone') {
+          url = "tel:" + value.trim();
+        } else if (type === 'email') {
+          url = "mailto:" + value.trim();
+        }
+        
+        if (url) {
+          // Make both label and value clickable
+          const valueW = doc.getTextWidth(value);
+          doc.link(dX, iconY - 5, labelW, 7, { url });
+          doc.link(valX, iconY - 5, valueW, 7, { url });
+        }
+      }
+    };
+
+    drawAgentDetail("NAME:", agent.name, dY); dY += 10;
+    drawAgentDetail("EMAIL:", agent.email, dY, 'email'); dY += 10;
+    drawAgentDetail("PHONE:", agent.phone, dY, 'phone'); dY += 10;
+    drawAgentDetail("WHATSAPP:", agent.whatsapp, dY, 'whatsapp');
+
+    // Personal Message Section
+    if (agent.notes) {
+      let nY = cardY + cardH + 20;
+      doc.setTextColor(...primaryColor);
+      doc.setFontSize(16);
+      doc.setFont("helvetica", "bold");
+      doc.text("PERSONAL MESSAGE", cardX, nY);
+      
+      nY += 8;
+      doc.setFillColor(255, 255, 255);
+      doc.setDrawColor(220, 220, 220);
+      const noteBoxW = cardW;
+      const noteBoxH = 50;
+      doc.roundedRect(cardX, nY, noteBoxW, noteBoxH, 3, 3, "FD");
+
+      doc.setTextColor(80, 80, 80);
+      doc.setFontSize(10);
+      doc.setFont("helvetica", "normal");
+      const splitNotes = doc.splitTextToSize(agent.notes, noteBoxW - 10);
+      doc.text(splitNotes, cardX + 5, nY + 10);
+    }
+  }
+
   // ================= FINALIZE =================
   const totalPages = (doc as any).internal.getNumberOfPages();
   for (let i = 1; i <= totalPages; i++) {
+    if (i === 1) continue; // Skip footer for the first page
     doc.setPage(i);
     addFooter(i);
   }

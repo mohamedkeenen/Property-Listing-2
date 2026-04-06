@@ -45,7 +45,7 @@ export async function generatePropertyPDF(listing: PropertyListing) {
   // Main image
   try {
     const mainImg = await loadImage(listing.images[0] || listing.image);
-    pdf.addImage(mainImg, "JPEG", margin, y, contentW, 80);
+    pdf.addImage(mainImg, "JPEG", margin, y, contentW, 80, undefined, 'FAST');
     y += 85;
   } catch {
     y += 5;
@@ -58,7 +58,7 @@ export async function generatePropertyPDF(listing: PropertyListing) {
   for (let i = 1; i < Math.min(listing.images.length, 5); i++) {
     try {
       const img = await loadImage(listing.images[i]);
-      pdf.addImage(img, "JPEG", tx, y, thumbW, thumbH);
+      pdf.addImage(img, "JPEG", tx, y, thumbW, thumbH, undefined, 'FAST');
     } catch { /* skip */ }
     tx += thumbW + 4;
   }

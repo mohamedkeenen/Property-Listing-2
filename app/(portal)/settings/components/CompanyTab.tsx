@@ -35,6 +35,7 @@ import {
   selectSalesOfferWebhook,
   selectSalesOfferEntityTypeId,
   selectOutboundHandlerToken,
+  selectPdfColor,
   setCompanySettings 
 } from "@/api/redux/slices/settingsSlice";
 import { useUpdateCompanySettingsMutation } from "@/api/redux/services/settingsApi";
@@ -64,6 +65,7 @@ export function CompanyTab({ isAdmin }: CompanyTabProps) {
   const reduxSalesOfferWebhook = useSelector(selectSalesOfferWebhook);
   const reduxSalesOfferEntityTypeId = useSelector(selectSalesOfferEntityTypeId);
   const reduxOutboundHandlerToken = useSelector(selectOutboundHandlerToken);
+  const reduxPdfColor = useSelector(selectPdfColor);
   
   const [companyName, setCompanyName] = useState(reduxCompanyName);
   const [logo, setLogo] = useState<string>(reduxLogo);
@@ -79,6 +81,7 @@ export function CompanyTab({ isAdmin }: CompanyTabProps) {
   const [pfLeadSourcePhone, setPfLeadSourcePhone] = useState(reduxPfLeadSourcePhone);
   const [salesOfferWebhook, setSalesOfferWebhook] = useState(reduxSalesOfferWebhook);
   const [salesOfferEntityTypeId, setSalesOfferEntityTypeId] = useState(reduxSalesOfferEntityTypeId);
+  const [pdfColor, setPdfColor] = useState(reduxPdfColor);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [updateSettings, { isLoading }] = useUpdateCompanySettingsMutation();
@@ -98,6 +101,7 @@ export function CompanyTab({ isAdmin }: CompanyTabProps) {
     setPfLeadSourcePhone(reduxPfLeadSourcePhone || "");
     setSalesOfferWebhook(reduxSalesOfferWebhook || "");
     setSalesOfferEntityTypeId(reduxSalesOfferEntityTypeId || "");
+    setPdfColor(reduxPdfColor || "#3D5434");
   }, [
     reduxCompanyName, 
     reduxLogo, 
@@ -112,7 +116,8 @@ export function CompanyTab({ isAdmin }: CompanyTabProps) {
     reduxPfLeadSourceEmail,
     reduxPfLeadSourcePhone,
     reduxSalesOfferWebhook,
-    reduxSalesOfferEntityTypeId
+    reduxSalesOfferEntityTypeId,
+    reduxPdfColor
   ]);
 
   const getLogoUrl = (logoStr: string) => {
@@ -143,6 +148,7 @@ export function CompanyTab({ isAdmin }: CompanyTabProps) {
         pf_lead_source_phone: pfLeadSourcePhone,
         sales_offer_webhook: salesOfferWebhook,
         sales_offer_entity_type_id: salesOfferEntityTypeId,
+        pdf_color: pdfColor,
       }).unwrap();
       
       if (result.status === 'success') {
@@ -401,6 +407,31 @@ export function CompanyTab({ isAdmin }: CompanyTabProps) {
               className="hidden" 
               accept="image/*"
             />
+
+            {/* PDF Theme Color Picker */}
+            <div className="mt-8 w-full space-y-4">
+              <div className="flex items-center justify-between">
+                 <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/70">PDF Theme Color</h4>
+                 <div className="h-px flex-1 bg-border/20 ml-4" />
+              </div>
+              <div className="flex items-center gap-4 bg-muted/20 p-4 rounded-2xl border border-border/50">
+                <div 
+                  className="w-12 h-12 rounded-xl border border-white/20 shadow-lg shrink-0 transition-transform hover:scale-105 active:scale-95"
+                  style={{ backgroundColor: pdfColor }}
+                />
+                <div className="flex-1 space-y-1">
+                  <p className="text-xs font-bold text-foreground">Offer PDF Palette</p>
+                  <p className="text-[10px] font-medium text-muted-foreground leading-tight">This color will be used as the primary theme for all generated Sales Offers.</p>
+                </div>
+                <input 
+                  type="color" 
+                  value={pdfColor} 
+                  onChange={(e) => setPdfColor(e.target.value)}
+                  disabled={!isAdmin}
+                  className="w-8 h-8 rounded-full border-none bg-transparent cursor-pointer overflow-hidden p-0"
+                />
+              </div>
+            </div>
           </CardContent>
         </Card>
       </div>

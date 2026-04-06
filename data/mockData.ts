@@ -25,6 +25,7 @@ export interface PropertyListing {
   size: number;
   image: string;
   images: string[];
+  pricePeriod?: string;
   listingAgent: string;
   listingAgentAvatar: string;
   owner: string;

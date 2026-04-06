@@ -28,6 +28,7 @@ const defaultFilters: FiltersState = {
 
 interface Props {
   onApply: (filters: FiltersState) => void;
+  agentOptions?: string[];
 }
 
 const SearchSelect = ({ 
@@ -82,8 +83,7 @@ const SearchSelect = ({
   );
 };
 
-export function ListingsFilters({ onApply }: Props) {
-  const [expanded, setExpanded] = useState(false);
+export function ListingsFilters({ onApply, agentOptions }: Props) {
   const [filters, setFilters] = useState<FiltersState>(defaultFilters);
 
   const update = (key: keyof FiltersState, value: string) => {
@@ -97,24 +97,16 @@ export function ListingsFilters({ onApply }: Props) {
 
   return (
     <div className="bg-card border-2 border-border rounded-[2.5rem] overflow-hidden shadow-sm transition-all hover:shadow-xl">
-      <button
-        onClick={() => setExpanded(!expanded)}
-        className="w-full flex items-center justify-between p-5 text-sm font-black uppercase tracking-widest text-foreground hover:bg-muted/30 transition-all"
-      >
-        <div className="flex items-center gap-3">
-          <div className="p-2 rounded-xl bg-primary/10 text-primary group-hover:scale-110 transition-transform">
-            <Search className="h-4 w-4" />
+      <div className="w-full flex items-center justify-between p-7 text-sm font-black uppercase tracking-[0.2em] text-foreground">
+        <div className="flex items-center gap-4">
+          <div className="h-10 w-10 flex items-center justify-center rounded-2xl bg-primary/10 text-primary">
+            <Search className="h-5 w-5" />
           </div>
           <span>Advanced Search Filters</span>
         </div>
-        <div className="flex items-center gap-3">
-           <span className="text-[10px] text-muted-foreground font-bold">{expanded ? "Hide Options" : "Show Options"}</span>
-           {expanded ? <ChevronUp className="h-4 w-4 text-primary" /> : <ChevronDown className="h-4 w-4 text-primary" />}
-        </div>
-      </button>
+      </div>
 
-      {expanded && (
-        <div className="p-6 pt-0 space-y-6">
+      <div className="p-8 pt-0 space-y-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
             <div className="space-y-1.5">
                <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Ref ID</label>
@@ -178,7 +170,7 @@ export function ListingsFilters({ onApply }: Props) {
               label="Agent" 
               value={filters.agent} 
               onValueChange={(v) => update("agent", v === "All" ? "" : v)} 
-              options={filterOptions.agents} 
+              options={agentOptions || filterOptions.agents} 
               placeholder="Select Agent" 
             />
 
@@ -238,8 +230,7 @@ export function ListingsFilters({ onApply }: Props) {
             </Button>
           </div>
         </div>
-      )}
-    </div>
+      </div>
   );
 }
 

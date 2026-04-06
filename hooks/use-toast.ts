@@ -1,24 +1,29 @@
 import React from "react";
 import { toast as hotToast } from "react-hot-toast";
+import { Loader2 } from "lucide-react";
 
 export type ToastProps = {
   id?: string;
   title?: React.ReactNode;
   description?: React.ReactNode;
-  variant?: "default" | "destructive" | "success";
+  variant?: "default" | "destructive" | "success" | "loading";
+  duration?: number;
 };
 
 export const toast = (props: ToastProps) => {
   const content = React.createElement(
     "div",
-    { className: "flex flex-col gap-1" },
-    props.title && React.createElement("div", { className: "text-sm font-bold text-foreground" }, props.title),
-    props.description && React.createElement("div", { className: "text-xs text-muted-foreground font-medium opacity-90" }, props.description)
+    { className: "flex items-start gap-3" },
+    props.variant === "loading" && React.createElement(Loader2, { className: "h-4 w-4 animate-spin mt-0.5 text-primary" }),
+    React.createElement("div", { className: "flex flex-col gap-1" },
+      props.title && React.createElement("div", { className: "text-sm font-bold text-foreground" }, props.title),
+      props.description && React.createElement("div", { className: "text-xs text-muted-foreground font-medium opacity-90" }, props.description)
+    )
   );
 
   const options = {
     id: props.id,
-    duration: 4000,
+    duration: props.duration ?? (props.variant === "loading" ? Infinity : 4000),
     style: {
       borderRadius: '1rem',
       background: 'var(--background)',

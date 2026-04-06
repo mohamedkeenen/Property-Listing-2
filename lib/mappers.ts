@@ -46,6 +46,7 @@ export const mapBackendPropertyToFrontend = (p: any): PropertyListing => {
     purpose: p.purpose?.charAt(0).toUpperCase() + p.purpose?.slice(1) as any,
     status: p.status as any,
     price: parseFloat(p.sale_price || p.rent_price || "0"),
+    pricePeriod: p.rent_frequency || "Yearly",
     bedrooms: p.bedrooms || 0,
     bathrooms: p.bathrooms || 0,
     size: p.size || 0,

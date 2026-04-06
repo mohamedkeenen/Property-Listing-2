@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { toast } from "react-hot-toast";
+import { toast } from "@/hooks/use-toast";
 import { 
   Sparkles, 
   Download, 
@@ -45,7 +45,7 @@ export default function SalesOfferPage() {
   const { data: offers, isLoading, isError, error, refetch } = useGetSalesOffersQuery();
   const [triggerFetchDetail] = useLazyGetSalesOfferDetailQuery();
   const [searchTerm, setSearchTerm] = useState("");
-  const [downloadingId, setDownloadingId] = useState<string | number | null>(null);
+  const [downloadingIds, setDownloadingIds] = useState<(string | number)[]>([]);
 
   const filteredOffers: SalesOffer[] = (offers as any)?.data?.filter((offer: SalesOffer) => 
     offer.project_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -54,17 +54,26 @@ export default function SalesOfferPage() {
   ) || [];
 
   const handleDownload = async (offerId: string | number) => {
-    setDownloadingId(offerId);
-    const loadingToast = toast.loading("Processing Bitrix data...");
+    setDownloadingIds(prev => [...prev, offerId]);
+    const { id, update, dismiss } = toast({ 
+      title: "Processing Bitrix data...", 
+      variant: "loading" 
+    });
 
     try {
       const result = await triggerFetchDetail(offerId).unwrap();
       const item = result.data;
       const mapped = result.mapped || {};
 
+      // ... existing mapping logic ...
       const cleanVal = (val: any) => {
         if (!val) return "";
         return String(val).split("|")[0].trim();
+      };
+
+      const getImg = (f: any) => {
+        if (!f) return null;
+        return f.showUrl || f.url || f.downloadUrl || (typeof f === 'string' ? f : null);
       };
       
       const mappedData = {
@@ -92,7 +101,7 @@ export default function SalesOfferPage() {
           const terrace = parseFloat(cleanVal(mapped['Terrace']).replace(/,/g, '')) || 0;
           return (suite + terrace).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 });
         })(),
-        themeColor: "#3D5434",
+        themeColor: mapped['Theme Color'] || "#3D5434",
         preReg: {
           dld: { 
             description: "DLD Charges", 
@@ -113,6 +122,14 @@ export default function SalesOfferPage() {
         paymentPlanPeriodType: mapped['Period Type']?.toLowerCase() || "month",
         firstInstallmentPercentage: mapped['First Install']?.toString() || "20",
         lastInstallmentPercentage: mapped['Last Install']?.toString() || "30",
+        agentDetails: {
+          name: mapped['Agent Name'] || "",
+          email: mapped['Agent Email'] || "",
+          phone: mapped['Agent Phone'] || "",
+          whatsapp: mapped['Agent Whatsapp'] || "",
+          notes: mapped['Agent Notes'] || "",
+          image: getImg(mapped['Agent Image']) || "https://res.cloudinary.com/devht0mp5/image/upload/v1775462494/image_2_ktx7px.png",
+        }
       };
 
       // AUTO-CALC PAYMENT PLAN
@@ -167,10 +184,6 @@ export default function SalesOfferPage() {
       }
 
       // IMAGE MAPPING
-      const getImg = (f: any) => {
-        if (!f) return null;
-        return f.showUrl || f.url || f.downloadUrl || (typeof f === 'string' ? f : null);
-      };
 
       const mappedImages = {
         cover: getImg(mapped['Upload Cover Image']),
@@ -182,18 +195,20 @@ export default function SalesOfferPage() {
           : [getImg(mapped['Project Images Only-2'] || mapped['project_images_only-2'] || mapped['Project Images'])]).filter(Boolean).slice(0, 10),
       };
 
-      toast.loading("Generating PDF...", { id: loadingToast });
+      update({ title: "Generating PDF...", variant: "loading" });
       
       await generateSalesOfferPDF(mappedData as any, mappedImages);
       
-      toast.success("PDF Downloaded!", { id: loadingToast });
+      update({ title: "PDF Downloaded!", variant: "success" });
+      setTimeout(() => dismiss(), 3000);
     } catch (error: any) {
       console.error("Full PDF Error Check:", error);
       const errorMsg = error?.data?.error || error?.message || "Check Console";
-      toast.error(`PDF Fail: ${errorMsg}`, { id: loadingToast });
+      update({ title: `PDF Fail: ${errorMsg}`, variant: "destructive" });
     } finally {
-      setDownloadingId(null);
+      setDownloadingIds(prev => prev.filter(id => id !== offerId));
     }
+
   };
 
   return (
@@ -336,16 +351,16 @@ export default function SalesOfferPage() {
                       <TableCell className="text-center">
                          <div className="flex items-center justify-center gap-2 text-muted-foreground font-semibold text-xs">
                           <Timer className="h-3 w-3" />
-                          {offer.created_at ? format(new Date(offer.created_at), 'MMM dd, yyyy') : 'N/A'}
+                          {offer.created_at ? format(new Date(offer.created_at), 'MMM dd, yyyy | hh:mm aa') : 'N/A'}
                          </div>
                       </TableCell>
                       <TableCell className="pr-6 text-right">
                         <Button
                           onClick={() => handleDownload(offer.id)}
-                          disabled={downloadingId === offer.id}
+                          disabled={downloadingIds.includes(offer.id)}
                           className="rounded-xl h-10 px-5 font-black bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/10 transition-all active:scale-95 group"
                         >
-                          {downloadingId === offer.id ? (
+                          {downloadingIds.includes(offer.id) ? (
                             <Loader2 className="h-4 w-4 animate-spin" />
                           ) : (
                             <>

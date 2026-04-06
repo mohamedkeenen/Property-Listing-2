@@ -7,13 +7,14 @@ import { DashboardCharts } from "@/components/dashboard/DashboardCharts";
 import { ListingsFilters, FiltersState } from "@/components/dashboard/ListingsFilters";
 import { ListingsTable } from "@/components/dashboard/ListingsTable";
 import { PropertyDetailDialog } from "@/components/listings/PropertyDetailDialog";
-import {  PropertyListing } from "@/data/mockData";
-import { BarChart3, List, PieChart, Search, Info, Loader2, RefreshCcw } from "lucide-react";
+import { PropertyListing } from "@/data/mockData";
 import { useGetPropertiesQuery } from "@/api/redux/services/propertyApi";
+import { useGetAgentsQuery } from "@/api/redux/services/userApi";
 import { mapBackendPropertyToFrontend } from "@/lib/mappers";
 import { Button } from "@/components/ui/button";
 import { toast } from "react-hot-toast";
 import { cn } from "@/lib/utils";
+import { RefreshCcw, BarChart3, Info, PieChart, List, Search, Loader2 } from "lucide-react";
 
 export default function Dashboard() {
   const router = useRouter();
@@ -21,6 +22,11 @@ export default function Dashboard() {
   const [selectedListing, setSelectedListing] = useState<PropertyListing | null>(null);
 
   const { data: propertiesData, isLoading, refetch } = useGetPropertiesQuery({ limit: 100 });
+  const { data: agentsData } = useGetAgentsQuery();
+
+  const agentNames = useMemo(() => {
+    return agentsData?.data?.map((a: any) => a.name) || [];
+  }, [agentsData]);
 
   const listings = useMemo(() => {
     return propertiesData?.data?.map(mapBackendPropertyToFrontend) || [];
@@ -46,7 +52,6 @@ export default function Dashboard() {
         if (filters.portal === "Bayut" && !l.portals.bayut) return false;
         if (filters.portal === "Dubizzle" && !l.portals.dubizzle) return false;
         if (filters.portal === "Website" && !l.portals.website) return false;
-
       }
       return true;
     });
@@ -83,9 +88,8 @@ export default function Dashboard() {
         </Button>
       </div>
 
-      {/* Scrollable upper sections if needed, though you wanted it fixed */}
+      {/* Stats Section */}
       <div className="shrink-0 space-y-8 mb-10">
-        {/* Stats Section */}
         <div className="space-y-6 text-card-foreground">
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-xl bg-primary/10 text-primary relative">
@@ -123,7 +127,7 @@ export default function Dashboard() {
           <Search className="h-4 w-4 text-muted-foreground" />
         </div>
         <div className="flex-1 flex flex-col min-h-0 space-y-4">
-          <ListingsFilters onApply={setFilters} />
+          <ListingsFilters onApply={setFilters} agentOptions={agentNames} />
           <div className="flex-1 min-h-0 overflow-auto relative">
             {isLoading ? (
               <div className="absolute inset-0 bg-background/50 backdrop-blur-sm z-50 flex items-center justify-center">
@@ -136,7 +140,7 @@ export default function Dashboard() {
               <ListingsTable
                 listings={filtered}
                 onViewDetails={setSelectedListing}
-                onEdit={(l) => router.push(`/create-listing?id=${l.id}`)}
+                onEdit={(l) => router.push(`/listing/${l.id}/edit`)}
               />
             )}
           </div>

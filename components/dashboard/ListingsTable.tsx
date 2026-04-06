@@ -78,6 +78,7 @@ export function ListingsTable({ listings, onViewDetails, onEdit }: Props) {
     const { id, dismiss, update } = toast({ 
       title: "Generating PDF...", 
       description: "Please wait while we prepare your document.",
+      duration: Infinity,
     });
 
     try {
@@ -183,7 +184,7 @@ export function ListingsTable({ listings, onViewDetails, onEdit }: Props) {
           <Table className="min-w-[1800px] relative">
           <TableHeader className="sticky top-0 bg-card z-10 shadow-[0_1px_0_rgba(0,0,0,0.1)] dark:shadow-[0_1px_0_rgba(255,255,255,0.1)]">
             <TableRow>
-              <TableHead className="w-[50px]"></TableHead>
+              <TableHead className="w-[80px]">Actions</TableHead>
               <TableHead>Portals</TableHead>
               <TableHead>Reference</TableHead>
               <TableHead className="min-w-[250px]">Title</TableHead>
@@ -237,28 +238,41 @@ export function ListingsTable({ listings, onViewDetails, onEdit }: Props) {
               paginated.map((l) => (
                 <TableRow key={l.id} className="hover:bg-muted/50 border-b-0">
                   <TableCell>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-8 w-8">
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="start" className="w-44">
-                        <DropdownMenuItem onClick={() => router.push(`/listing/${l.id}`)}>
-                          <Eye className="h-4 w-4 mr-2" /> View
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => onEdit(l)}>
-                          <Pencil className="h-4 w-4 mr-2" /> Edit
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleDownloadPDF(l)}>
-                          <FileDown className="h-4 w-4 mr-2" /> Download PDF
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={() => handleDelete(l)} className="text-destructive focus:text-destructive">
-                          <Trash2 className="h-4 w-4 mr-2" /> Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                    <div className="flex items-center gap-1">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" className="h-8 w-8">
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="start" className="w-44">
+                          <DropdownMenuItem 
+                            onClick={() => router.push(`/listing/${l.id}`)}
+                            className="focus:bg-blue-600 focus:text-white cursor-pointer"
+                          >
+                            <Eye className="h-4 w-4 mr-2" /> View
+                          </DropdownMenuItem>
+                          <DropdownMenuItem 
+                            onClick={() => onEdit(l)}
+                            className="focus:bg-amber-500 focus:text-white cursor-pointer"
+                          >
+                            <Pencil className="h-4 w-4 mr-2" /> Edit
+                          </DropdownMenuItem>
+                          <DropdownMenuItem 
+                            onClick={() => handleDelete(l)} 
+                            className="focus:bg-red-600 focus:text-white cursor-pointer"
+                          >
+                            <Trash2 className="h-4 w-4 mr-2" /> Delete
+                          </DropdownMenuItem>
+                          <DropdownMenuItem 
+                            onClick={() => handleDownloadPDF(l)}
+                            className="focus:bg-primary focus:text-white cursor-pointer"
+                          >
+                            <FileDown className="h-4 w-4 mr-2" /> Download PDF
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
                   </TableCell>
                   <TableCell>
                     <div className="flex gap-1">
@@ -276,8 +290,8 @@ export function ListingsTable({ listings, onViewDetails, onEdit }: Props) {
                           PF {l.pfStatus === 'Failed' ? '❌' : (l.pfStatus === 'Synced' ? '✅' : '')}
                         </Badge>
                       )}
-                      {l.portals.bayut && <Badge variant="outline" className="text-[10px] px-1 py-0 bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-200 dark:border-orange-500/30">BY</Badge>}
-                      {l.portals.dubizzle && <Badge variant="outline" className="text-[10px] px-1 py-0 bg-[#CC0000]/10 text-[#CC0000] dark:text-[#FF3333] border-[#CC0000]/20">DB</Badge>}
+                      {l.portals.bayut && <Badge variant="outline" className="text-[10px] px-1 py-0 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/30">BY</Badge>}
+                      {l.portals.dubizzle && <Badge variant="outline" className="text-[10px] px-1 py-0 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/30">DB</Badge>}
                       {l.portals.website && <Badge variant="outline" className="text-[10px] px-1 py-0 bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-500/30">WB</Badge>}
 
                     </div>

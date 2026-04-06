@@ -16,7 +16,6 @@ interface Props {
 const publishOptions = [
   { value: "publish", label: "Publish Immediately", desc: "Push listing to all selected portals right now", icon: Rocket },
   { value: "draft", label: "Save as Draft", desc: "Keep it in your inventory for later editing", icon: FileText },
-  { value: "approval", label: "Send for Approval", desc: "Notify admin to review compliance details", icon: Users },
   { value: "pocket", label: "Private Listing", desc: "Only visible to your internal network", icon: Lock },
 ];
 
@@ -70,7 +69,7 @@ export function CompletedStep({ form }: Props) {
       rent_frequency: values.purpose === "Rent" ? values.pricePeriod : null,
       amenities: values.amenities,
       images: values.images,
-      status: publishStatus === "publish" ? "Live" : (publishStatus === "pocket" ? "Pocket" : "Draft"),
+      status: publishStatus === "publish" ? "Live" : (publishStatus === "pocket" ? "Private" : "Draft"),
       // Location fields
       property_location: values.property_location, // Added this field in form if it exists, or just send it if it's there
       bayut_location: values.bayutLocation,
