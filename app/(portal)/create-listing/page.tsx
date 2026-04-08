@@ -8,7 +8,6 @@ import { StepIndicator } from "@/components/create-listing/StepIndicator";
 import { PortalSelectionStep } from "@/components/create-listing/PortalSelectionStep";
 import { PropertyDetailsStep } from "@/components/create-listing/PropertyDetailsStep";
 import { LocationStep } from "@/components/create-listing/LocationStep";
-import { PublishingStep } from "@/components/create-listing/PublishingStep";
 import { CompletedStep } from "@/components/create-listing/CompletedStep";
 import { Button } from "@/components/ui/button";
 import { ChevronRight, Save, LayoutGrid, CheckCircle2, ChevronLeft } from "lucide-react";
@@ -25,7 +24,6 @@ import { Suspense } from "react";
 const STEPS = [
   "Property Details",
   "Location",
-  "Publishing",
   "Completed",
 ];
 
@@ -146,8 +144,6 @@ function CreateListingContent() {
       fields = ["category", "purpose", "type", "unitNo", "bedrooms", "bathrooms", "size", "price", "title", "listingAgent", "images"];
     } else if (stepIndex === 1) { // Location
       return true;
-    } else if (stepIndex === 2) { // Publishing
-      return true;
     }
     
     if (fields.length === 0) return true;
@@ -210,8 +206,7 @@ function CreateListingContent() {
     switch (currentStep) {
       case 0: return <PropertyDetailsStep form={form} />;
       case 1: return <LocationStep form={form} />;
-      case 2: return <PublishingStep form={form} />;
-      case 3: return <CompletedStep form={form} />;
+      case 2: return <CompletedStep form={form} />;
       default: return null;
     }
   };
