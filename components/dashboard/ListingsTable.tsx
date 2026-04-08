@@ -12,13 +12,83 @@ import { PropertyListing } from "@/data/mockData";
 import { cn, formatRelativeTime } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
 import { generatePropertyPDF } from "@/lib/generatePDF";
-import { useDeletePropertyMutation } from "@/api/redux/services/propertyApi";
+import { useDeletePropertyMutation, useTogglePortalMutation } from "@/api/redux/services/propertyApi";
+import { Loader2 } from "lucide-react";
 
 interface Props {
   listings: PropertyListing[];  
   onViewDetails: (listing: PropertyListing) => void;
   onEdit: (listing: PropertyListing) => void;
 }
+
+const PortalBadge = ({ initialStatus, portal, propertyId, pfStatus }: { 
+  initialStatus: boolean; 
+  portal: string; 
+  propertyId: string;
+  pfStatus?: string | null;
+}) => {
+  const [togglePortal, { isLoading }] = useTogglePortalMutation();
+  const [active, setActive] = useState(initialStatus);
+
+  const handleToggle = async () => {
+    try {
+      const newStatus = !active;
+      await togglePortal({ id: propertyId, portal, status: newStatus }).unwrap();
+      setActive(newStatus);
+      toast({ 
+        title: `${newStatus ? 'Added to' : 'Removed from'} ${portal.toUpperCase()}`,
+        description: `Listing ${newStatus ? 'is now live' : 'has been removed'} on ${portal.toUpperCase()}.`,
+        variant: "success"
+      });
+    } catch (err: any) {
+      toast({ 
+        title: "Toggle failed", 
+        description: err.data?.message || "Internal server error occurred.",
+        variant: "destructive" 
+      });
+    }
+  };
+
+  const portalNames: Record<string, string> = {
+    pf: "PF",
+    bayut: "BY",
+    dubizzle: "DB",
+    website: "WB"
+  };
+
+  const portalColors: Record<string, string> = {
+    pf: "hover:bg-red-500 hover:text-white border-red-200 dark:border-red-500/30 text-red-600 dark:text-red-400 bg-red-500/10",
+    pf_active: "bg-red-500 text-white border-red-500 shadow-sm",
+    pf_failed: "bg-orange-500 text-white border-orange-600 shadow-sm animate-pulse",
+    bayut: "hover:bg-emerald-500 hover:text-white border-emerald-200 dark:border-emerald-500/30 text-emerald-600 dark:text-emerald-400 bg-emerald-500/10",
+    bayut_active: "bg-emerald-500 text-white border-emerald-500 shadow-sm",
+    dubizzle: "hover:bg-rose-500 hover:text-white border-emerald-200 dark:border-emerald-500/30 text-emerald-600 dark:text-emerald-400 bg-emerald-500/10",
+    dubizzle_active: "bg-emerald-500 text-white border-emerald-500 shadow-sm",
+    website: "hover:bg-blue-500 hover:text-white border-blue-200 dark:border-blue-500/30 text-blue-600 dark:text-blue-400 bg-blue-500/10",
+    website_active: "bg-blue-500 text-white border-blue-500 shadow-sm"
+  };
+
+  let color = portalColors[portal];
+  if (active) color = portalColors[`${portal}_active`];
+  if (portal === 'pf' && pfStatus === 'Failed') color = portalColors.pf_failed;
+
+  return (
+    <Badge 
+      variant="outline" 
+      onClick={(e) => { e.stopPropagation(); handleToggle(); }}
+      className={cn(
+        "text-[10px] px-1.5 py-0 cursor-pointer transition-all duration-200 active:scale-90 select-none h-5 min-w-[28px] flex items-center justify-center font-bold",
+        color,
+        isLoading && "opacity-50 pointer-events-none"
+      )}
+      title={pfStatus === 'Failed' ? 'Sync Failed' : portal.toUpperCase()}
+    >
+      {isLoading ? <Loader2 className="h-2 w-2 animate-spin" /> : portalNames[portal]}
+      {portal === 'pf' && pfStatus === 'Synced' && active && <span className="ml-1">✅</span>}
+      {portal === 'pf' && pfStatus === 'Failed' && active && <span className="ml-1">❌</span>}
+    </Badge>
+  );
+};
 
 const statusTabs = [
   { label: "All Listings", value: "all" },
@@ -275,25 +345,28 @@ export function ListingsTable({ listings, onViewDetails, onEdit }: Props) {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <div className="flex gap-1">
-                      {l.portals.pf && (
-                        <Badge 
-                          variant="outline" 
-                          className={cn(
-                            "text-[10px] px-1 py-0",
-                            l.pfStatus === 'Failed' 
-                              ? "bg-red-500/10 text-red-600 dark:text-red-400 border-red-500" 
-                              : "bg-red-500/10 text-red-600 dark:text-red-400 border-red-200 dark:border-red-500/30"
-                          )}
-                          title={l.pfStatus === 'Failed' ? 'Property Finder Sync Failed' : 'Property Finder'}
-                        >
-                          PF {l.pfStatus === 'Failed' ? '❌' : (l.pfStatus === 'Synced' ? '✅' : '')}
-                        </Badge>
-                      )}
-                      {l.portals.bayut && <Badge variant="outline" className="text-[10px] px-1 py-0 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/30">BY</Badge>}
-                      {l.portals.dubizzle && <Badge variant="outline" className="text-[10px] px-1 py-0 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/30">DB</Badge>}
-                      {l.portals.website && <Badge variant="outline" className="text-[10px] px-1 py-0 bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-500/30">WB</Badge>}
-
+                    <div className="flex gap-1.5 flex-wrap max-w-[120px]">
+                      <PortalBadge 
+                        portal="pf" 
+                        propertyId={l.id} 
+                        initialStatus={l.portals.pf} 
+                        pfStatus={l.pfStatus} 
+                      />
+                      <PortalBadge 
+                        portal="bayut" 
+                        propertyId={l.id} 
+                        initialStatus={l.portals.bayut} 
+                      />
+                      <PortalBadge 
+                        portal="dubizzle" 
+                        propertyId={l.id} 
+                        initialStatus={l.portals.dubizzle} 
+                      />
+                      <PortalBadge 
+                        portal="website" 
+                        propertyId={l.id} 
+                        initialStatus={l.portals.website} 
+                      />
                     </div>
                   </TableCell>
                   <TableCell className="font-mono text-xs">{l.reference}</TableCell>

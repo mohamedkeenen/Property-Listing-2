@@ -88,6 +88,8 @@ export const mapBackendPropertyToFrontend = (p: any): PropertyListing => {
       title: d.title,
       url: d.url || getImageUrl(d.file_path)
     })),
+    projectName: p.project_name || "",
+    developers: p.developer_name || "",
   };
 };
 
@@ -134,8 +136,8 @@ export const mapBackendPropertyToFormValues = (p: any): any => {
     currency: p.currency || "Dirham",
     listingAgent: p.agent_id?.toString() || "",
     listingOwner: p.owner_id?.toString() || "",
-    projectName: p.project_id?.toString() || "",
-    developers: p.developer_id?.toString() || "",
+    projectName: p.project_name || "",
+    developers: p.developer_name || "",
     amenities: p.amenities || [],
     property_location: p.property_location || "",
     pfLocation: p.property_location || "",

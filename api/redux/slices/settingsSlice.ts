@@ -6,6 +6,7 @@ interface SettingsState {
   logo: string;
   lastUpdated: number;
   bitrix_webhook: string;
+  listing_webhook: string;
   sales_offer_webhook: string;
   pf_api_key: string;
   pf_api_secret: string;
@@ -28,6 +29,7 @@ const initialState: SettingsState = {
   logo: '',
   lastUpdated: Date.now(),
   bitrix_webhook: '',
+  listing_webhook: '',
   sales_offer_webhook: '',
   pf_api_key: '',
   pf_api_secret: '',
@@ -53,6 +55,7 @@ const settingsSlice = createSlice({
       state.companyName = action.payload.company_name || action.payload.companyName;
       state.logo = action.payload.logo;
       state.bitrix_webhook = action.payload.bitrix_webhook || action.payload.bitrix_webhook || '';
+      state.listing_webhook = action.payload.listing_webhook || '';
       state.sales_offer_webhook = action.payload.sales_offer_webhook || '';
       state.pf_api_key = action.payload.pf_api_key || '';
       state.pf_api_secret = action.payload.pf_api_secret || '';
@@ -89,6 +92,7 @@ export const selectCompanyName = (state: RootState) => state.settings.companyNam
 export const selectCompanyLogo = (state: RootState) => state.settings.logo;
 export const selectSettingsLastUpdated = (state: RootState) => state.settings.lastUpdated;
 export const selectBitrixWebhook = (state: RootState) => state.settings.bitrix_webhook;
+export const selectListingWebhook = (state: RootState) => state.settings.listing_webhook;
 export const selectPfApiKey = (state: RootState) => state.settings.pf_api_key;
 export const selectPfApiSecret = (state: RootState) => state.settings.pf_api_secret;
 export const selectBayutApiKey = (state: RootState) => state.settings.bayut_api_key;

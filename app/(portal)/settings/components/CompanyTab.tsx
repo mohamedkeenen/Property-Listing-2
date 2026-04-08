@@ -23,6 +23,7 @@ import {
   selectCompanyLogo, 
   selectSettingsLastUpdated, 
   selectBitrixWebhook,
+  selectListingWebhook,
   selectPfApiKey,
   selectPfApiSecret,
   selectBayutApiKey,
@@ -52,6 +53,7 @@ export function CompanyTab({ isAdmin }: CompanyTabProps) {
   const reduxCompanyName = useSelector(selectCompanyName);
   const reduxLogo = useSelector(selectCompanyLogo);
   const reduxBitrixWebhook = useSelector(selectBitrixWebhook);
+  const reduxListingWebhook = useSelector(selectListingWebhook);
   const reduxPfApiKey = useSelector(selectPfApiKey);
   const reduxPfApiSecret = useSelector(selectPfApiSecret);
   const reduxBayutApiKey = useSelector(selectBayutApiKey);
@@ -70,6 +72,7 @@ export function CompanyTab({ isAdmin }: CompanyTabProps) {
   const [companyName, setCompanyName] = useState(reduxCompanyName);
   const [logo, setLogo] = useState<string>(reduxLogo);
   const [bitrixWebhook, setBitrixWebhook] = useState(reduxBitrixWebhook);
+  const [listingWebhook, setListingWebhook] = useState(reduxListingWebhook);
   const [pfApiKey, setPfApiKey] = useState(reduxPfApiKey);
   const [pfApiSecret, setPfApiSecret] = useState(reduxPfApiSecret);
   const [bayutApiKey, setBayutApiKey] = useState(reduxBayutApiKey);
@@ -90,6 +93,7 @@ export function CompanyTab({ isAdmin }: CompanyTabProps) {
     setCompanyName(reduxCompanyName || "");
     setLogo(reduxLogo || "");
     setBitrixWebhook(reduxBitrixWebhook || "");
+    setListingWebhook(reduxListingWebhook || "");
     setPfApiKey(reduxPfApiKey || "");
     setPfApiSecret(reduxPfApiSecret || "");
     setBayutApiKey(reduxBayutApiKey || "");
@@ -106,6 +110,7 @@ export function CompanyTab({ isAdmin }: CompanyTabProps) {
     reduxCompanyName, 
     reduxLogo, 
     reduxBitrixWebhook, 
+    reduxListingWebhook,
     reduxPfApiKey, 
     reduxPfApiSecret, 
     reduxBayutApiKey,
@@ -137,6 +142,7 @@ export function CompanyTab({ isAdmin }: CompanyTabProps) {
         company_name: companyName,
         logo: logo,
         bitrix_webhook: bitrixWebhook,
+        listing_webhook: listingWebhook,
         pf_api_key: pfApiKey,
         pf_api_secret: pfApiSecret,
         bayut_api_key: bayutApiKey,
@@ -227,12 +233,12 @@ export function CompanyTab({ isAdmin }: CompanyTabProps) {
                   Bitrix24
                 </h3>
                 <ModernField 
-                  label="Bitrix Webhook URL" 
-                  placeholder="https://your-domain.bitrix24.com/rest/1/..." 
+                  label="Listing Webhook URL" 
+                  placeholder="https://your-domain.com/webhook/listing" 
                   icon={Webhook} 
                   type="password"
-                  value={bitrixWebhook}
-                  onChange={(e) => setBitrixWebhook(e.target.value)}
+                  value={listingWebhook}
+                  onChange={(e) => setListingWebhook(e.target.value)}
                   readOnly={!isAdmin}
                 />
                 <ModernField 
@@ -280,32 +286,7 @@ export function CompanyTab({ isAdmin }: CompanyTabProps) {
                     readOnly={!isAdmin}
                   />
                 </div>
-                <div className="grid gap-4 md:grid-cols-3">
-                  <ModernField 
-                    label="PF Lead Source WhatsApp" 
-                    placeholder="Source ID" 
-                    icon={MessageSquare} 
-                    value={pfLeadSourceWhatsapp}
-                    onChange={(e) => setPfLeadSourceWhatsapp(e.target.value)}
-                    readOnly={!isAdmin}
-                  />
-                  <ModernField 
-                    label="PF Lead Source Email" 
-                    placeholder="Source ID" 
-                    icon={Mail} 
-                    value={pfLeadSourceEmail}
-                    onChange={(e) => setPfLeadSourceEmail(e.target.value)}
-                    readOnly={!isAdmin}
-                  />
-                  <ModernField 
-                    label="PF Lead Source Phone" 
-                    placeholder="Source ID" 
-                    icon={Phone} 
-                    value={pfLeadSourcePhone}
-                    onChange={(e) => setPfLeadSourcePhone(e.target.value)}
-                    readOnly={!isAdmin}
-                  />
-                </div>
+
               </div>
 
               {/* Bayut Section */}
@@ -323,32 +304,7 @@ export function CompanyTab({ isAdmin }: CompanyTabProps) {
                   onChange={(e) => setBayutApiKey(e.target.value)}
                   readOnly={!isAdmin}
                 />
-                <div className="grid gap-4 md:grid-cols-3">
-                  <ModernField 
-                    label="Bayut Lead Source WhatsApp" 
-                    placeholder="Source ID" 
-                    icon={MessageSquare} 
-                    value={bayutLeadSourceWhatsapp}
-                    onChange={(e) => setBayutLeadSourceWhatsapp(e.target.value)}
-                    readOnly={!isAdmin}
-                  />
-                  <ModernField 
-                    label="Bayut Lead Source Email" 
-                    placeholder="Source ID" 
-                    icon={Mail} 
-                    value={bayutLeadSourceEmail}
-                    onChange={(e) => setBayutLeadSourceEmail(e.target.value)}
-                    readOnly={!isAdmin}
-                  />
-                  <ModernField 
-                    label="Bayut Lead Source Phone" 
-                    placeholder="Source ID" 
-                    icon={Phone} 
-                    value={bayutLeadSourcePhone}
-                    onChange={(e) => setBayutLeadSourcePhone(e.target.value)}
-                    readOnly={!isAdmin}
-                  />
-                </div>
+
               </div>
             </div>
           </CardContent>

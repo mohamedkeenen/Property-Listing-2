@@ -8,13 +8,13 @@ import { ListingsFilters, FiltersState } from "@/components/dashboard/ListingsFi
 import { ListingsTable } from "@/components/dashboard/ListingsTable";
 import { PropertyDetailDialog } from "@/components/listings/PropertyDetailDialog";
 import { PropertyListing } from "@/data/mockData";
-import { useGetPropertiesQuery } from "@/api/redux/services/propertyApi";
+import { useGetPropertiesQuery, useSyncBitrixMutation } from "@/api/redux/services/propertyApi";
 import { useGetAgentsQuery } from "@/api/redux/services/userApi";
 import { mapBackendPropertyToFrontend } from "@/lib/mappers";
 import { Button } from "@/components/ui/button";
 import { toast } from "react-hot-toast";
 import { cn } from "@/lib/utils";
-import { RefreshCcw, BarChart3, Info, PieChart, List, Search, Loader2 } from "lucide-react";
+import { RefreshCcw, BarChart3, Info, PieChart, List, Search, Loader2, Database } from "lucide-react";
 
 export default function Dashboard() {
   const router = useRouter();
@@ -22,6 +22,7 @@ export default function Dashboard() {
   const [selectedListing, setSelectedListing] = useState<PropertyListing | null>(null);
 
   const { data: propertiesData, isLoading, refetch } = useGetPropertiesQuery({ limit: 100 });
+  const [syncBitrix, { isLoading: isSyncing }] = useSyncBitrixMutation();
   const { data: agentsData } = useGetAgentsQuery();
 
   const agentNames = useMemo(() => {
@@ -59,8 +60,9 @@ export default function Dashboard() {
 
   const handleRefresh = async () => {
     try {
+      const res = await syncBitrix().unwrap();
       await refetch().unwrap();
-      toast.success("Inventory synchronized!");
+      toast.success(`Inventory synchronized! ${res.count || 0} items updated from Bitrix.`);
     } catch {
       toast.error("Failed to sync inventory.");
     }
@@ -76,16 +78,29 @@ export default function Dashboard() {
           </h1>
           <p className="text-xs text-muted-foreground font-medium">Property listings overview & analytics</p>
         </div>
-        <Button 
-          variant="outline" 
-          size="sm" 
-          onClick={handleRefresh}
-          disabled={isLoading}
-          className="rounded-xl font-bold text-[10px] uppercase tracking-wider py-5 px-6 gap-2"
-        >
-          <RefreshCcw className={cn("h-3.5 w-3.5", isLoading && "animate-spin")} />
-          Sync Data
-        </Button>
+        <div className="flex gap-3">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => refetch()}
+            disabled={isLoading}
+            className="rounded-xl font-bold text-[10px] uppercase tracking-wider py-5 px-6 gap-2"
+          >
+            <RefreshCcw className={cn("h-3.5 w-3.5", isLoading && "animate-spin")} />
+            Refresh List
+          </Button>
+
+          <Button 
+            variant="default" 
+            size="sm" 
+            onClick={handleRefresh}
+            disabled={isSyncing}
+            className="rounded-xl font-bold text-[10px] uppercase tracking-wider py-5 px-6 gap-2 bg-primary text-white shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all active:scale-95"
+          >
+            <Database className={cn("h-3.5 w-3.5", isSyncing && "animate-spin")} />
+            Sync Bitrix
+          </Button>
+        </div>
       </div>
 
       {/* Stats Section */}
@@ -140,7 +155,7 @@ export default function Dashboard() {
               <ListingsTable
                 listings={filtered}
                 onViewDetails={setSelectedListing}
-                onEdit={(l) => router.push(`/listing/${l.id}/edit`)}
+                onEdit={(l) => router.push(`/create-listing?id=${l.id}`)}
               />
             )}
           </div>

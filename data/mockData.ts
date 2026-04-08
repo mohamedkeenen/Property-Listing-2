@@ -47,6 +47,8 @@ export interface PropertyListing {
   uaeEmirate?: string;
   notes?: any[];
   documents?: any[];
+  projectName?: string;
+  developers?: string;
 }
 
 export interface Lead {

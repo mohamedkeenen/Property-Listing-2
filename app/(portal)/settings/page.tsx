@@ -13,7 +13,6 @@ import { selectCurrentUser } from "@/api/redux/slices/authSlice";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ProfileTab } from "./components/ProfileTab";
 import { CompanyTab } from "./components/CompanyTab";
-import { InputsTab } from "./components/InputsTab";
 import { Button } from "@/components/ui/button";
 
 export default function SettingsPage() {
@@ -83,13 +82,6 @@ export default function SettingsPage() {
                 <Building2 className="h-4 w-4" />
                 Integrations
               </TabsTrigger>
-              <TabsTrigger 
-                value="inputs" 
-                className="rounded-xl h-full px-8 data-[state=active]:bg-background data-[state=active]:shadow-lg data-[state=active]:text-primary font-black transition-all gap-2"
-              >
-                <ListIcon className="h-4 w-4" />
-                Inputs
-              </TabsTrigger>
             </>
           )}
         </TabsList>
@@ -102,9 +94,6 @@ export default function SettingsPage() {
           <>
             <TabsContent value="company" className="mt-0 focus-visible:outline-none focus-visible:ring-0">
               <CompanyTab isAdmin={isAdmin} />
-            </TabsContent>
-            <TabsContent value="inputs" className="mt-0 focus-visible:outline-none focus-visible:ring-0">
-              <InputsTab isAdmin={isAdmin} />
             </TabsContent>
           </>
         )}

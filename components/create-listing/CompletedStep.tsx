@@ -26,7 +26,7 @@ export function CompletedStep({ form }: Props) {
   const propertyId = searchParams.get("id");
   const isEdit = !!propertyId;
   const { toast } = useToast();
-  const publishStatus = watch("publishStatus") || "publish";
+  const publishStatus = watch("publishStatus") || "draft";
   const [submittedLink, setSubmitted] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
@@ -56,8 +56,8 @@ export function CompletedStep({ form }: Props) {
       bedrooms: values.bedrooms,
       bathrooms: values.bathrooms,
       parking: values.parking,
-      project_id: values.projectName ? parseInt(values.projectName) : null,
-      developer_id: values.developers ? parseInt(values.developers) : null,
+      project_name: values.projectName || null,
+      developer_name: values.developers || null,
       agent_id: values.listingAgent ? parseInt(values.listingAgent) : null,
       owner_id: values.listingOwner ? parseInt(values.listingOwner) : null,
       title_en: values.title,
@@ -246,7 +246,7 @@ export function CompletedStep({ form }: Props) {
              </>
            ) : (
              <>
-               Finalize & Publish Listing
+               Complete & Save Listing
                <ArrowRight className="h-4 w-4" />
              </>
            )}

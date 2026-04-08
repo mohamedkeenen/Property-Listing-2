@@ -59,6 +59,21 @@ export const propertyApi = createApi({
       }),
       invalidatesTags: ['Property'],
     }),
+    togglePortal: builder.mutation<any, { id: number | string; portal: string; status: boolean }>({
+      query: ({ id, portal, status }) => ({
+        url: `/properties/${id}/toggle-portal`,
+        method: 'POST',
+        body: { portal, status },
+      }),
+      invalidatesTags: (result, error, { id }) => ['Property', { type: 'Property', id }],
+    }),
+    syncBitrix: builder.mutation<any, void>({
+      query: () => ({
+        url: '/properties/sync-bitrix',
+        method: 'POST',
+      }),
+      invalidatesTags: ['Property'],
+    }),
   }),
 });
 
@@ -68,4 +83,6 @@ export const {
   useCreatePropertyMutation,
   useUpdatePropertyMutation,
   useDeletePropertyMutation,
+  useTogglePortalMutation,
+  useSyncBitrixMutation,
 } = propertyApi;

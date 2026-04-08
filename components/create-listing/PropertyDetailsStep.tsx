@@ -20,7 +20,6 @@ import { ModernSelect } from "@/components/ui/modern-select";
 import { NumberSearchSelect } from "@/components/ui/number-search-select";
 import { CreditCard as CreditCardIcon, Paintbrush } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
-import { useGetProjectsQuery, useGetDevelopersQuery } from "@/api/redux/services/settingsApi";
 import { useGetUsersQuery } from "@/api/redux/services/userApi";
 import { useSelector } from "react-redux";
 import { selectCompanyLogo, selectSettingsLastUpdated } from "@/api/redux/slices/settingsSlice";
@@ -41,17 +40,8 @@ export function PropertyDetailsStep({ form }: Props) {
   const AMENITIES_LIST = filterOptions.amenities;
   const pricePeriod = watch("pricePeriod");
 
-  const { data: projectsData } = useGetProjectsQuery();
-  const { data: developersData } = useGetDevelopersQuery();
   const { data: usersData } = useGetUsersQuery();
 
-  const projectOptions = useMemo(() => 
-    projectsData?.data?.map((p: any) => ({ label: p.name, value: p.name })) || [], 
-  [projectsData]);
-
-  const developerOptions = useMemo(() => 
-    developersData?.data?.map((d: any) => ({ label: d.name, value: d.name })) || [], 
-  [developersData]);
 
   const agentOptions = useMemo(() => 
     usersData?.data?.map((u: any) => ({ label: u.name, value: u.id.toString() })) || [], 
@@ -490,12 +480,12 @@ export function PropertyDetailsStep({ form }: Props) {
               onClear={() => setValue("permitNumber", "", { shouldValidate: true })}
             />
 
-            <ModernSelect 
+            <ModernField 
               label="Project Name" 
               icon={Building2} 
-              value={watch("projectName")} 
-              onValueChange={(v) => setValue("projectName", v, { shouldValidate: true })}
-              options={projectOptions}
+              {...register("projectName")} 
+              value={watch("projectName")}
+              onClear={() => setValue("projectName", "", { shouldValidate: true })}
             />
             
             <ModernSelect 
@@ -506,12 +496,12 @@ export function PropertyDetailsStep({ form }: Props) {
               options={["Freehold", "Leasehold"]}
             />
 
-            <ModernSelect 
+            <ModernField 
               label="Developers" 
               icon={Building2} 
-              value={watch("developers")} 
-              onValueChange={(v) => setValue("developers", v, { shouldValidate: true })}
-              options={developerOptions}
+              {...register("developers")} 
+              value={watch("developers")}
+              onClear={() => setValue("developers", "", { shouldValidate: true })}
             />
 
             <ModernField label="Build Year" icon={Calendar} type="number" {...register("buildYear")} value={watch("buildYear")} />
