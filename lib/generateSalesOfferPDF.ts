@@ -103,10 +103,16 @@ export const generateSalesOfferPDF = async (formData: any, images: any) => {
         ctx.drawImage(img, sx, sy, sw, sh, 0, 0, sw, sh);
 
         if (addGradient) {
-          const gradient = ctx.createLinearGradient(0, 0, 0, sh);
-          gradient.addColorStop(0, "rgba(0,0,0,0)");
-          gradient.addColorStop(0.3, "rgba(0,0,0,0.1)");
-          gradient.addColorStop(1, "rgba(0,0,0,0.7)");
+          // Horizontal Gradient from Right to Left using primary color components
+          const gradient = ctx.createLinearGradient(sw, 0, 0, 0); 
+          const r = primaryColor[0];
+          const g = primaryColor[1];
+          const b = primaryColor[2];
+          
+          gradient.addColorStop(0, `rgba(${r},${g},${b},0.9)`);
+          gradient.addColorStop(0.4, `rgba(${r},${g},${b},0.3)`);
+          gradient.addColorStop(1, "rgba(0,0,0,0)");
+          
           ctx.fillStyle = gradient;
           ctx.fillRect(0, 0, sw, sh);
         }
