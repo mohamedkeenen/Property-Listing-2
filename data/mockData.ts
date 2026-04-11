@@ -31,7 +31,7 @@ export interface PropertyListing {
   owner: string;
   ownerAvatar: string;
   ownerPhone: string;
-  portals: { pf: boolean; bayut: boolean; website: boolean; skyloov: boolean; dubizzle: boolean };
+  portals: { pf: boolean; bayut: boolean; website: boolean; dubizzle: boolean };
   pfStatus: string | null;
   updatedAt: string;
   description: string;
@@ -609,7 +609,7 @@ export const filterOptions = {
     "Sobha",
     "Tecom Group"
   ],
-  portals: ["Property Finder", "Bayut", "Website", "Skyloov", "Dubizzle"],
+  portals: ["Property Finder", "Bayut", "Website", "Dubizzle"],
   areaUnit: "SQ. FT",
   currencies: ["Dirham", "Egypt Pound", "US Dollar", "EURO"],
   finishingTypes: [

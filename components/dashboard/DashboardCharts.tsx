@@ -77,12 +77,6 @@ export function DashboardCharts({ listings }: { listings: PropertyListing[] }) {
       color: COLORS.blue,
       breakdown: []
     },
-    { 
-      name: "Skyloov", 
-      value: listings.filter((l) => l.portals.skyloov && false).length, // Forced 0 as inactive
-      color: COLORS.skyloov,
-      breakdown: []
-    },
   ];
 
   const typeMap: Record<string, number> = {};

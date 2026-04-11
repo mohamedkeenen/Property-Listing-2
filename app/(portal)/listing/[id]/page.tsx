@@ -7,10 +7,10 @@ import { mapBackendPropertyToFrontend } from "@/lib/mappers";
 import { cn, formatRelativeTime } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import {
   ArrowLeft, BedDouble, Bath, Maximize, Car, MapPin, Building2, User, Calendar,
-  Phone, ChevronLeft, ChevronRight, FileText, Tag, Armchair, Loader2, Image as ImageIcon
+  Phone, ChevronLeft, ChevronRight, FileText, Tag, Loader2, Image as ImageIcon,
+  Clock, Hash, Globe
 } from "lucide-react";
 
 export default function PropertyDetail({ params }: { params: Promise<{ id: string }> }) {
@@ -19,30 +19,31 @@ export default function PropertyDetail({ params }: { params: Promise<{ id: strin
   const { data: propertyResponse, isLoading } = useGetPropertyQuery(id);
   const listing = propertyResponse?.data ? mapBackendPropertyToFrontend(propertyResponse.data) : null;
   const [activeImage, setActiveImage] = useState(0);
-  const thumbRef = useRef<HTMLDivElement>(null);
 
   if (isLoading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
-        <Loader2 className="h-8 w-8 text-primary animate-spin" />
-        <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground animate-pulse">Requesting Source Files...</p>
+      <div className="flex flex-col items-center justify-center min-h-[600px] gap-6">
+        <Loader2 className="h-12 w-12 text-primary animate-spin" />
+        <p className="text-sm font-black uppercase tracking-[0.3em] text-muted-foreground animate-pulse font-arabic">جاري تحميل تفاصيل العقار...</p>
       </div>
     );
   }
 
   if (!listing) {
     return (
-      <div className="p-12 text-center max-w-sm mx-auto space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-        <div className="h-20 w-20 rounded-3xl bg-muted mx-auto flex items-center justify-center">
-          <ArrowLeft className="h-8 w-8 text-muted-foreground/40" />
+      <div className="min-h-[70vh] flex items-center justify-center px-8">
+        <div className="text-center max-w-lg space-y-8">
+          <div className="mx-auto h-24 w-24 rounded-4xl bg-muted/50 border border-border/40 flex items-center justify-center shadow-inner">
+            <ArrowLeft className="h-10 w-10 text-muted-foreground/40" />
+          </div>
+          <div className="space-y-3">
+            <h2 className="text-3xl font-black text-foreground tracking-tighter uppercase font-arabic">العقار غير موجود</h2>
+            <p className="text-muted-foreground font-medium px-12 font-arabic opacity-60">لم نتمكن من العثور على العقار المطلوب في قاعدة البيانات الحالية.</p>
+          </div>
+          <Button onClick={() => router.push("/")} size="lg" className="h-16 px-10 rounded-4xl font-black text-[12px] uppercase tracking-widest bg-primary shadow-2xl shadow-primary/20 hover:scale-[1.05] transition-all font-arabic">
+            العودة إلى الرئيسية
+          </Button>
         </div>
-        <div className="space-y-2">
-           <h3 className="text-xl font-black text-foreground">Property Depleted</h3>
-           <p className="text-xs text-muted-foreground font-medium px-8">The requested digital asset could not be located in our encrypted database clusters.</p>
-        </div>
-        <Button variant="outline" className="h-12 px-8 rounded-2xl font-black text-[10px] uppercase tracking-widest border-border/40 hover:bg-muted" onClick={() => router.push("/")}>
-          <ArrowLeft className="h-4 w-4 mr-2" /> Back to Intelligence
-         </Button>
       </div>
     );
   }
@@ -51,323 +52,247 @@ export default function PropertyDetail({ params }: { params: Promise<{ id: strin
 
   const goSlide = (dir: number) => {
     setActiveImage((prev) => {
-      const next = prev + dir;
-      if (next < 0) return imgs.length - 1;
-      if (next >= imgs.length) return 0;
+      let next = prev + dir;
+      if (next < 0) next = imgs.length - 1;
+      if (next >= imgs.length) next = 0;
       return next;
     });
   };
 
   const statusColors: Record<string, string> = {
-    Live: "bg-emerald-500/10 text-emerald-600 border-emerald-200",
-    Draft: "bg-yellow-500/10 text-yellow-600 border-yellow-200",
-    Pending: "bg-blue-500/10 text-blue-600 border-blue-200",
-    Archived: "bg-gray-500/10 text-gray-500 border-gray-200",
-    Pocket: "bg-purple-500/10 text-purple-600 border-purple-200",
+    Live: "bg-emerald-500 text-white border-emerald-500",
+    Draft: "bg-yellow-500 text-white border-yellow-500",
+    Pending: "bg-blue-500 text-white border-blue-500",
+    Archived: "bg-gray-500 text-white border-gray-500",
+    Pocket: "bg-purple-500 text-white border-purple-500",
   };
 
   return (
-    <div className="p-4 md:p-6 max-w-5xl mx-auto space-y-6">
-      {/* Header */}
-       <div className="flex items-center gap-3">
-        <Button variant="outline" size="icon" className="rounded-xl" onClick={() => router.push("/")}>
-          <ArrowLeft className="h-4 w-4" />
-        </Button>
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 flex-wrap">
-            <h1 className="text-xl md:text-2xl font-bold text-foreground truncate">{listing.title}</h1>
-            <Badge variant="outline" className={statusColors[listing.status]}>{listing.status}</Badge>
+    <div className="flex flex-col min-h-screen bg-background text-foreground">
+      {/* Premium Header Bar */}
+      <div className="sticky top-0 z-50 bg-background/90 backdrop-blur-2xl border-b border-border/50 px-8 py-6">
+        <div className="flex items-start justify-between gap-6 w-full max-w-[1800px] mx-auto">
+          <div className="flex items-center gap-10 min-w-0">
+            <Button 
+                variant="outline" 
+                size="icon" 
+                className="h-14 w-14 shrink-0 rounded-2xl border-border/40 hover:bg-muted/50 transition-all active:scale-95 shadow-sm" 
+                onClick={() => router.push("/")}
+            >
+              <ArrowLeft className="h-6 w-6" />
+            </Button>
+            
+            <div className="flex flex-col min-w-0">
+              <h1 className="text-3xl md:text-4xl font-black text-foreground truncate tracking-tighter uppercase leading-none mb-2">{listing.title}</h1>
+              <div className="flex items-center gap-4 text-xs md:text-sm text-muted-foreground font-bold uppercase tracking-widest opacity-60">
+                <span className="flex items-center gap-2"><Hash className="h-3.5 w-3.5" /> {listing.reference}</span>
+                <span className="h-1.5 w-1.5 rounded-full bg-border" />
+                <span className="flex items-center gap-2"><MapPin className="h-3.5 w-3.5" /> Dubai, {listing.community}</span>
+              </div>
+            </div>
           </div>
-          <p className="text-sm text-muted-foreground">{listing.reference} • {listing.community}, {listing.location}</p>
+
+          <Badge className={cn("px-8 py-2.5 rounded-2xl font-black text-[12px] uppercase tracking-[0.2em] shadow-xl shadow-emerald-500/10 ring-8 ring-emerald-500/5 transition-all", statusColors[listing.status])}>
+            {listing.status}
+          </Badge>
         </div>
       </div>
 
-       {/* Main Image Slider */}
-       <div className="relative rounded-2xl overflow-hidden bg-black/95 aspect-video group">
-        {imgs[activeImage] ? (
-          <img
-            src={imgs[activeImage]}
-            alt={listing.title}
-            className="w-full h-full object-contain transition-all duration-500"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center bg-muted">
-            <ImageIcon className="h-12 w-12 text-muted-foreground/20" />
-          </div>
-        )}
-        {/* Overlay with price */}
-        <div className="absolute bottom-0 inset-x-0 bg-linear-to-t from-black/70 via-black/30 to-transparent p-6">
-          <div className="flex items-end justify-between">
-            <div>
-              <p className="text-white/80 text-sm">{listing.purpose === "Rent" ? "Annual Rent" : "Sale Price"}</p>
-               <p className="text-white text-3xl font-bold">AED {listing.price.toLocaleString()}</p>
-            </div>
-            <div className="flex gap-2">
-              <Badge className="bg-white/20 text-white border-white/30 backdrop-blur-sm">{listing.type}</Badge>
-               <Badge className="bg-white/20 text-white border-white/30 backdrop-blur-sm">{listing.purpose}</Badge>
-            </div>
-          </div>
-        </div>
-        {/* Navigation arrows */}
-        {imgs.length > 1 && (
-          <>
-            <button
-              onClick={() => goSlide(-1)}
-              className="absolute left-3 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full bg-black/40 backdrop-blur-sm text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/60"
-            >
-              <ChevronLeft className="h-5 w-5" />
-            </button>
-            <button
-              onClick={() => goSlide(1)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full bg-black/40 backdrop-blur-sm text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/60"
-            >
-              <ChevronRight className="h-5 w-5" />
-            </button>
-          </>
-        )}
-        {/* Image counter */}
-        <div className="absolute top-4 right-4 bg-black/50 backdrop-blur-sm text-white text-xs px-3 py-1.5 rounded-full">
-          {activeImage + 1} / {imgs.length}
-        </div>
-      </div>
-
-       {/* Thumbnail strip */}
-       {imgs.length > 1 && (
-        <div ref={thumbRef} className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
-          {imgs.map((img, i) => (
-            <button
-              key={i}
-              onClick={() => setActiveImage(i)}
-              className={`shrink w-20 h-14 rounded-xl overflow-hidden border-2 transition-all ${
-                i === activeImage ? "border-primary ring-2 ring-primary/30" : "border-transparent opacity-60 hover:opacity-100"
-              }`}
-            >
-              <div className="relative w-full h-full bg-black/90">
-                {img ? (
-                  <img src={img} alt={`Photo ${i + 1}`} className="w-full h-full object-contain" />
+      <main className="flex-1 w-full max-w-[1800px] mx-auto px-8 py-12">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-12">
+          
+          {/* Main Content Area */}
+          <div className="lg:col-span-3 space-y-12">
+            
+            {/* Cinematic Image Gallery */}
+            <div className="relative rounded-[4rem] overflow-hidden bg-black ring-1 ring-border/20 group shadow-2xl">
+              <div className="h-[500px] flex items-center justify-center relative z-10">
+                {imgs[activeImage] ? (
+                  <img
+                    src={imgs[activeImage]}
+                    alt={listing.title}
+                    className="w-full h-full object-cover transition-all duration-700 ease-in-out"
+                  />
                 ) : (
-                  <div className="w-full h-full bg-muted flex items-center justify-center">
-                    <ImageIcon className="h-4 w-4 text-muted-foreground/20" />
+                  <div className="flex flex-col items-center gap-6 py-32 opacity-10">
+                    <ImageIcon className="h-24 w-24" />
+                    <p className="text-sm font-black uppercase tracking-[0.3em]">No Visual Assets Available</p>
                   </div>
                 )}
               </div>
-            </button>
-          ))}
-        </div>
-      )}
 
-       {/* Quick specs */}
-       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        {listing.bedrooms > 0 && (
-          <div className="bg-card border border-border rounded-xl p-4 flex items-center gap-3">
-            <div className="h-10 w-10 rounded-lg bg-blue-500/10 flex items-center justify-center">
-              <BedDouble className="h-5 w-5 text-blue-500" />
-            </div>
-            <div>
-              <p className="text-xs text-muted-foreground">Bedrooms</p>
-              <p className="font-semibold text-foreground">{listing.bedrooms}</p>
-            </div>
-          </div>
-        )}
-        <div className="bg-card border border-border rounded-xl p-4 flex items-center gap-3">
-          <div className="h-10 w-10 rounded-lg bg-cyan-500/10 flex items-center justify-center">
-            <Bath className="h-5 w-5 text-cyan-500" />
-          </div>
-          <div>
-            <p className="text-xs text-muted-foreground">Bathrooms</p>
-            <p className="font-semibold text-foreground">{listing.bathrooms}</p>
-          </div>
-        </div>
-        <div className="bg-card border border-border rounded-xl p-4 flex items-center gap-3">
-          <div className="h-10 w-10 rounded-lg bg-emerald-500/10 flex items-center justify-center">
-            <Maximize className="h-5 w-5 text-emerald-500" />
-          </div>
-          <div>
-            <p className="text-xs text-muted-foreground">Size</p>
-             <p className="font-semibold text-foreground">{listing.size.toLocaleString()} sq.ft</p>
-          </div>
-        </div>
-        <div className="bg-card border border-border rounded-xl p-4 flex items-center gap-3">
-          <div className="h-10 w-10 rounded-lg bg-amber-500/10 flex items-center justify-center">
-            <Car className="h-5 w-5 text-amber-500" />
-          </div>
-          <div>
-            <p className="text-xs text-muted-foreground">Parking</p>
-            <p className="font-semibold text-foreground">{listing.parking}</p>
-          </div>
-        </div>
-      </div>
-
-      <div className="grid md:grid-cols-3 gap-6">
-        {/* Left: descriptions */}
-        <div className="md:col-span-2 space-y-6">
-          {/* Description EN */}
-          <div className="bg-card border border-border rounded-xl p-5 space-y-3">
-            <h3 className="font-semibold text-foreground flex items-center gap-2">
-              <FileText className="h-4 w-4 text-primary" /> Description
-            </h3>
-            <p className="text-sm text-muted-foreground leading-relaxed">{listing.description}</p>
-          </div>
-
-           {/* Description AR */}
-           {listing.descriptionAr && (
-            <div className="bg-card border border-border rounded-xl p-5 space-y-3" dir="rtl">
-              <h3 className="font-semibold text-foreground flex items-center gap-2">
-                <FileText className="h-4 w-4 text-primary" /> الوصف
-              </h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">{listing.descriptionAr}</p>
-            </div>
-          )}
-
-           {/* Details grid */}
-           <div className="bg-card border border-border rounded-xl p-5 space-y-4">
-            <h3 className="font-semibold text-foreground">Property Details</h3>
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <div className="flex items-center gap-2">
-                <MapPin className="h-4 w-4 text-muted-foreground" />
-                <span className="text-muted-foreground">Location:</span>
-                <span className="text-foreground font-medium">{listing.community}, {listing.subCommunity}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Building2 className="h-4 w-4 text-muted-foreground" />
-                <span className="text-muted-foreground">Building:</span>
-                <span className="text-foreground font-medium">{listing.building || "—"}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Tag className="h-4 w-4 text-muted-foreground" />
-                <span className="text-muted-foreground">Unit:</span>
-                <span className="text-foreground font-medium">{listing.unitNo}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Armchair className="h-4 w-4 text-muted-foreground" />
-                <span className="text-muted-foreground">Furnished:</span>
-                <span className="text-foreground font-medium">{listing.furnished}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Calendar className="h-4 w-4 text-muted-foreground" />
-                <span className="text-muted-foreground">Available:</span>
-                <span className="text-foreground font-medium">{listing.availableFrom}</span>
-              </div>
-              {listing.permitNumber && (
-                <div className="flex items-center gap-2">
-                  <FileText className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-muted-foreground">Permit:</span>
-                  <span className="text-foreground font-medium">{listing.permitNumber}</span>
+              {/* Price Banner Overlay */}
+              <div className="absolute bottom-12 left-12 p-10 rounded-[3rem] bg-black/40 backdrop-blur-3xl border border-white/10 text-white shadow-2xl animate-in fade-in slide-in-from-left-8 duration-700">
+                <p className="text-[11px] font-black uppercase tracking-[0.4em] text-white/40 mb-2">
+                    {listing.purpose === "Rent" ? "MARKET ANNUAL RENTAL" : "ASSET VALUE"}
+                </p>
+                <div className="flex items-baseline gap-3">
+                    <span className="text-xl font-medium opacity-30">AED</span>
+                    <span className="text-6xl font-black tracking-tighter"> {listing.price.toLocaleString()}</span>
                 </div>
+              </div>
+
+              {/* Navigation Arrows */}
+              {imgs.length > 1 && (
+                <>
+                  <button onClick={() => goSlide(-1)} className="absolute left-8 top-1/2 -translate-y-1/2 h-14 w-14 rounded-full bg-black/50 hover:bg-primary backdrop-blur-xl border border-white/10 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all hover:scale-110 active:scale-95 z-20 cursor-pointer">
+                    <ChevronLeft className="h-8 w-8" />
+                  </button>
+                  <button onClick={() => goSlide(1)} className="absolute right-8 top-1/2 -translate-y-1/2 h-14 w-14 rounded-full bg-black/50 hover:bg-primary backdrop-blur-xl border border-white/10 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all hover:scale-110 active:scale-95 z-20 cursor-pointer">
+                    <ChevronRight className="h-8 w-8" />
+                  </button>
+                  <div className="absolute top-10 left-1/2 -translate-x-1/2 bg-black/50 backdrop-blur-xl border border-white/10 text-white text-[10px] font-black px-8 py-3 rounded-full uppercase tracking-[0.3em] z-20">
+                    FRAME {activeImage + 1} / {imgs.length}
+                  </div>
+                </>
               )}
             </div>
-          </div>
 
-           {/* Amenities */}
-           {listing.amenities.length > 0 && (
-            <div className="bg-card border border-border rounded-xl p-5 space-y-3">
-              <h3 className="font-semibold text-foreground">Amenities</h3>
-              <div className="flex flex-wrap gap-2">
-                {listing.amenities.map((a) => (
-                  <Badge key={a} variant="outline" className="rounded-lg px-3 py-1">{a}</Badge>
+            {/* Thumbnails Strip */}
+            {imgs.length > 1 && (
+                <div className="flex gap-8 overflow-x-auto pb-4 scrollbar-none py-2 snap-x">
+                {imgs.map((img, i) => (
+                    <button
+                        key={i}
+                        onClick={() => setActiveImage(i)}
+                        className={cn(
+                            "relative shrink-0 w-48 aspect-video rounded-2xl overflow-hidden border-2 transition-all duration-300 snap-start",
+                            i === activeImage 
+                                ? "border-primary ring-8 ring-primary/10 scale-105 shadow-xl shadow-primary/20" 
+                                : "border-transparent grayscale opacity-40 hover:opacity-100 hover:grayscale-0"
+                        )}
+                    >
+                        <img src={img} className="w-full h-full object-cover" alt="" />
+                    </button>
                 ))}
-              </div>
-            </div>
-          )}
+                </div>
+            )}
 
-           {/* Portal Status */}
-           <div className="bg-card border border-border rounded-xl p-5 space-y-3">
-            <h3 className="font-semibold text-foreground">Portal Status</h3>
-            <div className="flex gap-2 flex-wrap">
-              <Badge variant={listing.portals.pf ? "default" : "secondary"} className="rounded-lg">
-                Property Finder {listing.portals.pf ? "✓" : "✗"}
-              </Badge>
-              <Badge variant={listing.portals.bayut ? "default" : "secondary"} className="rounded-lg">
-                Bayut {listing.portals.bayut ? "✓" : "✗"}
-              </Badge>
-              <Badge variant={listing.portals.website ? "default" : "secondary"} className="rounded-lg">
-                Website {listing.portals.website ? "✓" : "✗"}
-              </Badge>
+            {/* Quick Specs Icons */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                {[
+                    { label: "Bedrooms", val: listing.bedrooms, icon: BedDouble, color: "text-blue-500", bg: "bg-blue-500/10" },
+                    { label: "Bathrooms", val: listing.bathrooms, icon: Bath, color: "text-cyan-500", bg: "bg-cyan-500/10" },
+                    { label: "Area", val: `${listing.size.toLocaleString()} SQFT`, icon: Maximize, color: "text-emerald-500", bg: "bg-emerald-500/10" },
+                    { label: "Parking", val: listing.parking || "N/A", icon: Car, color: "text-amber-500", bg: "bg-amber-500/10" },
+                ].map((spec, i) => (
+                    <div key={i} className="bg-card border border-border/40 rounded-3xl p-8 flex items-center gap-6 shadow-sm hover:shadow-xl transition-all duration-300">
+                        <div className={cn("h-16 w-16 rounded-[1.25rem] flex items-center justify-center shadow-inner shrink-0", spec.bg)}>
+                            <spec.icon className={cn("h-8 w-8", spec.color)} />
+                        </div>
+                        <div className="flex flex-col gap-0.5 min-w-0">
+                            <p className="text-[11px] font-black uppercase tracking-[0.2em] text-muted-foreground truncate">{spec.label}</p>
+                            <p className="text-2xl font-black text-foreground truncate leading-none mt-1">{spec.val}</p>
+                        </div>
+                    </div>
+                ))}
             </div>
-          </div>
-        </div>
 
-         {/* Right sidebar: Agent & Admin */}
-         <div className="space-y-4">
-          {/* Agent card */}
-          <div className="bg-card border border-border rounded-xl p-5 space-y-4">
-            <h3 className="font-semibold text-foreground text-sm">Listing Agent</h3>
-            <div className="flex items-center gap-3">
-              <div className="relative h-12 w-12 shrink-0">
-                {listing.listingAgentAvatar ? (
-                  <img
-                    src={listing.listingAgentAvatar}
-                    alt={listing.listingAgent}
-                    className="w-full h-full rounded-full object-cover ring-2 ring-primary/20"
-                  />
-                ) : (
-                  <div className="w-full h-full rounded-full bg-primary/10 flex items-center justify-center ring-2 ring-primary/20">
-                    <User className="h-6 w-6 text-primary" />
-                  </div>
+            {/* Description Sections */}
+            <div className="flex flex-col gap-10">
+                <div className="bg-card border border-border/40 rounded-[3rem] p-12 space-y-8 shadow-sm">
+                    <div className="flex items-center gap-4">
+                        <div className="p-3.5 rounded-2xl bg-primary/10 text-primary">
+                            <FileText className="h-7 w-7" />
+                        </div>
+                        <h3 className="text-[13px] font-black uppercase tracking-[0.3em] text-foreground">Intelligence Briefing</h3>
+                    </div>
+                    <p className="text-base text-muted-foreground leading-relaxed font-bold opacity-80 whitespace-pre-line">{listing.description}</p>
+                </div>
+
+                {listing.descriptionAr && (
+                    <div className="bg-card border border-border/40 rounded-[3rem] p-12 space-y-8 text-right shadow-sm" dir="rtl">
+                        <div className="flex items-center gap-4">
+                            <div className="p-3.5 rounded-2xl bg-primary/10 text-primary">
+                                <FileText className="h-7 w-7" />
+                            </div>
+                            <h3 className="text-xl font-black uppercase tracking-widest text-foreground font-arabic leading-tight">تفاصيل البيان العقاري</h3>
+                        </div>
+                        <p className="text-lg text-muted-foreground leading-loose font-bold opacity-80 font-arabic whitespace-pre-line">{listing.descriptionAr}</p>
+                    </div>
                 )}
-              </div>
-              <div>
-                <p className="font-medium text-foreground">{listing.listingAgent}</p>
-                <p className="text-xs text-muted-foreground flex items-center gap-1">
-                  <User className="h-3 w-3" /> Agent
-                </p>
-              </div>
             </div>
           </div>
 
-           {/* Owner card */}
-           <div className="bg-card border border-border rounded-xl p-5 space-y-4">
-            <h3 className="font-semibold text-foreground text-sm">Admin</h3>
-            <div className="flex items-center gap-3">
-              <div className="relative h-12 w-12 shrink-0">
-                {listing.ownerAvatar ? (
-                  <img
-                    src={listing.ownerAvatar}
-                    alt={listing.owner}
-                    className="w-full h-full rounded-full object-cover ring-2 ring-muted"
-                  />
-                ) : (
-                  <div className="w-full h-full rounded-full bg-muted flex items-center justify-center ring-2 ring-muted-foreground/10">
-                    <User className="h-6 w-6 text-muted-foreground/40" />
-                  </div>
-                )}
-              </div>
-              <div>
-                <p className="font-medium text-foreground">{listing.owner}</p>
-                <p className="text-xs text-muted-foreground flex items-center gap-1">
-                  <Phone className="h-3 w-3" /> {listing.ownerPhone}
-                </p>
-              </div>
+          {/* Sidebar Area */}
+          <div className="lg:col-span-1 space-y-10">
+            {/* Digital Specifications Matrix */}
+            <div className="bg-card border border-border/40 rounded-[3rem] p-10 space-y-10 shadow-sm sticky top-32">
+                <h3 className="text-[12px] font-black uppercase tracking-[0.3em] text-muted-foreground border-b border-border/40 pb-6">Digital Specifications</h3>
+                <div className="space-y-8">
+                    {[
+                        { label: "Category", val: listing.category, icon: Building2 },
+                        { label: "Status", val: listing.status, icon: Tag },
+                        { label: "Type", val: listing.type, icon: Hash },
+                        { label: "Purpose", val: listing.purpose, icon: Calendar },
+                        { label: "Refreshed", val: formatRelativeTime(listing.updatedAt), icon: Clock },
+                    ].map((item, i) => (
+                        <div key={i} className="flex items-center justify-between group">
+                            <div className="flex items-center gap-5">
+                                <item.icon className="h-5 w-5 text-primary opacity-40 group-hover:opacity-100 transition-all" />
+                                <span className="text-[12px] font-black text-muted-foreground uppercase tracking-wider">{item.label}</span>
+                            </div>
+                            <span className="text-sm font-black text-foreground">{item.val}</span>
+                        </div>
+                    ))}
+                </div>
+
+                <div className="pt-8 space-y-8 border-t border-border/40">
+                    <p className="text-[12px] font-black uppercase tracking-[0.3em] text-muted-foreground">Gateway Exposure Status</p>
+                    <div className="flex flex-wrap gap-5">
+                        {[
+                            { id: "pf", label: "PF", icon: "https://res.cloudinary.com/devht0mp5/image/upload/v1772105511/PF_ljkahc.png", active: listing.portals.pf },
+                            { id: "bayut", label: "Bayut", icon: "https://res.cloudinary.com/devht0mp5/image/upload/v1772105511/bayut_gy4ev2.png", active: listing.portals.bayut },
+                            { id: "dubizzle", label: "Dubizzle", icon: "https://res.cloudinary.com/devht0mp5/image/upload/v1775823210/download_gzle7f.png", active: listing.portals.dubizzle },
+                            { id: "website", label: "Portal", icon: "icon", active: listing.portals.website },
+                            { id: "bitrix", label: "Bitrix24", icon: "https://res.cloudinary.com/devht0mp5/image/upload/v1775823210/download_1_eswdk2.png", active: true },
+                        ].map((portal, i) => (
+                            <div key={i} className={cn(
+                                "relative h-14 w-14 rounded-2xl border border-border/40 flex items-center justify-center p-3 transition-all group",
+                                portal.active ? "bg-card border-primary ring-8 ring-primary/5 opacity-100 shadow-xl shadow-primary/5" : "opacity-20 grayscale border-dashed"
+                            )}>
+                                {portal.id === "website" ? (
+                                    <Globe className="h-7 w-7 text-blue-500" />
+                                ) : (
+                                    <img src={portal.icon} alt={portal.label} className="w-full h-full object-contain" title={portal.label} />
+                                )}
+                                {portal.active && (
+                                    <div className="absolute -top-1.5 -right-1.5 h-4 w-4 rounded-full bg-emerald-500 border-2 border-background shadow-lg animate-pulse" />
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </div>
+
+            {/* Agent Partner Section */}
+            <div className="bg-card border border-border/40 rounded-[3rem] p-10 space-y-8 group transition-all hover:bg-muted/5 shadow-sm sticky top-32">
+                <p className="text-[11px] font-black uppercase tracking-[0.4em] text-muted-foreground/60 mb-6">Certified Partner</p>
+                <div className="flex flex-col items-center text-center gap-6">
+                    <div className="relative h-32 w-32 shrink-0 p-1.5 rounded-4xl bg-linear-to-tr from-primary to-indigo-600 transition-transform group-hover:rotate-6 shadow-2xl shadow-primary/20">
+                        <div className="w-full h-full rounded-[1.8rem] overflow-hidden bg-background">
+                            {listing.listingAgentAvatar ? (
+                                <img src={listing.listingAgentAvatar} alt={listing.listingAgent} className="w-full h-full object-cover" />
+                            ) : (
+                                <div className="w-full h-full flex items-center justify-center bg-muted">
+                                    <User className="h-14 w-14 text-muted-foreground/30" />
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                    <div className="space-y-2 min-w-0">
+                        <p className="text-2xl font-black text-foreground leading-tight tracking-tighter uppercase">{listing.listingAgent}</p>
+                        <p className="text-[10px] uppercase font-black text-primary tracking-widest opacity-80">Certified Advisor</p>
+                    </div>
+                </div>
+                <Button className="w-full h-13 rounded-3xl font-black text-[12px] uppercase tracking-[0.2em] gap-3 bg-primary shadow-xl shadow-primary/20 transition-all hover:scale-[1.02] active:scale-95">
+                    <Phone className="h-4.5 w-4.5" /> Initialize Contact
+                </Button>
             </div>
           </div>
 
-           {/* Quick info */}
-           <div className="bg-card border border-border rounded-xl p-5 space-y-3">
-            <h3 className="font-semibold text-foreground text-sm">Quick Info</h3>
-            <div className="space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Category</span>
-                 <span className="text-foreground font-medium">{listing.category}</span>
-              </div>
-              <Separator />
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Type</span>
-                <span className="text-foreground font-medium">{listing.type}</span>
-              </div>
-              <Separator />
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Purpose</span>
-                <span className="text-foreground font-medium">{listing.purpose}</span>
-              </div>
-              <Separator />
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Updated</span>
-                <span className="text-foreground font-medium">{formatRelativeTime(listing.updatedAt)}</span>
-              </div>
-            </div>
-          </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 }

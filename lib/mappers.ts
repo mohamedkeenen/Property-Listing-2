@@ -62,7 +62,6 @@ export const mapBackendPropertyToFrontend = (p: any): PropertyListing => {
       pf: p.is_on_pf || false,
       bayut: p.is_on_bayut || false,
       website: p.is_on_website || false,
-      skyloov: false, 
       dubizzle: p.is_on_dubizzle || false,
     },
     uaeEmirate: p.uae_emirate || "",

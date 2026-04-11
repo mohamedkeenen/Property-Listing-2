@@ -18,7 +18,6 @@ export function StatsCards({ listings }: Props) {
   const pf = listings.filter((l) => l.portals.pf);
   const bayut = listings.filter((l) => l.portals.bayut);
   const web = listings.filter((l) => l.portals.website);
-  const skyloov = listings.filter((l) => l.portals.skyloov && false); // Force 0 for now as it's inactive
 
   const stats = [
     {
@@ -91,24 +90,10 @@ export function StatsCards({ listings }: Props) {
       barBg: "bg-cyan-500/15",
       borderColor: "border-r-cyan-500",
     },
-    {
-      label: "Skyloov",
-      total: skyloov.length,
-      residential: skyloov.filter((l) => l.category === "Residential").length,
-      commercial: skyloov.filter((l) => l.category === "Commercial").length,
-      image: "https://res.cloudinary.com/devht0mp5/image/upload/v1773486432/Logo-rebrand-blue_dwxrba.svg",
-      color: "#006bec",
-      bgColor: "bg-[#006bec]/10",
-      iconColor: "text-[#006bec]",
-      dotColor: "bg-[#006bec]",
-      barColor: "bg-[#006bec]",
-      barBg: "bg-[#006bec]/15",
-      borderColor: "border-r-[#006bec]",
-    },
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-4">
       {stats.map((s) => (
         <div 
           key={s.label} 
