@@ -156,34 +156,34 @@ export function CompletedStep({ form }: Props) {
     return (
         <div className="max-w-2xl mx-auto space-y-10 animate-in fade-in slide-in-from-bottom-5 duration-1000">
             <div className="text-center space-y-4">
-                <div className="relative inline-flex mb-4">
-                    <div className="absolute inset-0 bg-emerald-500/20 blur-4xl rounded-full animate-pulse scale-150 rotate-45" />
-                    <div className="relative h-28 w-28 rounded-4xl bg-linear-to-tr from-emerald-600 to-cyan-500 flex items-center justify-center p-0.5 group">
-                        <div className="h-full w-full bg-linear-to-tr from-emerald-500 to-cyan-400 rounded-4xl flex items-center justify-center">
-                           <CheckCircle2 className="h-14 w-14 text-white group-hover:scale-110 transition-transform duration-500" />
+                <div className="relative inline-flex mb-2">
+                    <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full scale-110" />
+                    <div className="relative h-20 w-20 rounded-3xl bg-linear-to-tr from-primary to-indigo-600 flex items-center justify-center p-0.5 shadow-xl shadow-primary/30">
+                        <div className="h-full w-full bg-linear-to-tr from-primary/90 to-indigo-500/90 rounded-[22px] flex items-center justify-center backdrop-blur-sm">
+                           <CheckCircle2 className="h-8 w-8 text-white" />
                         </div>
                     </div>
                 </div>
                 <div>
-                   <h2 className="text-4xl font-black text-foreground tracking-tight mb-2">Listing Synchronized!</h2>
-                   <p className="text-muted-foreground font-bold uppercase tracking-[0.2em] text-[10px]">Your listing is now active in global distribution feeds</p>
+                   <h2 className="text-4xl font-black text-foreground tracking-tighter mb-2">Listing Synchronized!</h2>
+                   <p className="text-muted-foreground font-bold uppercase tracking-[0.2em] text-xs">Your listing is now active in global distribution feeds</p>
                 </div>
             </div>
 
-            <div className="flex flex-col gap-4 pt-10">
+            <div className="flex items-center justify-center gap-4 pt-10">
                  <Button 
-                    className="h-14 rounded-2xl font-black text-[11px] uppercase tracking-[0.2em] bg-primary shadow-xl shadow-primary/20 hover:scale-105 transition-all"
+                    className="flex-1 h-14 rounded-2xl font-black text-[11px] uppercase tracking-[0.2em] bg-primary shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all"
                     onClick={() => router.push("/")}
                  >
-                    Return to Properties Dashboard
+                    Properties Dashboard
                  </Button>
                  <Button 
-                    variant="ghost"
-                    className="h-14 rounded-2xl font-black text-[11px] uppercase tracking-[0.2em] text-muted-foreground hover:bg-muted"
+                    variant="outline"
+                    className="flex-1 h-14 rounded-2xl font-black text-[11px] uppercase tracking-[0.2em] text-foreground border-border/60 hover:bg-muted active:scale-95 transition-all"
                     onClick={() => setSubmitted(null)}
                  >
-                    Add Another Property
-                    <ArrowLeft className="h-4 w-4 ml-3" />
+                    <ArrowLeft className="h-4 w-4 mr-3" />
+                    New Listing
                  </Button>
             </div>
         </div>

@@ -14,7 +14,10 @@ export default function PortalLayout({
   return (
     <ProtectedRoute>
       <SettingsSync />
-      <SidebarProvider>
+      <SidebarProvider style={{ 
+        "--sidebar-width": "260px",
+        "--sidebar-width-icon": "80px"
+      } as React.CSSProperties}>
         <AppSidebar />
         <SidebarInset className="min-h-0 h-full overflow-y-auto overflow-x-hidden">
           <header className="h-14 flex items-center justify-between border-b border-border/40 px-4 bg-background sticky top-0 z-20 shrink-0">

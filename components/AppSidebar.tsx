@@ -117,7 +117,7 @@ export function AppSidebar() {
                   )}
                 </div>
                 <div className="flex flex-col transition-all duration-500 delay-100 animate-in fade-in slide-in-from-bottom-2">
-                  <span className="text-md font-black text-sidebar-foreground uppercase tracking-[0.25em] leading-none mb-1">
+                  <span className="text-xl font-black text-sidebar-foreground uppercase tracking-[0.2em] leading-none mb-1">
                     {firstPart}
                   </span>
                   {secondPart && (
@@ -128,9 +128,9 @@ export function AppSidebar() {
                 </div>
               </>
             ) : (
-              <div className="flex items-center justify-center h-12 w-full rounded-2xl ring-2 ring-primary/10 shadow-lg bg-primary/5 transition-all hover:ring-primary/30">
-                <span className="text-[10px] font-black text-primary uppercase tracking-widest leading-none">
-                  {firstPart.substring(0, 4)}
+              <div className="flex items-center justify-center h-14 w-14 rounded-2xl ring-4 ring-primary/10 shadow-xl bg-primary/5 transition-all hover:ring-primary/30 group-hover:scale-110 duration-300">
+                <span className="text-sm font-black text-primary uppercase tracking-widest leading-none">
+                  {firstPart.substring(0, 2)}
                 </span>
               </div>
             )}
@@ -171,12 +171,12 @@ export function AppSidebar() {
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton className="w-full h-12 justify-between rounded-xl px-3 hover:bg-sidebar-accent/50 transition-all group-hover:scale-[1.02] active:scale-[0.98]">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary group-data-[state=open]:ring-2 group-data-[state=open]:ring-primary/20 transition-all overflow-hidden relative">
+                    <div className="w-11 h-11 rounded-full bg-primary/10 flex items-center justify-center text-primary group-data-[state=open]:ring-2 group-data-[state=open]:ring-primary/20 transition-all overflow-hidden relative border border-border/40 shrink-0 aspect-square">
                       {user?.photo ? (
                         <img 
                           src={getPhotoUrl(user.photo)} 
                           alt={user?.name}
-                          className="object-cover"
+                          className="w-full h-full object-cover rounded-full aspect-square"
                           onError={() => setImgError(true)}
                         />
                       ) : (

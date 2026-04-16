@@ -24,7 +24,7 @@ export default function PropertyDetail({ params }: { params: Promise<{ id: strin
     return (
       <div className="flex flex-col items-center justify-center min-h-[600px] gap-6">
         <Loader2 className="h-12 w-12 text-primary animate-spin" />
-        <p className="text-sm font-black uppercase tracking-[0.3em] text-muted-foreground animate-pulse font-arabic">جاري تحميل تفاصيل العقار...</p>
+        <p className="text-sm font-black uppercase tracking-[0.3em] text-muted-foreground animate-pulse">Loading property details...</p>
       </div>
     );
   }
@@ -37,11 +37,11 @@ export default function PropertyDetail({ params }: { params: Promise<{ id: strin
             <ArrowLeft className="h-10 w-10 text-muted-foreground/40" />
           </div>
           <div className="space-y-3">
-            <h2 className="text-3xl font-black text-foreground tracking-tighter uppercase font-arabic">العقار غير موجود</h2>
-            <p className="text-muted-foreground font-medium px-12 font-arabic opacity-60">لم نتمكن من العثور على العقار المطلوب في قاعدة البيانات الحالية.</p>
+            <h2 className="text-3xl font-black text-foreground tracking-tighter uppercase">Property Not Found</h2>
+            <p className="text-muted-foreground font-medium px-12 opacity-60">We couldn't find the requested property in our current database.</p>
           </div>
-          <Button onClick={() => router.push("/")} size="lg" className="h-16 px-10 rounded-4xl font-black text-[12px] uppercase tracking-widest bg-primary shadow-2xl shadow-primary/20 hover:scale-[1.05] transition-all font-arabic">
-            العودة إلى الرئيسية
+          <Button onClick={() => router.push("/")} size="lg" className="h-16 px-10 rounded-4xl font-black text-[12px] uppercase tracking-widest bg-primary shadow-2xl shadow-primary/20 hover:scale-[1.05] transition-all">
+            Return to Dashboard
           </Button>
         </div>
       </div>
@@ -76,15 +76,23 @@ export default function PropertyDetail({ params }: { params: Promise<{ id: strin
             <Button 
                 variant="outline" 
                 size="icon" 
-                className="h-14 w-14 shrink-0 rounded-2xl border-border/40 hover:bg-muted/50 transition-all active:scale-95 shadow-sm" 
+                className="h-14 w-14 shrink-0 rounded-2xl border-border/40 bg-card hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all active:scale-95 shadow-sm group" 
                 onClick={() => router.push("/")}
             >
-              <ArrowLeft className="h-6 w-6" />
+              <ArrowLeft className="h-6 w-6 transition-transform group-hover:-translate-x-1" />
             </Button>
             
             <div className="flex flex-col min-w-0">
-              <h1 className="text-3xl md:text-4xl font-black text-foreground truncate tracking-tighter uppercase leading-none mb-2">{listing.title}</h1>
-              <div className="flex items-center gap-4 text-xs md:text-sm text-muted-foreground font-bold uppercase tracking-widest opacity-60">
+              <div className="flex items-center gap-6 mb-2">
+                <h1 className="text-3xl md:text-4xl font-black text-foreground truncate tracking-tighter uppercase leading-none">{listing.title}</h1>
+                <div className="flex items-center gap-3 bg-primary/10 text-primary px-5 py-2.5 rounded-2xl shrink-0">
+                    <span className="text-[11px] font-black uppercase tracking-[0.2em] opacity-70">
+                        {listing.purpose === "Rent" ? "RENTAL:" : "PRICE:"}
+                    </span>
+                    <span className="text-xl font-black tracking-tighter">AED {listing.price.toLocaleString()}</span>
+                </div>
+              </div>
+              <div className="flex items-center gap-4 text-xs md:text-sm text-muted-foreground font-bold uppercase tracking-widest opacity-60 mt-1">
                 <span className="flex items-center gap-2"><Hash className="h-3.5 w-3.5" /> {listing.reference}</span>
                 <span className="h-1.5 w-1.5 rounded-full bg-border" />
                 <span className="flex items-center gap-2"><MapPin className="h-3.5 w-3.5" /> Dubai, {listing.community}</span>
@@ -121,17 +129,6 @@ export default function PropertyDetail({ params }: { params: Promise<{ id: strin
                 )}
               </div>
 
-              {/* Price Banner Overlay */}
-              <div className="absolute bottom-12 left-12 p-10 rounded-[3rem] bg-black/40 backdrop-blur-3xl border border-white/10 text-white shadow-2xl animate-in fade-in slide-in-from-left-8 duration-700">
-                <p className="text-[11px] font-black uppercase tracking-[0.4em] text-white/40 mb-2">
-                    {listing.purpose === "Rent" ? "MARKET ANNUAL RENTAL" : "ASSET VALUE"}
-                </p>
-                <div className="flex items-baseline gap-3">
-                    <span className="text-xl font-medium opacity-30">AED</span>
-                    <span className="text-6xl font-black tracking-tighter"> {listing.price.toLocaleString()}</span>
-                </div>
-              </div>
-
               {/* Navigation Arrows */}
               {imgs.length > 1 && (
                 <>
@@ -150,7 +147,7 @@ export default function PropertyDetail({ params }: { params: Promise<{ id: strin
 
             {/* Thumbnails Strip */}
             {imgs.length > 1 && (
-                <div className="flex gap-8 overflow-x-auto pb-4 scrollbar-none py-2 snap-x">
+                <div className="flex gap-6 overflow-x-auto py-8 px-4 scrollbar-none snap-x w-full">
                 {imgs.map((img, i) => (
                     <button
                         key={i}
@@ -158,7 +155,7 @@ export default function PropertyDetail({ params }: { params: Promise<{ id: strin
                         className={cn(
                             "relative shrink-0 w-48 aspect-video rounded-2xl overflow-hidden border-2 transition-all duration-300 snap-start",
                             i === activeImage 
-                                ? "border-primary ring-8 ring-primary/10 scale-105 shadow-xl shadow-primary/20" 
+                                ? "border-primary ring-8 ring-primary/10 scale-105 shadow-xl shadow-primary/20 z-10" 
                                 : "border-transparent grayscale opacity-40 hover:opacity-100 hover:grayscale-0"
                         )}
                     >
@@ -206,7 +203,7 @@ export default function PropertyDetail({ params }: { params: Promise<{ id: strin
                             <div className="p-3.5 rounded-2xl bg-primary/10 text-primary">
                                 <FileText className="h-7 w-7" />
                             </div>
-                            <h3 className="text-xl font-black uppercase tracking-widest text-foreground font-arabic leading-tight">تفاصيل البيان العقاري</h3>
+                            <h3 className="text-xl font-black uppercase tracking-widest text-foreground leading-tight">Property Briefing Details</h3>
                         </div>
                         <p className="text-lg text-muted-foreground leading-loose font-bold opacity-80 font-arabic whitespace-pre-line">{listing.descriptionAr}</p>
                     </div>

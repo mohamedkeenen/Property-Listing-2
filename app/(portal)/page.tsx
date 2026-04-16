@@ -63,8 +63,10 @@ export default function Dashboard() {
       const res = await syncBitrix().unwrap();
       await refetch().unwrap();
       toast.success(`Inventory synchronized! ${res.count || 0} items updated from Bitrix.`);
-    } catch {
-      toast.error("Failed to sync inventory.");
+    } catch (err: any) {
+      console.error("[Sync Error]", err);
+      const msg = err?.data?.message || err?.data?.error || "Failed to sync inventory.";
+      toast.error(msg, { duration: 8000 });
     }
   };
 
