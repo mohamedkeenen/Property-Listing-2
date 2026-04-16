@@ -110,32 +110,6 @@ function CreateListingContent() {
     }
   }, [isEdit, propertyResponse, form]);
 
-  // Load from localStorage (only for new listings)
-  useEffect(() => {
-    if (isEdit) return; // Don't use draft for editing existing
-    const saved = localStorage.getItem("property-listing-draft");
-    if (saved) {
-      try {
-        const data = JSON.parse(saved);
-        Object.keys(data).forEach((key) => {
-          form.setValue(key as any, data[key]);
-        });
-      } catch (e) {
-        console.error("Failed to parse saved draft", e);
-      }
-    }
-  }, [form, isEdit]);
-
-  // Save to localStorage on change (but only lightweight fields and only for new listings)
-  useEffect(() => {
-    if (isEdit) return;
-    const subscription = form.watch((value) => {
-      // Create a lightweight draft copy without heavy base64 arrays
-      const { images, documents, ...lightDraft } = value as any;
-      localStorage.setItem("property-listing-draft", JSON.stringify(lightDraft));
-    });
-    return () => subscription.unsubscribe();
-  }, [form, isEdit]);
 
   const validateStep = async (stepIndex: number) => {
     let fields: (keyof ListingFormValues)[] = [];
@@ -237,15 +211,15 @@ function CreateListingContent() {
               </div>
 
               <div className="flex items-center gap-4">
-                <Button variant="ghost" className="h-11 rounded-[1.25rem] font-black text-[10px] uppercase tracking-widest text-muted-foreground hover:text-foreground dark:hover:text-white hover:bg-muted dark:hover:bg-white/5 transition-all px-8" type="button">
+                <Button variant="ghost" className="h-11 rounded-[1.25rem] font-black text-[10px] uppercase tracking-widest text-muted-foreground hover:text-destructive hover:bg-destructive/5 dark:hover:bg-destructive/10 transition-all px-8" type="button">
                   Discard Changes
                 </Button>
-                <Button variant="outline" className="h-11 rounded-[1.25rem] border-border/40 bg-transparent text-foreground dark:text-white font-black text-[10px] uppercase tracking-widest px-10 hover:bg-muted dark:hover:bg-white/5 transition-all shadow-xs gap-2" type="button">
-                  <Save className="h-3.5 w-3.5" /> Save Draft
+                <Button variant="outline" className="h-11 rounded-[1.25rem] border-border/60 bg-white/50 dark:bg-white/5 text-foreground dark:text-white font-black text-[10px] uppercase tracking-widest px-10 hover:border-primary/50 hover:bg-primary/5 transition-all shadow-sm hover:shadow-md gap-2.5 group/save" type="button">
+                  <Save className="h-3.5 w-3.5 text-muted-foreground group-hover/save:text-primary transition-colors" /> Save Draft
                 </Button>
                 <Button 
                   onClick={handleNext}
-                  className="h-11 rounded-[1.25rem] font-black text-[10px] uppercase tracking-widest px-12 shadow-xl shadow-indigo-500/20 hover:shadow-indigo-500/40 hover:-translate-y-0.5 active:translate-y-0 transition-all bg-linear-to-r from-primary to-indigo-600 text-white"
+                  className="h-11 rounded-[1.25rem] font-black text-[10px] uppercase tracking-widest px-12 shadow-xl shadow-primary/20 hover:shadow-primary/40 hover:-translate-y-0.5 active:translate-y-0 transition-all bg-linear-to-r from-primary to-indigo-600 text-white"
                   type="button"
                 >
                   Save & Continue <ChevronRight className="h-4 w-4 ml-1" />
@@ -302,9 +276,10 @@ function CreateListingContent() {
               <div className="flex gap-5">
                 <Button 
                   variant="outline" 
-                  className="rounded-2xl border-primary/40 text-primary hover:bg-primary hover:text-white hover:border-primary font-black text-[10px] uppercase tracking-[0.2em] px-12 h-14 transition-all hover:scale-[1.02] active:scale-95 hover:shadow-lg hover:shadow-primary/20"
+                  className="rounded-2xl border-primary/30 text-primary bg-primary/5 hover:bg-primary hover:text-white hover:border-primary font-black text-[10px] uppercase tracking-[0.2em] px-12 h-14 transition-all hover:scale-[1.02] active:scale-95 hover:shadow-xl hover:shadow-primary/30 group/save-bottom"
                   type="button"
                 >
+                  <Save className="h-4 w-4 mr-3 text-primary group-hover/save-bottom:text-white transition-colors" />
                   Save Draft
                 </Button>
                 <Button 
