@@ -12,15 +12,16 @@ import { filterOptions } from "@/data/mockData";
 import { cn } from "@/lib/utils";
 import {
   Home, Building2, BedDouble, Bath, Car, Maximize, Tag, DollarSign, FileText, Sparkles,
-  Calendar, User, Hash, CalendarCheck, Info, X, PlusCircle, CheckCircle2, AlertCircle, Mail
+  Calendar, User, Hash, CalendarCheck, Info, X, PlusCircle, CheckCircle2, AlertCircle, Mail,
+  LayoutGrid, Type, Layers
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { ModernField } from "@/components/ui/modern-field";
 import { ModernSelect } from "@/components/ui/modern-select";
 import { NumberSearchSelect } from "@/components/ui/number-search-select";
 import { CreditCard as CreditCardIcon, Paintbrush } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { useGetUsersQuery } from "@/api/redux/services/userApi";
+import { useGetCustomFieldsQuery } from "@/api/redux/services/settingsApi";
 import { useSelector } from "react-redux";
 import { selectCompanyLogo, selectSettingsLastUpdated } from "@/api/redux/slices/settingsSlice";
 import { selectToken } from "@/api/redux/slices/authSlice";
@@ -57,6 +58,47 @@ export function PropertyDetailsStep({ form }: Props) {
   const images = watch("images") || [];
   const documents = watch("documents") || [];
   const notes = watch("notes") || "";
+
+  const { data: customFieldsData } = useGetCustomFieldsQuery();
+  const customFields = customFieldsData?.data || [];
+  const customValues = watch("custom_values") || {};
+  const [activeCustomFieldId, setActiveCustomFieldId] = useState<number | null>(null);
+  const fileInputCustomRef = useRef<HTMLInputElement>(null);
+
+  const handleCustomFieldChange = (fieldId: number, value: any) => {
+    setValue("custom_values", {
+      ...customValues,
+      [fieldId]: value
+    });
+  };
+
+  const handleCustomImageClick = (fieldId: number) => {
+    setActiveCustomFieldId(fieldId);
+    fileInputCustomRef.current?.click();
+  };
+
+  const onCustomImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || !files.length || activeCustomFieldId === null) return;
+    
+    const file = files[0];
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const base64 = event.target?.result as string;
+      const field = customFields.find((f: any) => f.id === activeCustomFieldId);
+      
+      if (field?.type === 'text_image') {
+        handleCustomFieldChange(activeCustomFieldId, {
+          ...(customValues[activeCustomFieldId] || {}),
+          image: base64
+        });
+      } else {
+        handleCustomFieldChange(activeCustomFieldId, base64);
+      }
+    };
+    reader.readAsDataURL(file);
+    e.target.value = "";
+  };
 
   const getLogoUrl = (logoStr: string) => {
     if (!logoStr) return null;
@@ -990,6 +1032,142 @@ export function PropertyDetailsStep({ form }: Props) {
             </ModernField>
           </div>
         </section>
+
+        {/* Section 9: Custom Inputs */}
+        {customFields.length > 0 && (
+          <section className="space-y-6">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-xl bg-primary/10 text-primary">
+                <LayoutGrid className="h-4 w-4" />
+              </div>
+              <h3 className="text-sm font-bold text-foreground">Custom Listing Details</h3>
+            <div className="h-px flex-1 bg-border/20" />
+            <Layers className="h-4 w-4 text-muted-foreground/30" />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-8 bg-card/30 p-8 rounded-4xl border border-border/20">
+              {customFields.map((field: any) => {
+                const value = customValues[field.id];
+
+                if (field.type === 'text' || field.type === 'number') {
+                  return (
+                    <ModernField 
+                      key={field.id}
+                      label={field.name} 
+                      icon={field.type === 'number' ? Hash : Type} 
+                      value={value || ""}
+                      type={field.type === 'number' ? 'number' : 'text'}
+                      onChange={(e) => handleCustomFieldChange(field.id, e.target.value)}
+                      onClear={() => handleCustomFieldChange(field.id, "")}
+                      placeholder={`Enter ${field.name}...`}
+                    />
+                  );
+                }
+
+                if (field.type === 'image') {
+                   return (
+                     <div key={field.id} className="space-y-3">
+                       <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">
+                         {field.name}
+                       </Label>
+                       <div 
+                         onClick={() => handleCustomImageClick(field.id)}
+                         className={cn(
+                           "h-32 rounded-3xl border-2 border-dashed flex flex-col items-center justify-center gap-2 cursor-pointer transition-all overflow-hidden relative",
+                           value ? "border-primary/30" : "border-border/50 hover:border-primary/50 hover:bg-primary/5"
+                         )}
+                       >
+                         {value ? (
+                           <>
+                             <img src={value} className="w-full h-full object-cover" />
+                             <div className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 flex items-center justify-center transition-opacity">
+                               <PlusCircle className="h-8 w-8 text-white" />
+                             </div>
+                           </>
+                         ) : (
+                           <>
+                             <ImageIcon className="h-6 w-6 text-muted-foreground/30" />
+                             <span className="text-[10px] font-bold text-muted-foreground">Upload Image</span>
+                           </>
+                         )}
+                       </div>
+                     </div>
+                   );
+                }
+
+                if (field.type === 'text_image') {
+                  const textVal = value?.text || "";
+                  const imgVal = value?.image || "";
+
+                  return (
+                    <div key={field.id} className="md:col-span-2">
+                      <div className={cn(
+                        "relative flex w-full rounded-xl border transition-all duration-300 bg-background p-2 gap-4 min-h-[80px] items-center",
+                        "border-border hover:border-primary/20 focus-within:border-primary focus-within:ring-4 focus-within:ring-primary/5 shadow-sm"
+                      )}>
+                        {/* Image Part - First */}
+                        <div 
+                          onClick={() => handleCustomImageClick(field.id)}
+                          className={cn(
+                            "h-20 w-32 rounded-lg border-2 border-dashed flex items-center justify-center cursor-pointer transition-all overflow-hidden relative shrink-0",
+                            imgVal ? "border-primary/30" : "border-border/50 hover:border-primary/50 hover:bg-primary/5"
+                          )}
+                        >
+                          {imgVal ? (
+                             <>
+                               <img src={imgVal} className="w-full h-full object-cover" />
+                               <div className="absolute inset-0 bg-black/20 hover:bg-black/40 flex items-center justify-center transition-all">
+                                 <ImageIcon className="h-4 w-4 text-white" />
+                               </div>
+                             </>
+                          ) : (
+                            <div className="flex flex-col items-center gap-1">
+                              <ImageIcon className="h-4 w-4 text-muted-foreground/30" />
+                              <span className="text-[8px] font-black uppercase text-muted-foreground/40 text-center">Attach Image</span>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Text Part - Second */}
+                        <div className="flex-1 relative h-full flex flex-col justify-center">
+                          <input 
+                            type="text"
+                            value={textVal}
+                            onChange={(e) => handleCustomFieldChange(field.id, { ...value, text: e.target.value })}
+                            className="w-full bg-transparent border-none focus:ring-0 text-sm font-bold text-foreground outline-none p-0 placeholder:text-muted-foreground/20"
+                            placeholder={`Enter ${field.name} description...`}
+                          />
+                          <label className="absolute -top-6 left-0 text-[10px] font-black uppercase tracking-widest text-primary bg-background px-1">
+                            {field.name}
+                          </label>
+                        </div>
+
+                        {textVal && (
+                          <button 
+                            type="button" 
+                            onClick={() => handleCustomFieldChange(field.id, { ...value, text: "" })}
+                            className="shrink-0 text-muted-foreground hover:text-foreground transition-all p-1.5 rounded-full hover:bg-muted/50"
+                          >
+                            <X className="h-3.5 w-3.5" />
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  );
+                }
+                return null;
+              })}
+            </div>
+          </section>
+        )}
+
+        <input 
+          type="file" 
+          ref={fileInputCustomRef} 
+          className="hidden" 
+          accept="image/*"
+          onChange={onCustomImageUpload}
+        />
       </div>
 
     </div>

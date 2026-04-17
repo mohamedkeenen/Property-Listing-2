@@ -23,7 +23,7 @@ export const settingsApi = createApi({
       return headers;
     },
   }),
-  tagTypes: ['CompanySettings', 'Projects', 'Developers'],
+  tagTypes: ['CompanySettings', 'Projects', 'Developers', 'CustomFields'],
   endpoints: (builder) => ({
     getCompanySettings: builder.query<any, void>({
       query: () => '/settings/company',
@@ -75,6 +75,25 @@ export const settingsApi = createApi({
       }),
       invalidatesTags: ['Developers'],
     }),
+    getCustomFields: builder.query<any, void>({
+      query: () => '/custom-fields',
+      providesTags: ['CustomFields'],
+    }),
+    addCustomField: builder.mutation<any, { name: string; type: string }>({
+      query: (data) => ({
+        url: '/custom-fields',
+        method: 'POST',
+        body: data,
+      }),
+      invalidatesTags: ['CustomFields'],
+    }),
+    deleteCustomField: builder.mutation<any, string | number>({
+      query: (id) => ({
+        url: `/custom-fields/${id}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['CustomFields'],
+    }),
   }),
 });
 
@@ -86,5 +105,8 @@ export const {
   useDeleteProjectMutation,
   useGetDevelopersQuery,
   useAddDeveloperMutation,
-  useDeleteDeveloperMutation
+  useDeleteDeveloperMutation,
+  useGetCustomFieldsQuery,
+  useAddCustomFieldMutation,
+  useDeleteCustomFieldMutation
 } = settingsApi;
