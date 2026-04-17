@@ -80,6 +80,7 @@ function CreateListingContent() {
       images: [],
       documents: [],
       notes: "",
+      custom_values: {},
       property_location: "",
       pfLocation: "",
       city: "",

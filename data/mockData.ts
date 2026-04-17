@@ -49,6 +49,8 @@ export interface PropertyListing {
   documents?: any[];
   projectName?: string;
   developers?: string;
+  custom_fields?: any[];
+  custom_values?: Record<string, any>;
 }
 
 export interface Lead {

@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import {
   ArrowLeft, BedDouble, Bath, Maximize, Car, MapPin, Building2, User, Calendar,
   Phone, ChevronLeft, ChevronRight, FileText, Tag, Loader2, Image as ImageIcon,
-  Clock, Hash, Globe
+  Clock, Hash, Globe, LayoutGrid
 } from "lucide-react";
 
 export default function PropertyDetail({ params }: { params: Promise<{ id: string }> }) {
@@ -189,7 +189,7 @@ export default function PropertyDetail({ params }: { params: Promise<{ id: strin
             <div className="flex flex-col gap-10">
                 <div className="bg-card border border-border/40 rounded-[3rem] p-12 space-y-8 shadow-sm">
                     <div className="flex items-center gap-4">
-                        <div className="p-3.5 rounded-2xl bg-primary/10 text-primary">
+                        <div className="p-3.5 rounded-2xl bg-linear-to-tr from-primary/10 to-indigo-600/10 text-primary">
                             <FileText className="h-7 w-7" />
                         </div>
                         <h3 className="text-[13px] font-black uppercase tracking-[0.3em] text-foreground">Intelligence Briefing</h3>
@@ -200,12 +200,77 @@ export default function PropertyDetail({ params }: { params: Promise<{ id: strin
                 {listing.descriptionAr && (
                     <div className="bg-card border border-border/40 rounded-[3rem] p-12 space-y-8 text-right shadow-sm" dir="rtl">
                         <div className="flex items-center gap-4">
-                            <div className="p-3.5 rounded-2xl bg-primary/10 text-primary">
+                            <div className="p-3.5 rounded-2xl bg-linear-to-tr from-primary/10 to-indigo-600/10 text-primary">
                                 <FileText className="h-7 w-7" />
                             </div>
                             <h3 className="text-xl font-black uppercase tracking-widest text-foreground leading-tight">Property Briefing Details</h3>
                         </div>
                         <p className="text-lg text-muted-foreground leading-loose font-bold opacity-80 font-arabic whitespace-pre-line">{listing.descriptionAr}</p>
+                    </div>
+                )}
+
+                {listing.custom_fields && listing.custom_fields.length > 0 && (
+                    <div className="bg-card border border-border/40 rounded-[3rem] p-12 space-y-10 shadow-sm">
+                        <div className="flex items-center gap-4">
+                            <div className="p-3.5 rounded-2xl bg-linear-to-tr from-primary/10 to-indigo-600/10 text-primary">
+                                <LayoutGrid className="h-7 w-7" />
+                            </div>
+                            <h3 className="text-[13px] font-black uppercase tracking-[0.3em] text-foreground">Premium Selection Details</h3>
+                        </div>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10">
+                            {listing.custom_fields.map((field: any, i: number) => {
+                                const isTextImage = field.type === 'text_image';
+                                const isImage = field.type === 'image';
+                                
+                                if (isTextImage) {
+                                    return (
+                                        <div key={i} className="md:col-span-2 flex flex-col md:flex-row gap-8 items-start bg-muted/20 p-8 rounded-4xl border border-border/20 group hover:border-primary/20 transition-all">
+                                            {field.value?.image && (
+                                                <div className="w-full md:w-64 aspect-video rounded-2xl overflow-hidden shrink-0 shadow-lg group-hover:scale-[1.02] transition-transform">
+                                                    <img src={field.value.image} alt={field.name} className="w-full h-full object-cover" />
+                                                </div>
+                                            )}
+                                            <div className="space-y-3 flex-1 pt-2">
+                                                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">{field.name}</p>
+                                                <p className="text-xl font-black text-foreground tracking-tight leading-relaxed">{field.value?.text || "No description provided"}</p>
+                                            </div>
+                                        </div>
+                                    );
+                                }
+
+                                if (isImage) {
+                                  return (
+                                    <div key={i} className="space-y-4 group">
+                                      <p className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground ml-1">{field.name}</p>
+                                      <div className="aspect-square rounded-3xl overflow-hidden border-2 border-border/40 bg-muted/20 group-hover:border-primary/20 transition-all shadow-sm">
+                                        {field.value ? (
+                                          <img src={field.value} alt={field.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                                        ) : (
+                                          <div className="w-full h-full flex items-center justify-center opacity-10">
+                                            <ImageIcon className="h-10 w-10" />
+                                          </div>
+                                        )}
+                                      </div>
+                                    </div>
+                                  );
+                                }
+
+                                return (
+                                    <div key={i} className="flex flex-col gap-2 group">
+                                        <div className="flex items-center gap-3">
+                                            <div className="h-1.5 w-1.5 rounded-full bg-primary" />
+                                            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground">{field.name}</p>
+                                        </div>
+                                        <p className="text-xl font-black text-foreground tracking-tight ml-4.5 group-hover:text-primary transition-colors">
+                                            {field.type === 'number' && typeof field.value === 'number' 
+                                                ? field.value.toLocaleString() 
+                                                : (field.value || "Not specified")}
+                                        </p>
+                                    </div>
+                                );
+                            })}
+                        </div>
                     </div>
                 )}
             </div>

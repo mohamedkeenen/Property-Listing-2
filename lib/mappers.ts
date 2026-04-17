@@ -1,29 +1,49 @@
 import { PropertyListing } from "@/data/mockData";
-import { API_BASE_URL } from "@/api/redux/apiConfig";
+
+const getImageUrl = (path: string) => {
+  if (!path) return "";
+  if (path.startsWith('http') || path.startsWith('data:image')) return path;
+  
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL 
+    ? process.env.NEXT_PUBLIC_API_URL.replace(/\/api\/?$/, '') 
+    : 'https://property-listing.keenenter.com';
+
+  if (path.startsWith('/api/storage/')) return `${baseUrl}${path}`;
+  if (path.startsWith('api/storage/')) return `${baseUrl}/${path}`;
+  
+  // For older properties or paths without the prefix:
+  let cleanPath = path.startsWith('/') ? path.substring(1) : path;
+  cleanPath = cleanPath.replace(/^(api\/storage\/|storage\/)+/, '');
+  
+  return `${baseUrl}/api/storage/${cleanPath}`;
+};
+
+const mapCustomValues = (values: any, fields: any[] = []) => {
+  const result = { ...values };
+  fields.forEach(f => {
+    const val = result[f.id];
+    if (!val) return;
+
+    if (f.type === 'image' && typeof val === 'string') {
+      result[f.id] = getImageUrl(val);
+    } else if (f.type === 'text_image' && val.image) {
+      result[f.id] = { ...val, image: getImageUrl(val.image) };
+    }
+  });
+  return result;
+};
 
 export const mapBackendPropertyToFrontend = (p: any): PropertyListing => {
-  const getImageUrl = (path: string) => {
-    if (!path) return "";
-    if (path.startsWith('http') || path.startsWith('data:image')) return path;
-    
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL 
-      ? process.env.NEXT_PUBLIC_API_URL.replace(/\/api\/?$/, '') 
-      : 'https://property-listing.keenenter.com';
-
-    if (path.startsWith('/api/storage/')) return `${baseUrl}${path}`;
-    if (path.startsWith('api/storage/')) return `${baseUrl}/${path}`;
-    
-    // For older properties or paths without the prefix:
-    let cleanPath = path.startsWith('/') ? path.substring(1) : path;
-    cleanPath = cleanPath.replace(/^(api\/storage\/|storage\/)+/, '');
-    
-    return `${baseUrl}/api/storage/${cleanPath}`;
-  };
-
   const imagesList = p.images || [];
   const coverMedia = imagesList.find((m: any) => m.type === 'cover') || imagesList[0];
   const coverUrl = coverMedia ? (coverMedia.url || getImageUrl(coverMedia.file_path)) : "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400&h=300&fit=crop";
   const allImages = imagesList.map((m: any) => m.url || getImageUrl(m.file_path));
+
+  // Process custom_fields if they exist
+  const customFields = (p.custom_fields || []).map((f: any) => ({
+    ...f,
+    value: f.type === 'image' ? getImageUrl(f.value) : (f.type === 'text_image' ? { ...f.value, image: getImageUrl(f.value?.image) } : f.value)
+  }));
 
   return {
     id: p.id.toString(),
@@ -87,30 +107,14 @@ export const mapBackendPropertyToFrontend = (p: any): PropertyListing => {
       title: d.title,
       url: d.url || getImageUrl(d.file_path)
     })),
+    custom_values: p.custom_values || {},
+    custom_fields: customFields,
     projectName: p.project_name || "",
     developers: p.developer_name || "",
   };
 };
 
 export const mapBackendPropertyToFormValues = (p: any): any => {
-  const getImageUrl = (path: string) => {
-    if (!path) return "";
-    if (path.startsWith('http') || path.startsWith('data:image')) return path;
-    
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL 
-      ? process.env.NEXT_PUBLIC_API_URL.replace(/\/api\/?$/, '') 
-      : 'https://property-listing.keenenter.com';
-
-    if (path.startsWith('/api/storage/')) return `${baseUrl}${path}`;
-    if (path.startsWith('api/storage/')) return `${baseUrl}/${path}`;
-    
-    // For older properties or paths without the prefix:
-    let cleanPath = path.startsWith('/') ? path.substring(1) : path;
-    cleanPath = cleanPath.replace(/^(api\/storage\/|storage\/)+/, '');
-    
-    return `${baseUrl}/api/storage/${cleanPath}`;
-  };
-
   const getPrice = () => {
     const sale = parseFloat(p.sale_price || "0");
     const rent = parseFloat(p.rent_price || "0");
@@ -173,6 +177,7 @@ export const mapBackendPropertyToFormValues = (p: any): any => {
       size: doc.size || "Unknown"
     })),
     notes: typeof p.notes === 'string' ? p.notes : (Array.isArray(p.notes) ? p.notes.map((n: any) => n.content || n).join('\n') : ""),
+    custom_values: p.custom_values || {},
     portals: {
       propertyFinder: !!p.is_on_pf,
       bayutEnabled: !!p.is_on_bayut,

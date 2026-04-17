@@ -107,6 +107,7 @@ export function CompletedStep({ form }: Props) {
       // Notes & Docs
       notes: values.notes,
       documents: values.documents,
+      custom_values: values.custom_values,
     };
 
     try {

@@ -87,6 +87,7 @@ export const listingSchema = z.object({
   images: z.array(z.string()).min(1, "At least one photo is required."),
   documents: z.array(z.string()).optional(),
   publishStatus: z.string().optional(),
+  custom_values: z.record(z.string(), z.any()).optional(),
 });
 
 export type ListingFormValues = z.infer<typeof listingSchema>;
