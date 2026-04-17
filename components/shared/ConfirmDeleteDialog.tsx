@@ -48,7 +48,7 @@ export function ConfirmDeleteDialog({
             type="button"
             variant="outline"
             onClick={() => onOpenChange(false)}
-            className="flex-1 h-14 rounded-2xl font-black text-xs uppercase tracking-widest text-muted-foreground hover:bg-muted/80 transition-all border-2 border-border/40 active:scale-95"
+            className="flex-1 h-14 rounded-2xl font-black text-xs uppercase tracking-widest text-foreground bg-muted/20 hover:bg-muted/50 transition-all border-2 border-border/80 active:scale-95 shadow-sm"
             disabled={loading}
           >
             Go Back
