@@ -29,6 +29,8 @@ import { cn } from "@/lib/utils";
 import { useSelector } from "react-redux";
 import { selectCurrentUser } from "@/api/redux/slices/authSlice";
 
+import { ConfirmDeleteDialog } from "@/components/shared/ConfirmDeleteDialog";
+
 export default function UsersPage() {
   const { data, isLoading, isError, refetch, isFetching } = useGetAgentsQuery();
   const [createAgent, { isLoading: isCreating }] = useCreateAgentMutation();
@@ -39,6 +41,11 @@ export default function UsersPage() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<any>(null);
   const [searchQuery, setSearchQuery] = useState("");
+
+  // Delete dialog state
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState<any>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const users = data?.data || [];
   const filteredUsers = users.filter((u: any) => 
@@ -56,24 +63,34 @@ export default function UsersPage() {
     setDialogOpen(true);
   };
 
-  const handleDelete = async (id: number) => {
-    if (confirm("Are you sure you want to delete this user? This action cannot be undone.")) {
-      try {
-        await deleteAgent(id).unwrap();
-        toast.success("User removed successfully", {
-            style: {
-                borderRadius: '1rem',
-                background: '#0f172a',
-                color: '#fff',
-                fontWeight: 'bold',
-                textTransform: 'uppercase',
-                fontSize: '0.75rem',
-                letterSpacing: '0.1em'
-            }
-        });
-      } catch (err: any) {
-        toast.error(err.data?.message || "Failed to delete user");
-      }
+  const handleDeleteClick = (user: any) => {
+    setUserToDelete(user);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!userToDelete) return;
+    
+    setIsDeleting(true);
+    try {
+      await deleteAgent(userToDelete.id).unwrap();
+      toast.success("User removed successfully", {
+          style: {
+              borderRadius: '1rem',
+              background: '#0f172a',
+              color: '#fff',
+              fontWeight: 'bold',
+              textTransform: 'uppercase',
+              fontSize: '0.75rem',
+              letterSpacing: '0.1em'
+          }
+      });
+      setDeleteDialogOpen(false);
+    } catch (err: any) {
+      toast.error(err.data?.message || "Failed to delete user");
+    } finally {
+      setIsDeleting(false);
+      setUserToDelete(null);
     }
   };
 
@@ -222,7 +239,7 @@ export default function UsersPage() {
             <UserTable
               users={filteredUsers}
               onEdit={handleEdit}
-              onDelete={handleDelete}
+              onDelete={handleDeleteClick}
               onView={(u) => handleEdit(u)} // For now view same as edit
             />
           )}
@@ -235,6 +252,15 @@ export default function UsersPage() {
         user={selectedUser}
         onSubmit={handleSubmit}
         isLoading={isCreating || isUpdating}
+      />
+
+      <ConfirmDeleteDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        onConfirm={handleConfirmDelete}
+        loading={isDeleting}
+        itemName={userToDelete ? `${userToDelete.name} (${userToDelete.email})` : ""}
+        title="Remove Organization Member?"
       />
     </div>
   );

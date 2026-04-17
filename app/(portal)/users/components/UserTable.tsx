@@ -41,7 +41,7 @@ interface User {
 interface UserTableProps {
   users: User[];
   onEdit: (user: User) => void;
-  onDelete: (id: number) => void;
+  onDelete: (user: User) => void;
   onView: (user: User) => void;
 }
 
@@ -140,7 +140,7 @@ export function UserTable({ users, onEdit, onDelete, onView }: UserTableProps) {
                           Edit User
                         </DropdownMenuItem>
                         <div className="h-px bg-border/40 my-1 mx-2" />
-                        <DropdownMenuItem onClick={() => onDelete(user.id)} className="rounded-xl px-3 py-2 cursor-pointer text-destructive focus:bg-destructive/10 focus:text-destructive font-black text-xs gap-3">
+                        <DropdownMenuItem onClick={() => onDelete(user)} className="rounded-xl px-3 py-2 cursor-pointer text-destructive focus:bg-destructive/10 focus:text-destructive font-black text-xs gap-3">
                           <Trash2 className="h-4 w-4" />
                           Delete User
                         </DropdownMenuItem>

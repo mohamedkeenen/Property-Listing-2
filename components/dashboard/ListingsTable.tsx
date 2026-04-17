@@ -107,6 +107,8 @@ const statusColors: Record<string, string> = {
   Pocket: "bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-500/30",
 };
 
+import { ConfirmDeleteDialog } from "@/components/shared/ConfirmDeleteDialog";
+
 export function ListingsTable({ listings, onViewDetails, onEdit }: Props) {
   const router = useRouter();
   const [deleteProperty] = useDeletePropertyMutation();
@@ -115,6 +117,11 @@ export function ListingsTable({ listings, onViewDetails, onEdit }: Props) {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(10);
+
+  // Delete dialog state
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [listingToDelete, setListingToDelete] = useState<PropertyListing | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const filtered = listings
     .filter((l) => activeTab === "all" || l.status === activeTab)
@@ -129,18 +136,32 @@ export function ListingsTable({ listings, onViewDetails, onEdit }: Props) {
 
   const tabCounts = (val: string) => val === "all" ? listings.length : listings.filter((l) => l.status === val).length;
 
-  const handleDelete = async (listing: PropertyListing) => {
-    if (!confirm(`Are you sure you want to delete ${listing.reference}?`)) return;
+  const handleDeleteClick = (listing: PropertyListing) => {
+    setListingToDelete(listing);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!listingToDelete) return;
     
+    setIsDeleting(true);
     try {
-      await deleteProperty(listing.id).unwrap();
-      toast({ title: "Listing deleted", description: `${listing.reference} has been removed successfully.` });
+      await deleteProperty(listingToDelete.id).unwrap();
+      toast({ 
+        title: "Listing deleted", 
+        description: `${listingToDelete.reference} has been removed successfully.`,
+        variant: "success"
+      });
+      setDeleteDialogOpen(false);
     } catch (err: any) {
       toast({ 
         title: "Delete failed", 
         description: err.data?.message || "Failed to delete the property. Internal server error.",
         variant: "destructive" 
       });
+    } finally {
+      setIsDeleting(false);
+      setListingToDelete(null);
     }
   };
 
@@ -329,7 +350,7 @@ export function ListingsTable({ listings, onViewDetails, onEdit }: Props) {
                             <Pencil className="h-4 w-4 mr-2" /> Edit
                           </DropdownMenuItem>
                           <DropdownMenuItem 
-                            onClick={() => handleDelete(l)} 
+                            onClick={() => handleDeleteClick(l)} 
                             className="focus:bg-red-600 focus:text-white cursor-pointer"
                           >
                             <Trash2 className="h-4 w-4 mr-2" /> Delete
@@ -504,6 +525,14 @@ export function ListingsTable({ listings, onViewDetails, onEdit }: Props) {
           </Button>
         </div>
       </div>
+
+      <ConfirmDeleteDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        onConfirm={handleConfirmDelete}
+        loading={isDeleting}
+        itemName={`${listingToDelete?.reference}: ${listingToDelete?.title}`}
+      />
     </div>
   );
 }
