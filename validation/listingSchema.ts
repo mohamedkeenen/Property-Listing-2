@@ -53,6 +53,7 @@ export const listingSchema = z.object({
   minimalRentalPeriod: z.coerce.number().optional(),
   videoUrl: z.string().optional(),
   view360Url: z.string().optional(),
+  qrUrl: z.string().optional(),
   pfLocation: z.string().optional(),
   city: z.string().optional(),
   community: z.string().optional(),

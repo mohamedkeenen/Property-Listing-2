@@ -79,8 +79,12 @@ export function Providers({ children }: { children: React.ReactNode }) {
             <Toaster 
               position="top-center" 
               toastOptions={{
-                className: "text-sm font-bold shadow-2xl rounded-2xl",
+                className: "text-[13px] font-bold shadow-2xl rounded-2xl border border-border dark:bg-slate-800 dark:text-slate-100 dark:border-slate-700",
                 duration: 4000,
+                style: {
+                    borderRadius: '1rem',
+                    padding: '12px 20px',
+                }
               }}
             />
           </TooltipProvider>

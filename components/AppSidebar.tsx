@@ -128,8 +128,8 @@ export function AppSidebar() {
                 </div>
               </>
             ) : (
-              <div className="flex items-center justify-center h-14 w-14 rounded-2xl ring-4 ring-primary/10 shadow-xl bg-primary/5 transition-all hover:ring-primary/30 group-hover:scale-110 duration-300">
-                <span className="text-sm font-black text-primary uppercase tracking-widest leading-none">
+              <div className="flex items-center justify-center h-9 w-9 rounded-xl ring-4 ring-primary/10 shadow-lg bg-primary/5 transition-all hover:ring-primary/30 group-hover:scale-110 duration-300">
+                <span className="text-[10px] font-black text-primary uppercase tracking-widest leading-none">
                   {firstPart.substring(0, 2)}
                 </span>
               </div>
@@ -150,7 +150,10 @@ export function AppSidebar() {
                     <NavLink
                       href={item.url}
                       exact={item.url === "/"}
-                      className="flex items-center gap-3 rounded-xl px-4"
+                      className={cn(
+                        "flex items-center rounded-xl transition-all",
+                        collapsed ? "justify-center w-full h-8 px-0" : "gap-3 px-4 w-full h-10"
+                      )}
                       activeClassName="bg-primary/10 text-primary font-black shadow-sm"
                     >
                       <item.icon className={cn("h-4 w-4 transition-transform duration-300", pathname === item.url && "scale-110")} />
@@ -169,9 +172,15 @@ export function AppSidebar() {
           <SidebarMenuItem>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <SidebarMenuButton className="w-full h-12 justify-between rounded-xl px-3 hover:bg-sidebar-accent/50 transition-all group-hover:scale-[1.02] active:scale-[0.98]">
-                  <div className="flex items-center gap-3">
-                    <div className="w-11 h-11 rounded-full bg-primary/10 flex items-center justify-center text-primary group-data-[state=open]:ring-2 group-data-[state=open]:ring-primary/20 transition-all overflow-hidden relative border border-border/40 shrink-0 aspect-square">
+                <SidebarMenuButton className={cn(
+                  "w-full h-14 rounded-xl hover:bg-sidebar-accent/50 transition-all group-hover:scale-[1.02] active:scale-[0.98]",
+                  collapsed ? "justify-center px-0" : "justify-between px-3"
+                )}>
+                  <div className={cn("flex items-center gap-3", collapsed && "justify-center w-full")}>
+                    <div className={cn(
+                      "rounded-full bg-primary/10 flex items-center justify-center text-primary group-data-[state=open]:ring-2 group-data-[state=open]:ring-primary/20 transition-all overflow-hidden relative border border-border/40 shrink-0 aspect-square",
+                      collapsed ? "w-8 h-8" : "w-10 h-10"
+                    )}>
                       {user?.photo ? (
                         <img 
                           src={getPhotoUrl(user.photo)} 
@@ -180,13 +189,14 @@ export function AppSidebar() {
                           onError={() => setImgError(true)}
                         />
                       ) : (
-                        <User className="h-4 w-4" />
+                        <User className={cn(collapsed ? "h-3.5 w-3.5" : "h-4 w-4")} />
                       )}
                     </div>
                     {!collapsed && <span className="font-black text-sm tracking-tight capitalize">{user?.name || "Account"}</span>}
                   </div>
                   {!collapsed && <ChevronUp className="h-4 w-4 text-muted-foreground transition-transform duration-300 group-data-[state=open]:rotate-180" />}
                 </SidebarMenuButton>
+                
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 side="top"

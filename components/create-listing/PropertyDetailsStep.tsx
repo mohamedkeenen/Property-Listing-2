@@ -955,7 +955,7 @@ export function PropertyDetailsStep({ form }: Props) {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               <ModernField label="Video Tour URL" icon={Video} {...register("videoUrl")} value={watch("videoUrl")} />
               <ModernField label="View 360 URL" icon={RotateCw} {...register("view360Url")} value={watch("view360Url")} />
-              <ModernField label="QR Code URL" icon={QrCode} {...register("qrCodeUrl")} value={watch("qrCodeUrl")} />
+              <ModernField label="QR Code URL" icon={QrCode} {...register("qrUrl")} value={watch("qrUrl")} />
             </div>
           </div>
         </section>
@@ -1105,7 +1105,6 @@ export function PropertyDetailsStep({ form }: Props) {
                         "relative flex w-full rounded-xl border transition-all duration-300 bg-background p-2 gap-4 min-h-[80px] items-center",
                         "border-border hover:border-primary/20 focus-within:border-primary focus-within:ring-4 focus-within:ring-primary/5 shadow-sm"
                       )}>
-                        {/* Image Part - First */}
                         <div 
                           onClick={() => handleCustomImageClick(field.id)}
                           className={cn(

@@ -2,7 +2,12 @@ export interface PropertyListing {
   id: string;
   reference: string;
   agentEmail?: string;
+  agentPhone?: string;
   title: string;
+  titleAr?: string;
+  video_url?: string;
+  virtual_tour_url?: string;
+  qr_url?: string;
   location: string;
   pfLocation?: string;
   property_location?: string;
@@ -31,7 +36,7 @@ export interface PropertyListing {
   owner: string;
   ownerAvatar: string;
   ownerPhone: string;
-  portals: { pf: boolean; bayut: boolean; website: boolean; dubizzle: boolean };
+  portals: { pf: boolean; bayut: boolean; website: boolean; dubizzle: boolean; bitrix: boolean };
   pfStatus: string | null;
   updatedAt: string;
   description: string;

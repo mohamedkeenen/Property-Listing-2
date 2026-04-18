@@ -39,7 +39,7 @@ export function CompletedStep({ form }: Props) {
         navigator.clipboard.writeText(submittedLink);
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
-        toast({ title: "Copied!", description: "Bayut XML Feed URL copied to clipboard." });
+        toast({ title: "Copied!", description: "Bayut XML Feed URL copied to clipboard.", variant: "success" });
     }
   };
 
@@ -104,6 +104,10 @@ export function CompletedStep({ form }: Props) {
       cheques: values.cheques ? parseInt(values.cheques) : null,
       reference: values.reference || null,
       agent_email: values.agentEmail || null,
+      // Video & Virtual Tour Links
+      video_url: values.videoUrl || null,
+      virtual_tour_url: values.view360Url || null,
+      qr_url: values.qrUrl || null,
       // Notes & Docs
       notes: values.notes,
       documents: values.documents,
@@ -126,6 +130,7 @@ export function CompletedStep({ form }: Props) {
       toast({
         title: "Success! 🎉",
         description: isEdit ? "Property listing updated successfully." : "Your property has been listed successfully.",
+        variant: "success",
       });
       
       if (!isEdit) localStorage.removeItem("property-listing-draft");
@@ -139,6 +144,7 @@ export function CompletedStep({ form }: Props) {
         toast({
             title: "Success! 🎉",
             description: "Property listing updated successfully.",
+            variant: "success",
         });
         setSubmitted("updated"); // Simple flag to show dashboard button
         return;

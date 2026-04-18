@@ -3,7 +3,12 @@ import { useState, useEffect } from "react";
 export function useTheme() {
   const [theme, setTheme] = useState<"light" | "dark">(() => {
     if (typeof window !== "undefined") {
-      return (localStorage.getItem("theme") as "light" | "dark") || "light";
+      const savedTheme = localStorage.getItem("theme") as "light" | "dark" | null;
+      if (savedTheme) return savedTheme;
+
+      // Default based on time of day
+      const hour = new Date().getHours();
+      return hour >= 6 && hour < 18 ? "light" : "dark";
     }
     return "light";
   });
