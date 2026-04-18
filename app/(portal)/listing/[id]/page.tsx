@@ -97,8 +97,9 @@ export default function PropertyDetail({ params }: { params: Promise<{ id: strin
             {listing.video_url && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                 <VirtualTour videoUrl={listing.video_url} poster={imgs[0]} title={listing.title} />
-                {/* Reserved for next component */}
-                <div className="hidden md:block" />
+                {listing.property_location && (
+                  <LocationMap location={listing.community} />
+                )}
               </div>
             )}
 
@@ -130,10 +131,6 @@ export default function PropertyDetail({ params }: { params: Promise<{ id: strin
               />
               
               <DocumentsAndNotes documents={listing.documents ?? []} notes={listing.notes ?? []} />
-              
-              {listing.property_location && (
-                <LocationMap location={listing.community} />
-              )}
             </div>
           </div>
 

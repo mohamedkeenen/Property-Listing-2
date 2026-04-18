@@ -50,41 +50,54 @@ export function PremiumDetails({ fields }: { fields: any[] }) {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {fields.map((field, i) => {
+          const isComplex = field.type === 'text_image' || field.type === 'image';
+          if (isComplex) return null;
+
+          return (
+            <div key={i} className="flex flex-col gap-1.5 p-5 rounded-3xl bg-muted/30 border border-border shadow-xs hover:bg-muted/50 transition-all">
+              <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">
+                {field.name}
+              </span>
+              <span className="text-base font-black text-foreground tracking-tight uppercase">
+                {field.value || "—"}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {fields.map((field, i) => {
           const isTextImage = field.type === 'text_image';
           const isImage = field.type === 'image';
 
-          if (isTextImage || isImage) {
-            return (
-              <div key={i} className="md:col-span-2 bg-muted/50 rounded-3xl p-6 border border-border flex flex-col md:flex-row gap-6">
-                <div className="w-full md:w-32 aspect-square rounded-2xl overflow-hidden shadow-md shrink-0 border border-border">
-                  {field.value?.image || field.value ? (
-                    <img src={field.value?.image || field.value} alt={field.name} className="w-full h-full object-cover" />
-                  ) : (
-                    <div className="w-full h-full bg-muted flex items-center justify-center">
-                      <ImageIcon className="h-8 w-8 text-muted-foreground" />
-                    </div>
-                  )}
-                </div>
-                <div className="flex flex-col justify-center gap-2">
-                  <span className="text-[10px] font-black text-primary uppercase tracking-widest">{field.name}</span>
-                  <p className="text-lg font-black text-foreground leading-tight">
-                    {field.value?.text || (isImage ? "Featured Asset" : "No Content")}
-                  </p>
-                </div>
-              </div>
-            );
-          }
+          if (!isTextImage && !isImage) return null;
 
           return (
-            <div key={i} className="flex flex-col gap-2 p-6 rounded-3xl bg-muted/30 border border-border">
-              <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">
-                {field.name}
-              </span>
-              <span className="text-lg font-black text-foreground tracking-tight">
-                {field.value || "—"}
-              </span>
+            <div key={i} className="bg-muted/50 rounded-3xl p-8 border border-border flex flex-col gap-6 shadow-sm group hover:bg-muted/70 transition-all">
+              <div className="flex flex-col gap-1">
+                <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">{field.name}</span>
+              </div>
+              
+              <div className="w-full aspect-square md:aspect-16/10 rounded-3xl overflow-hidden shadow-lg border border-border group-hover:scale-[1.01] transition-transform duration-500">
+                {field.value?.image || (typeof field.value === 'string' && (field.value.startsWith('http') || field.value.startsWith('data:'))) ? (
+                  <img src={field.value?.image || field.value} alt={field.name} className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full bg-muted flex items-center justify-center">
+                    <ImageIcon className="h-12 w-12 text-muted-foreground/30" />
+                  </div>
+                )}
+              </div>
+
+              {isTextImage && (
+                <div className="space-y-2">
+                  <p className="text-xl font-black text-foreground leading-snug tracking-tight">
+                    {field.value?.text || "Detailed Property Feature"}
+                  </p>
+                </div>
+              )}
             </div>
           );
         })}
