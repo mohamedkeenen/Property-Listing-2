@@ -230,10 +230,10 @@ export function DashboardCharts({ listings }: { listings: PropertyListing[] }) {
 
   return (
     <div className="space-y-8 min-w-0">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 lg:gap-8">
         <Card className={cn(cardClass, "lg:col-span-1 min-w-0")}>
-          <CardHeader className="flex flex-row items-center justify-between pb-4 pt-6 px-6 bg-muted/10 border-b border-border/20 space-y-0">
-            <CardTitle className={labelClass}>
+          <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-4 pt-6 px-4 lg:px-6 bg-muted/10 border-b border-border/20 space-y-3 sm:space-y-0">
+            <CardTitle className={cn(labelClass, "text-base lg:text-lg")}>
               <BarChart3 className="h-4 w-4 text-emerald-500" />
               Inventory Status Distribution
             </CardTitle>
@@ -315,7 +315,7 @@ export function DashboardCharts({ listings }: { listings: PropertyListing[] }) {
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6 lg:gap-8">
         <Card className={cn(cardClass, "min-w-0")}>
           <CardHeader className="flex flex-row items-center justify-between pb-4 pt-6 px-6 bg-muted/10 border-b border-border/20 space-y-0">
             <CardTitle className={labelClass}>
@@ -407,8 +407,8 @@ export function DashboardCharts({ listings }: { listings: PropertyListing[] }) {
         </Card>
 
         <Card className={cn(cardClass, "min-w-0")}>
-          <CardHeader className="flex flex-row items-center justify-between pb-4 pt-6 px-6 bg-muted/10 border-b border-border/20 space-y-0">
-            <CardTitle className={labelClass}>
+          <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-4 pt-6 px-4 lg:px-6 bg-muted/10 border-b border-border/20 space-y-3 sm:space-y-0">
+            <CardTitle className={cn(labelClass, "text-base lg:text-lg")}>
               <Users className="h-4 w-4 text-orange-500" />
               Inquiry Sources
             </CardTitle>
@@ -456,7 +456,7 @@ export function DashboardCharts({ listings }: { listings: PropertyListing[] }) {
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 lg:gap-8">
         <Card className={cn(cardClass, "min-w-0")}>
           <CardHeader className="flex flex-row items-center justify-between pb-4 pt-6 px-6 bg-muted/10 border-b border-border/20 space-y-0">
             <CardTitle className={labelClass}>

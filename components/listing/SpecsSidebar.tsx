@@ -27,8 +27,8 @@ export function SpecsSidebar({ category, status, type, purpose, updatedAt, porta
 
   return (
     <div className="space-y-10">
-      <div className="bg-card backdrop-blur-3xl border border-border rounded-xl px-6 py-5 space-y-8 shadow-sm hover:bg-muted/50 transition-all">
-        <h3 className="text-sm font-black text-foreground uppercase tracking-[0.2em]">Digital Specifications</h3>
+      <div className="bg-card backdrop-blur-3xl border border-border rounded-xl px-4 lg:px-6 py-5 space-y-6 lg:space-y-8 shadow-sm hover:bg-muted/50 transition-all">
+        <h3 className="text-xs lg:text-sm font-black text-foreground uppercase tracking-[0.2em]">Digital Specifications</h3>
         <div className="space-y-6">
           {specs.map((s, i) => (
             <div key={i} className="flex items-center justify-between">
@@ -44,15 +44,15 @@ export function SpecsSidebar({ category, status, type, purpose, updatedAt, porta
           ))}
         </div>
 
-        <div className="pt-8 space-y-6 border-t border-border/50">
-          <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Gateway Status</p>
+        <div className="pt-6 lg:pt-8 space-y-4 lg:space-y-6 border-t border-border/50">
+          <p className="text-[9px] lg:text-[10px] font-black text-muted-foreground uppercase tracking-widest">Gateway Status</p>
           <div className="flex flex-wrap items-center gap-3">
             {[
               { id: 'bitrix', name: 'BITRIX', active: portals?.bitrix, color: '#2FC6F6', icon: 'https://res.cloudinary.com/devht0mp5/image/upload/v1775823210/download_1_eswdk2.png' },
               { id: 'website', name: 'WEBSITE', active: portals?.website, color: '#3B82F6', icon: 'https://res.cloudinary.com/devht0mp5/image/upload/v1772529258/web_xgqvbi.png' },
               { id: 'pf', name: 'PF', active: portals?.pf, color: '#EE2D37', icon: 'https://res.cloudinary.com/devht0mp5/image/upload/v1772105511/PF_ljkahc.png' },
               { id: 'bayut', name: 'BAYUT', active: portals?.bayut, color: '#2ABB66', icon: 'https://res.cloudinary.com/devht0mp5/image/upload/v1772105511/bayut_gy4ev2.png' },
-              { id: 'dubizzle', name: 'DUBIZZLE', active: portals?.dubizzle, color: '#E52E2E', icon: 'https://res.cloudinary.com/devht0mp5/image/upload/v1775823210/download_gzle7f.png' },
+              { id: 'dubizzle', name: 'DUBIZZLE', active: portals?.dubizzle, color: '#2ABB66', icon: 'https://res.cloudinary.com/devht0mp5/image/upload/v1775823210/download_gzle7f.png' },
             ].map((portal) => (
               <div key={portal.id} className="flex flex-col items-center gap-2 min-w-0">
                 <div 
@@ -67,7 +67,11 @@ export function SpecsSidebar({ category, status, type, purpose, updatedAt, porta
                   <img 
                     src={portal.icon} 
                     alt={portal.name} 
-                    className={cn("h-4.5 w-4.5 object-contain transition-all", portal.active ? "brightness-0 invert" : "opacity-50")}
+                    className={cn(
+                      "h-4.5 w-4.5 object-contain transition-all", 
+                      portal.active ? "contrast-110" : "opacity-50",
+                      portal.id === 'website' && portal.active && "brightness-0 invert"
+                    )}
                   />
                   {portal.active && <div className="absolute inset-0 bg-linear-to-tr from-white/20 to-transparent pointer-events-none" />}
                 </div>

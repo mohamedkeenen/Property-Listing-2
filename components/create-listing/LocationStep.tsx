@@ -1,10 +1,7 @@
 import { UseFormReturn } from "react-hook-form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { filterOptions } from "@/data/mockData";
-import { Label } from "@/components/ui/label";
 import { MapPin, Navigation, Building2, Globe } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { ModernField } from "@/components/ui/modern-field";
 import { ModernSelect } from "@/components/ui/modern-select";
 
 interface Props {

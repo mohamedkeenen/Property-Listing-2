@@ -1,10 +1,10 @@
 "use client";
 
-import { use, useEffect } from "react";
+import { use } from "react";
 import { useRouter } from "next/navigation";
 import { useGetPropertyQuery } from "@/api/redux/services/propertyApi";
 import { mapBackendPropertyToFrontend } from "@/lib/mappers";
-import { Loader2, ArrowLeft } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 import { PropertyHeader } from "@/components/listing/PropertyHeader";
@@ -74,10 +74,10 @@ export default function PropertyDetail({ params }: { params: Promise<{ id: strin
           onBack={() => router.back()}
         />
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+        <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 lg:gap-10">
           
-          {/* LEFT COLUMN: Main Visuals & Details - 9/12 */}
-          <div className="lg:col-span-9 space-y-10">
+          {/* LEFT COLUMN: Main Visuals & Details - 8/12 or 9/12 */}
+          <div className="xl:col-span-8 2xl:col-span-9 space-y-6 lg:space-y-10">
             
             <ImageGallery images={imgs} />
             
@@ -114,9 +114,9 @@ export default function PropertyDetail({ params }: { params: Promise<{ id: strin
 
           </div>
 
-          {/* RIGHT COLUMN: Specs & Agent - 3/12 */}
-          <div className="lg:col-span-3 space-y-10">
-            <div className="sticky top-10 space-y-10">
+          {/* RIGHT COLUMN: Specs & Agent - 4/12 or 3/12 */}
+          <div className="xl:col-span-4 2xl:col-span-3 space-y-6 lg:space-y-10">
+            <div className="xl:sticky xl:top-10 space-y-6 lg:space-y-10">
               <SpecsSidebar 
                 category={listing.category}
                 status={listing.status}

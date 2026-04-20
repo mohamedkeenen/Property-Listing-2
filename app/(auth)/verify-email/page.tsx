@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
-import { useRegisterMutation, useVerifyEmailMutation } from "@/api/redux/services/authApi";
+import { useSearchParams } from "next/navigation";
+import { useVerifyEmailMutation } from "@/api/redux/services/authApi";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -12,9 +12,8 @@ import { Suspense } from "react";
 
 function VerifyEmailContent() {
   const searchParams = useSearchParams();
-  const router = useRouter();
   const token = searchParams.get("token");
-  const [verifyEmail, { isLoading }] = useVerifyEmailMutation();
+  const [verifyEmail] = useVerifyEmailMutation();
   const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
   const hasAttempted = useRef(false);
 

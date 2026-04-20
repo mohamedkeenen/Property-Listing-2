@@ -1,26 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { 
-  Building2, 
-  Plus, 
-  Trash2,
-  LayoutGrid,
-  Search,
-  CheckCircle2,
-  Loader2
-} from "lucide-react";
+import { Building2, Plus, Trash2, LayoutGrid, Search, CheckCircle2, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { 
-  useGetProjectsQuery, 
-  useAddProjectMutation, 
-  useDeleteProjectMutation,
-  useGetDevelopersQuery,
-  useAddDeveloperMutation,
-  useDeleteDeveloperMutation
-} from "@/api/redux/services/settingsApi";
+import { useGetProjectsQuery, useAddProjectMutation, useDeleteProjectMutation, useGetDevelopersQuery, useAddDeveloperMutation, useDeleteDeveloperMutation } from "@/api/redux/services/settingsApi";
 import { toast } from "react-hot-toast";
 
 interface InputsTabProps {
@@ -100,7 +85,6 @@ export function InputsTab({ isAdmin }: InputsTabProps) {
 
   return (
     <div className="grid gap-8 md:grid-cols-2">
-      {/* Developers Section */}
       <Card className="rounded-2xl border-border/50 shadow-xl overflow-hidden backdrop-blur-sm bg-card/50 h-full flex flex-col">
         <CardHeader className="border-b border-border/10 bg-muted/30 pb-4">
           <div className="flex items-center gap-3">

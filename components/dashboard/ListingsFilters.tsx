@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ChevronDown, ChevronUp, RotateCcw, Search } from "lucide-react";
+import { RotateCcw, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { filterOptions } from "@/data/mockData";
@@ -221,12 +221,19 @@ export function ListingsFilters({ onApply, agentOptions }: Props) {
             </div>
           </div>
           
-          <div className="flex items-center gap-3 justify-end pt-2">
-            <Button variant="outline" onClick={reset} className="rounded-xl h-10 px-6 font-black uppercase tracking-widest text-[10px] gap-2">
-              <RotateCcw className="h-3.5 w-3.5" /> Reset All
+          <div className="flex items-center gap-4 justify-end pt-4 border-t border-border/50">
+            <Button 
+              variant="outline" 
+              onClick={reset} 
+              className="h-12 px-6 rounded-2xl border-2 border-primary/10 bg-transparent text-primary hover:bg-primary/5 hover:border-primary transition-all font-black uppercase tracking-[0.2em] text-[10px] gap-3"
+            >
+              <RotateCcw className="h-4 w-4" /> Reset All
             </Button>
-            <Button onClick={() => onApply(filters)} className="rounded-xl h-10 px-8 font-black uppercase tracking-widest text-[10px] shadow-lg shadow-primary/20">
-              Search Inventory
+            <Button 
+              onClick={() => onApply(filters)} 
+              className="h-12 px-10 rounded-2xl border-2 border-primary/10 bg-transparent text-primary hover:bg-primary/5 hover:border-primary transition-all font-black uppercase tracking-[0.2em] text-[10px] shadow-none"
+            >
+              <Search className="h-4 w-4 mr-1" /> Search Inventory
             </Button>
           </div>
         </div>

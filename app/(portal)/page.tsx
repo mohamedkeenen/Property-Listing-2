@@ -86,18 +86,18 @@ export default function Dashboard() {
             size="sm" 
             onClick={() => refetch()}
             disabled={isLoading}
-            className="flex-1 sm:flex-none rounded-2xl font-black text-[10px] uppercase tracking-wider h-12 px-6 gap-3 border-2 border-border/80 hover:border-primary transition-all active:scale-95 bg-background/50 backdrop-blur-xl"
+            className="flex-1 sm:flex-none rounded-2xl font-black text-[10px] uppercase tracking-widest h-12 px-6 gap-3 border-2 border-primary/20 bg-background text-primary hover:border-primary hover:bg-primary/5 transition-all active:scale-95 shadow-sm hover:shadow-primary/5"
           >
             <RefreshCcw className={cn("h-4 w-4", isLoading && "animate-spin")} />
             <span className="hidden xs:inline">Refresh</span>
           </Button>
 
           <Button 
-            variant="default" 
+            variant="outline" 
             size="sm" 
             onClick={handleRefresh}
             disabled={isSyncing}
-            className="flex-1 sm:flex-none rounded-2xl font-black text-[10px] uppercase tracking-wider h-12 px-8 gap-3 bg-primary text-white shadow-xl shadow-primary/20 hover:shadow-primary/40 transition-all active:scale-95 ring-offset-background focus:ring-2 focus:ring-primary/20"
+            className="flex-1 sm:flex-none rounded-2xl font-black text-[10px] uppercase tracking-widest h-12 px-8 gap-3 border-2 border-primary/20 bg-background text-primary hover:border-primary hover:bg-primary/5 transition-all active:scale-95 shadow-sm hover:shadow-primary/5"
           >
             <Database className={cn("h-4 w-4", isSyncing && "animate-spin")} />
             Sync <span className="hidden xs:inline">Bitrix</span>
@@ -145,7 +145,7 @@ export default function Dashboard() {
         </div>
         <div className="flex-1 flex flex-col min-h-0 space-y-4">
           <ListingsFilters onApply={setFilters} agentOptions={agentNames} />
-          <div className="flex-1 min-h-0 overflow-auto relative">
+          <div className="flex-1 min-h-0 relative">
             {isLoading ? (
               <div className="absolute inset-0 bg-background/50 backdrop-blur-sm z-50 flex items-center justify-center">
                 <div className="flex flex-col items-center gap-4">

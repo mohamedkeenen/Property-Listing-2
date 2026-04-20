@@ -51,12 +51,12 @@ export default function Leads() {
 
   const updateFilter = (key: string, value: string) => {
     setFilters(prev => ({ ...prev, [key]: value }));
-    setPage(1); // Reset to first page on filter change
+    setPage(1); 
   };
 
   const handleLimitChange = (newLimit: number) => {
     setLimit(newLimit);
-    setPage(1); // Reset to first page on limit change
+    setPage(1); 
   };
 
   return (

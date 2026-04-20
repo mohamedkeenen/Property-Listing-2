@@ -2,33 +2,14 @@
 
 import { useState } from "react";
 import { toast } from "@/hooks/use-toast";
-import { 
-  Sparkles, 
-  Download, 
-  Search, 
-  FileText, 
-  Building2, 
-  Timer,
-  Hash,
-  DollarSign,
-  Image as ImageIcon,
-  Loader2,
-  CircleUser
-} from "lucide-react";
+import {  Sparkles,  Download,  Search,  FileText,  Building2,  Timer, Hash, DollarSign, Image as ImageIcon, Loader2, CircleUser } from "lucide-react";
 import { format } from "date-fns";
 import { generateSalesOfferPDF } from "@/lib/generateSalesOfferPDF";
 import { useGetSalesOffersQuery, useLazyGetSalesOfferDetailQuery } from "@/api/redux/services/salesOfferApi";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from "@/components/ui/table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 
 interface SalesOffer {
@@ -65,7 +46,6 @@ export default function SalesOfferPage() {
       const item = result.data;
       const mapped = result.mapped || {};
 
-      // ... existing mapping logic ...
       const cleanVal = (val: any) => {
         if (!val) return "";
         return String(val).split("|")[0].trim();
@@ -132,7 +112,6 @@ export default function SalesOfferPage() {
         }
       };
 
-      // AUTO-CALC PAYMENT PLAN
       const startDate = mappedData.paymentPlanStartDate ? new Date(mappedData.paymentPlanStartDate) : null;
       const duration = parseInt(mappedData.paymentPlanDuration) || 0;
       const firstP = parseFloat(mappedData.firstInstallmentPercentage) || 0;
@@ -183,7 +162,6 @@ export default function SalesOfferPage() {
         mappedData.paymentPlan = newPlan;
       }
 
-      // IMAGE MAPPING
 
       const mappedImages = {
         cover: getImg(mapped['Upload Cover Image']),
@@ -213,7 +191,6 @@ export default function SalesOfferPage() {
 
   return (
     <div className="flex-1 space-y-8 p-8 pt-6 overflow-y-auto bg-transparent">
-      {/* Header section with refined aesthetics */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
           <div className="flex items-center gap-3 mb-2">
@@ -302,12 +279,10 @@ export default function SalesOfferPage() {
                                 if (!raw) return "";
                                 const baseUrl = (process.env.NEXT_PUBLIC_API_URL || 'https://property-listing.keenenter.com').replace(/\/api$/, '').replace(/\/$/, '');
                                 
-                                // Case 1: Already points to our API proxy - just add base URL
                                 if (raw.startsWith('/api/')) {
                                   return `${baseUrl}${raw}`;
                                 }
 
-                                // Case 2: Direct Bitrix URL needs our proxy
                                 if (raw.includes('bitrix24.com') || raw.includes('/ajax.php')) {
                                   return `${baseUrl}/api/sales-offers/proxy-image?url=${encodeURIComponent(raw)}`;
                                 }

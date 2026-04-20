@@ -13,10 +13,9 @@ import { CustomDetailsStep } from "@/components/create-listing/CustomDetailsStep
 import { CompletedStep } from "@/components/create-listing/CompletedStep";
 import { Button } from "@/components/ui/button";
 import { Footer } from "@/components/layout/Footer";
-import { ChevronRight, Save, LayoutGrid, CheckCircle2, ChevronLeft } from "lucide-react";
+import { ChevronRight, Save, ChevronLeft } from "lucide-react";
 import { FormProvider } from "react-hook-form";
 import { useToast } from "@/hooks/use-toast";
-import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useGetPropertyQuery } from "@/api/redux/services/propertyApi";
 import { mapBackendPropertyToFormValues } from "@/lib/mappers";
@@ -109,7 +108,6 @@ function CreateListingContent() {
     } as any,
   });
 
-  // Load data for editing
   useEffect(() => {
     if (isEdit && propertyResponse?.data) {
       const formValues = mapBackendPropertyToFormValues(propertyResponse.data);
@@ -121,16 +119,15 @@ function CreateListingContent() {
   const validateStep = async (stepIndex: number) => {
     let fields: (keyof ListingFormValues)[] = [];
     
-    if (stepIndex === 0) { // Property Details
+    if (stepIndex === 0) {
       fields = ["category", "purpose", "type", "unitNo", "bedrooms", "bathrooms", "size", "price", "title", "description", "listingAgent", "listingOwner"];
-    } else if (stepIndex === 1) { // Media
+    } else if (stepIndex === 1) {
       fields = ["images"];
-    } else if (stepIndex === 2) { // Location
-      // Location fields are often complex, but we can check if bayutLocation or pfLocation exists if we want strictness
+    } else if (stepIndex === 2) {
       return true;
-    } else if (stepIndex === 3) { // Assets & Notes
+    } else if (stepIndex === 3) {
       return true;
-    } else if (stepIndex === 4) { // Custom Details
+    } else if (stepIndex === 4) {
       return true;
     }
     
@@ -157,14 +154,12 @@ function CreateListingContent() {
   };
 
   const handleStepClick = async (stepIndex: number) => {
-    // Only allow jumping back freely, moving forward requires validation
     if (stepIndex < currentStep) {
       setCurrentStep(stepIndex);
       window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
 
-    // Moving forward: validate current step and all steps in between
     for (let i = currentStep; i < stepIndex; i++) {
       const isValid = await validateStep(i);
       if (!isValid) {
@@ -205,10 +200,8 @@ function CreateListingContent() {
   return (
     <div className="min-h-screen bg-muted/10">
       <FormProvider {...form}>
-        {/* Header Section */}
         <div className="bg-white/80 dark:bg-slate-900/40 backdrop-blur-2xl border-b border-border/10 sticky top-0 z-50 transition-all duration-300">
           <div className="max-w-[1800px] mx-auto px-4 md:px-8">
-            {/* Top Bar - Simplified & Premium */}
             <div className="flex flex-col lg:flex-row lg:items-center justify-between py-4 md:py-6 gap-4">
               <div className="flex items-center gap-4 md:gap-12">
                  <div className="flex flex-col">
@@ -236,15 +229,18 @@ function CreateListingContent() {
                 </Button>
                 <Button 
                   onClick={handleNext}
-                  className="col-span-2 md:col-span-1 h-10 md:h-11 rounded-xl md:rounded-[1.25rem] font-black text-[9px] md:text-[10px] uppercase tracking-widest px-4 md:px-12 shadow-lg shadow-primary/10 hover:shadow-primary/20 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-500 bg-linear-to-r from-primary to-indigo-600 text-white"
+                  className="col-span-2 md:col-span-1 h-11 md:h-12 rounded-xl md:rounded-[1.25rem] font-bold text-[10px] md:text-[11px] uppercase tracking-[0.2em] px-4 md:px-14 shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all duration-300 bg-linear-to-br from-primary via-primary to-indigo-600 text-white border-none relative overflow-hidden group/btn"
                   type="button"
                 >
-                  {currentStep === STEPS.length - 2 ? "Finalize" : "Continue"} <ChevronRight className="h-3 w-3 md:h-4 md:w-4 ml-1 md:ml-1.5 shrink-0" />
+                  <div className="absolute inset-0 bg-white/10 -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700 skew-x-[-20deg]" />
+                  <span className="relative z-10 flex items-center gap-2">
+                    {currentStep === STEPS.length - 2 ? "Finalize" : "Continue"} 
+                    <ChevronRight className="h-3 w-3 md:h-4 md:w-4 transition-transform group-hover/btn:translate-x-1" />
+                  </span>
                 </Button>
               </div>
             </div>
 
-            {/* Stepper Bar */}
             <div className="pb-10 pt-2">
               <StepIndicator 
                 currentStep={currentStep} 
@@ -255,7 +251,6 @@ function CreateListingContent() {
           </div>
         </div>
 
-        {/* Main Content Area */}
         <div className="max-w-[1800px] mx-auto px-4 md:px-8 py-12">
           {isFetching ? (
             <div className="flex flex-col items-center justify-center min-h-[400px] gap-6">
@@ -276,7 +271,6 @@ function CreateListingContent() {
             </div>
           )}
 
-          {/* Bottom Navigation */}
           {currentStep < STEPS.length - 1 && (
             <div className="mt-8 md:mt-16 flex flex-col-reverse md:flex-row items-stretch md:items-center justify-between gap-4 md:gap-0 bg-white/40 dark:bg-card/40 p-4 md:p-8 rounded-3xl md:rounded-4xl border border-border/40 dark:border-white/5 sticky bottom-4 md:bottom-8 z-10 backdrop-blur-xl shadow-2xl shadow-black/20 transition-all duration-500">
               <Button 
@@ -301,12 +295,15 @@ function CreateListingContent() {
                 </Button>
                 <Button 
                   onClick={handleNext}
-                  className="w-full md:w-auto group/next rounded-2xl font-black text-[9px] md:text-[10px] uppercase tracking-widest md:tracking-[0.3em] px-2 md:px-16 h-12 md:h-14 shadow-lg shadow-primary/10 hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-1 active:scale-95 transition-all duration-500 bg-linear-to-r from-primary to-indigo-600 border-none"
+                  className="w-full md:w-auto group/next rounded-2xl font-bold text-[10px] md:text-[11px] uppercase tracking-[0.2em] px-4 md:px-20 h-12 md:h-14 shadow-xl shadow-primary/20 hover:shadow-primary/40 transition-all duration-300 bg-linear-to-br from-primary via-primary to-indigo-600 border-none relative overflow-hidden group/savebtn"
                   type="button"
                 >
-                  <span className="hidden md:inline">{currentStep === STEPS.length - 2 ? "Finalize Listing" : "Save & Continue"}</span>
-                  <span className="md:hidden truncate">{currentStep === STEPS.length - 2 ? "Finalize" : "Continue"}</span>
-                  <ChevronRight className="ml-1.5 md:ml-3 h-3.5 w-3.5 md:h-4 md:w-4 shrink-0 transition-transform group-hover/next:translate-x-1.5 duration-500" />
+                  <div className="absolute inset-0 bg-white/10 -translate-x-full group-hover/savebtn:translate-x-full transition-transform duration-1000 skew-x-[-20deg]" />
+                  <span className="relative z-10 flex items-center gap-2 md:gap-3">
+                    <span className="hidden md:inline">{currentStep === STEPS.length - 2 ? "Finalize Listing" : "Save & Continue"}</span>
+                    <span className="md:hidden truncate">{currentStep === STEPS.length - 2 ? "Finalize" : "Continue"}</span>
+                    <ChevronRight className="h-4 w-4 transition-transform group-hover/savebtn:translate-x-1.5" />
+                  </span>
                 </Button>
               </div>
             </div>

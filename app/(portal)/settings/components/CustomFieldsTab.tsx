@@ -1,34 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { 
-  Plus, 
-  Trash2,
-  List,
-  Search,
-  CheckCircle2,
-  Loader2,
-  Type,
-  Hash,
-  Image as ImageIcon,
-  Layers
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Plus, Trash2, List, Search, Loader2, Type, Hash, Image as ImageIcon, Layers } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { 
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { 
-  useGetCustomFieldsQuery,
-  useAddCustomFieldMutation,
-  useDeleteCustomFieldMutation
-} from "@/api/redux/services/settingsApi";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useGetCustomFieldsQuery, useAddCustomFieldMutation, useDeleteCustomFieldMutation } from "@/api/redux/services/settingsApi";
 import { toast } from "react-hot-toast";
+import { Button } from "@/components/ui/button";
 
 interface CustomFieldsTabProps {
   isAdmin: boolean;

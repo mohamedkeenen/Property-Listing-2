@@ -1,15 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { 
-  User as UserIcon, 
-  Mail, 
-  Camera, 
-  Lock, 
-  Eye,
-  EyeOff,
-  Phone
-} from "lucide-react";
+import { User as UserIcon, Mail, Camera, Lock, Eye, EyeOff, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ModernField } from "@/components/ui/modern-field";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -33,7 +25,6 @@ export function ProfileTab({ user }: ProfileTabProps) {
   const [photo, setPhoto] = useState<string>(user?.photo || "");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Password state
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPasswords, setShowPasswords] = useState(false);

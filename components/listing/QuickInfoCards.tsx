@@ -18,15 +18,15 @@ export function QuickInfoCards({ bedrooms, bathrooms, size, parking }: QuickInfo
   ];
 
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
       {specs.map((spec, i) => (
-        <div key={i} className="bg-card backdrop-blur-xl border border-border rounded-xl px-6 py-4 flex items-center gap-5 shadow-sm hover:bg-muted/50 transition-all">
-          <div className={`h-14 w-14 rounded-lg flex items-center justify-center shrink-0 ${spec.bg.replace('bg-', 'bg-')}/10`}>
-            <spec.icon className={`h-7 w-7 ${spec.iconColor}`} />
+        <div key={i} className="bg-card backdrop-blur-xl border border-border rounded-xl px-4 lg:px-6 py-4 flex items-center gap-4 lg:gap-5 shadow-sm hover:bg-muted/50 transition-all">
+          <div className={`h-12 lg:h-14 w-12 lg:w-14 rounded-lg flex items-center justify-center shrink-0 ${spec.bg.replace('bg-', 'bg-')}/10`}>
+            <spec.icon className={`h-6 lg:h-7 w-6 lg:w-7 ${spec.iconColor}`} />
           </div>
           <div className="flex flex-col min-w-0">
-            <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest truncate">{spec.label}</span>
-            <span className="text-xl font-black text-foreground truncate">{spec.val}</span>
+            <span className="text-[9px] lg:text-[10px] font-black text-muted-foreground uppercase tracking-widest truncate">{spec.label}</span>
+            <span className="text-lg lg:text-xl font-black text-foreground truncate">{spec.val}</span>
           </div>
         </div>
       ))}

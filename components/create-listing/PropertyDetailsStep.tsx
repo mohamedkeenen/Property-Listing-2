@@ -3,7 +3,6 @@
 import { useMemo } from "react";
 import { UseFormReturn } from "react-hook-form";
 import { Label } from "@/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { filterOptions } from "@/data/mockData";
 import { cn } from "@/lib/utils";
 import {

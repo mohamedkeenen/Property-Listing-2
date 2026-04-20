@@ -219,7 +219,7 @@ export function LeadsTable({
                 size="sm" 
                 onClick={onSync} 
                 disabled={isSyncing}
-                className="ml-auto rounded-xl gap-2 font-black text-[10px] uppercase tracking-wider h-10 px-4"
+                className="ml-auto rounded-xl gap-2 font-black text-[10px] uppercase tracking-widest h-10 px-4 border-2 border-primary/20 bg-background text-primary hover:border-primary hover:bg-primary/5 transition-all shadow-sm hover:shadow-primary/5"
             >
                 <RefreshCw className={cn("h-3 w-3", isSyncing && "animate-spin")} />
                 {isSyncing ? "Syncing..." : "Refresh Bitrix"}

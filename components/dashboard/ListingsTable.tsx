@@ -1,5 +1,4 @@
 import { useRef, useState } from "react";
-import NextImage from "next/image";
 import { useRouter } from "next/navigation";
 import { Eye, Pencil, Trash2, ChevronLeft, ChevronRight, Search, MoreHorizontal, FileDown, Bath, BedDouble, ArrowUpDown, User, Image as ImageIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -62,7 +61,7 @@ const PortalBadge = ({ initialStatus, portal, propertyId, pfStatus }: {
     pf_failed: "bg-orange-500 text-white border-orange-600 shadow-sm animate-pulse",
     bayut: "hover:bg-emerald-500 hover:text-white border-emerald-200 dark:border-emerald-500/30 text-emerald-600 dark:text-emerald-400 bg-emerald-500/10",
     bayut_active: "bg-emerald-500 text-white border-emerald-500 shadow-sm",
-    dubizzle: "hover:bg-rose-500 hover:text-white border-emerald-200 dark:border-emerald-500/30 text-emerald-600 dark:text-emerald-400 bg-emerald-500/10",
+    dubizzle: "hover:bg-emerald-500 hover:text-white border-emerald-200 dark:border-emerald-500/30 text-emerald-600 dark:text-emerald-400 bg-emerald-500/10",
     dubizzle_active: "bg-emerald-500 text-white border-emerald-500 shadow-sm",
     website: "hover:bg-blue-500 hover:text-white border-blue-200 dark:border-blue-500/30 text-blue-600 dark:text-blue-400 bg-blue-500/10",
     website_active: "bg-blue-500 text-white border-blue-500 shadow-sm"
@@ -194,8 +193,8 @@ export function ListingsTable({ listings, onViewDetails, onEdit }: Props) {
 
   const scroll = (direction: 'left' | 'right') => {
     if (scrollRef.current) {
-      const scrollAmount = direction === 'left' ? 0 : scrollRef.current.scrollWidth;
-      scrollRef.current.scrollTo({
+      const scrollAmount = direction === 'left' ? -350 : 350;
+      scrollRef.current.scrollBy({
         left: scrollAmount,
         behavior: 'smooth'
       });
@@ -209,7 +208,7 @@ export function ListingsTable({ listings, onViewDetails, onEdit }: Props) {
         {statusTabs.map((tab) => {
           const tabStyles: Record<string, string> = {
             all: "hover:bg-primary/10 hover:text-primary",
-            Live: "hover:bg-primary/10 hover:text-primary",
+            Live: "hover:bg-emerald-500/10 hover:text-emerald-600",
             Draft: "hover:bg-yellow-500/10 hover:text-yellow-600",
             Pending: "hover:bg-sky-500/10 hover:text-sky-600",
             Archived: "hover:bg-gray-500/10 hover:text-gray-600",
@@ -218,7 +217,7 @@ export function ListingsTable({ listings, onViewDetails, onEdit }: Props) {
 
           const activeColors: Record<string, string> = {
             all: "bg-primary text-white",
-            Live: "bg-primary text-white",
+            Live: "bg-emerald-500 text-white shadow-emerald-500/20",
             Draft: "bg-yellow-500 text-white",
             Pending: "bg-sky-500 text-white",
             Archived: "bg-gray-500 text-white",
@@ -256,10 +255,10 @@ export function ListingsTable({ listings, onViewDetails, onEdit }: Props) {
       </div>
 
       {/* Table Section - Flex to fill and allow internal scroll */}
-      <div className="relative group/table w-full flex-1 flex flex-col min-h-0">
+      <div className="relative group/table w-full flex-1 flex flex-col min-h-0 overflow-hidden">
         {/* Left Scroll Indicator */}
         <button 
-          onClick={() => scroll('left')}
+          onClick={(e) => { e.preventDefault(); e.stopPropagation(); scroll('left'); }}
           className="absolute left-0 top-0 bottom-0 z-20 flex items-center justify-center transition-all opacity-0 group-hover/table:opacity-100 border-none"
           title="Scroll to Start"
         >
@@ -270,9 +269,10 @@ export function ListingsTable({ listings, onViewDetails, onEdit }: Props) {
 
         <div 
           ref={scrollRef} 
-          className="flex-1 overflow-auto w-full pb-4 scroll-smooth"
+          className="flex-1 overflow-x-auto overflow-y-auto w-full max-w-full pb-4"
+          style={{ width: 0, minWidth: '100%' }}
         >
-          <Table className="min-w-[1800px] relative">
+          <Table className="min-w-[1800px]">
           <TableHeader className="sticky top-0 bg-card z-10 shadow-[0_1px_0_rgba(0,0,0,0.1)] dark:shadow-[0_1px_0_rgba(255,255,255,0.1)]">
             <TableRow>
               <TableHead className="w-[80px]">Actions</TableHead>
@@ -491,7 +491,7 @@ export function ListingsTable({ listings, onViewDetails, onEdit }: Props) {
 
         {/* Right Scroll Indicator */}
         <button 
-          onClick={() => scroll('right')}
+          onClick={(e) => { e.preventDefault(); e.stopPropagation(); scroll('right'); }}
           className="absolute right-0 top-0 bottom-0 z-20 flex items-center justify-center transition-all opacity-0 group-hover/table:opacity-100 border-none"
           title="Scroll to End"
         >

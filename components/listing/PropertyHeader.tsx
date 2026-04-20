@@ -23,43 +23,43 @@ export function PropertyHeader({
   onBack
 }: PropertyHeaderProps) {
   return (
-    <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 py-2 px-2">
-      <div className="flex items-center gap-6">
+    <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 py-2 px-2">
+      <div className="flex items-center gap-4 lg:gap-6">
         <Button 
           variant="outline" 
           size="icon" 
           onClick={onBack}
-          className="h-12 w-12 rounded-2xl border-border bg-card hover:bg-primary hover:text-white hover:border-primary transition-all active:scale-90 shadow-sm group shrink-0"
+          className="h-10 lg:h-12 w-10 lg:w-12 rounded-xl lg:rounded-2xl border-border bg-card hover:bg-primary hover:text-white hover:border-primary transition-all active:scale-90 shadow-sm group shrink-0"
         >
-          <ArrowLeft className="h-5 w-5 transition-transform group-hover:-translate-x-1" />
+          <ArrowLeft className="h-4 lg:h-5 w-4 lg:w-5 transition-transform group-hover:-translate-x-1" />
         </Button>
-
-        <div className="flex items-center gap-4 min-w-0">
-          <div className="h-12 w-12 rounded-full border border-orange-500/20 flex items-center justify-center bg-orange-500/10 shrink-0">
-            <MapPin className="h-6 w-6 text-orange-500" />
+ 
+        <div className="flex items-center gap-3 lg:gap-4 min-w-0">
+          <div className="h-10 lg:h-12 w-10 lg:w-12 rounded-full border border-orange-500/20 flex items-center justify-center bg-orange-500/10 shrink-0">
+            <MapPin className="h-5 lg:h-6 w-5 lg:w-6 text-orange-500" />
           </div>
-        <div className="flex flex-col">
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-black tracking-tight text-foreground uppercase">{title}</h1>
-            <Circle className="h-2 w-2 fill-primary text-primary" />
+          <div className="flex flex-col">
+            <div className="flex items-center gap-2">
+              <h1 className="text-lg lg:text-2xl font-black tracking-tight text-foreground uppercase truncate max-w-[200px] sm:max-w-md">{title}</h1>
+              <Circle className="h-1.5 lg:h-2 w-1.5 lg:w-2 fill-primary text-primary shrink-0" />
+            </div>
+            <p className="text-[10px] lg:text-xs font-bold text-muted-foreground tracking-wider truncate">
+              {reference} • {location.toUpperCase()}
+            </p>
           </div>
-          <p className="text-xs font-bold text-muted-foreground tracking-wider">
-            {reference} • {location.toUpperCase()}
-          </p>
         </div>
       </div>
-    </div>
-
-    <div className="flex items-center gap-6">
-        <div className="bg-primary/10 px-6 py-3 rounded-full flex items-center gap-3 border border-primary/20 shadow-sm">
-          <span className="text-[10px] font-black text-primary uppercase tracking-widest">Price:</span>
-          <span className="text-xl font-black text-primary">AED {price.toLocaleString()}</span>
+ 
+      <div className="flex flex-wrap items-center gap-4 lg:gap-6">
+        <div className="bg-primary/10 px-4 lg:px-6 py-2 lg:py-3 rounded-full flex items-center gap-2 lg:gap-3 border border-primary/20 shadow-sm">
+          <span className="text-[9px] lg:text-[10px] font-black text-primary uppercase tracking-widest">Price:</span>
+          <span className="text-lg lg:text-xl font-black text-primary">AED {price.toLocaleString()}</span>
         </div>
         
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 bg-emerald-500/10 text-emerald-500 dark:text-emerald-400 px-5 py-2.5 rounded-full border border-emerald-500/20 shadow-sm">
-            <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-xs font-black uppercase tracking-widest">{status}</span>
+        <div className="flex items-center">
+          <div className="flex items-center gap-2 bg-emerald-500/10 text-emerald-500 dark:text-emerald-400 px-4 lg:px-5 py-2 lg:py-2.5 rounded-full border border-emerald-500/20 shadow-sm">
+            <span className="h-1.5 lg:h-2 w-1.5 lg:w-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="text-[10px] lg:text-xs font-black uppercase tracking-widest">{status}</span>
           </div>
         </div>
       </div>

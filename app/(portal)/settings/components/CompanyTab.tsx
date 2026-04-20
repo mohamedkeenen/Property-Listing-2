@@ -1,44 +1,11 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { 
-  Building2, 
-  Camera, 
-  Save, 
-  Lock,
-  Globe,
-  Key,
-  Webhook,
-  MessageSquare,
-  Mail,
-  Phone,
-  LayoutGrid
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Building2, Camera, Lock,Globe,Key,Webhook,LayoutGrid } from "lucide-react";
 import { ModernField } from "@/components/ui/modern-field";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useDispatch, useSelector } from "react-redux";
-import { 
-  selectCompanyName, 
-  selectCompanyLogo, 
-  selectSettingsLastUpdated, 
-  selectBitrixWebhook,
-  selectListingWebhook,
-  selectPfApiKey,
-  selectPfApiSecret,
-  selectBayutApiKey,
-  selectBayutLeadSourceWhatsapp,
-  selectBayutLeadSourceEmail,
-  selectBayutLeadSourcePhone,
-  selectPfLeadSourceWhatsapp,
-  selectPfLeadSourceEmail,
-  selectPfLeadSourcePhone,
-  selectSalesOfferWebhook,
-  selectSalesOfferEntityTypeId,
-  selectOutboundHandlerToken,
-  selectPdfColor,
-  setCompanySettings 
-} from "@/api/redux/slices/settingsSlice";
+import { selectCompanyName, selectCompanyLogo, selectSettingsLastUpdated,  selectBitrixWebhook, selectListingWebhook, selectPfApiKey, selectPfApiSecret, selectBayutApiKey, selectBayutLeadSourceWhatsapp, selectBayutLeadSourceEmail, selectBayutLeadSourcePhone, selectPfLeadSourceWhatsapp, selectPfLeadSourceEmail, selectPfLeadSourcePhone, selectSalesOfferWebhook, selectSalesOfferEntityTypeId, selectOutboundHandlerToken, selectPdfColor, setCompanySettings } from "@/api/redux/slices/settingsSlice";
 import { useUpdateCompanySettingsMutation } from "@/api/redux/services/settingsApi";
 import { toast } from "react-hot-toast";
 import { cn } from "@/lib/utils";
@@ -66,7 +33,6 @@ export function CompanyTab({ isAdmin }: CompanyTabProps) {
   const settingsLastUpdated = useSelector(selectSettingsLastUpdated);
   const reduxSalesOfferWebhook = useSelector(selectSalesOfferWebhook);
   const reduxSalesOfferEntityTypeId = useSelector(selectSalesOfferEntityTypeId);
-  const reduxOutboundHandlerToken = useSelector(selectOutboundHandlerToken);
   const reduxPdfColor = useSelector(selectPdfColor);
   
   const [companyName, setCompanyName] = useState(reduxCompanyName);
@@ -211,7 +177,6 @@ export function CompanyTab({ isAdmin }: CompanyTabProps) {
           </CardContent>
         </Card>
 
-        {/* Integration Section */}
         <Card className="rounded-2xl border-border/50 shadow-xl overflow-hidden backdrop-blur-sm bg-card/50">
           <CardHeader className="border-b border-border/10 bg-muted/30 pb-4">
             <div className="flex items-center gap-3">
@@ -226,7 +191,6 @@ export function CompanyTab({ isAdmin }: CompanyTabProps) {
           </CardHeader>
           <CardContent className="pt-8">
             <div className="space-y-8">
-              {/* Bitrix Section */}
               <div className="space-y-4">
                 <h3 className="text-sm font-black uppercase tracking-widest text-primary/70 flex items-center gap-2">
                   <LayoutGrid className="h-4 w-4" />
@@ -260,7 +224,6 @@ export function CompanyTab({ isAdmin }: CompanyTabProps) {
                 />
               </div>
 
-              {/* Property Finder Section */}
               <div className="space-y-4">
                 <h3 className="text-sm font-black uppercase tracking-widest text-primary/70 flex items-center gap-2">
                   <Building2 className="h-4 w-4" />
@@ -289,7 +252,6 @@ export function CompanyTab({ isAdmin }: CompanyTabProps) {
 
               </div>
 
-              {/* Bayut Section */}
               <div className="space-y-4">
                 <h3 className="text-sm font-black uppercase tracking-widest text-primary/70 flex items-center gap-2">
                   <Globe className="h-4 w-4" />
@@ -364,7 +326,6 @@ export function CompanyTab({ isAdmin }: CompanyTabProps) {
               accept="image/*"
             />
 
-            {/* PDF Theme Color Picker */}
             <div className="mt-8 w-full space-y-4">
               <div className="flex items-center justify-between">
                  <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/70">PDF Theme Color</h4>
