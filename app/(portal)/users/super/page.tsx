@@ -18,7 +18,8 @@ import {
   ShieldCheck,
   ShieldAlert,
   Loader2,
-  ExternalLink
+  ExternalLink,
+  Calendar
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -27,6 +28,7 @@ import { cn } from "@/lib/utils";
 import { useSelector } from "react-redux";
 import { selectCurrentUser } from "@/api/redux/slices/authSlice";
 import { ConfirmDeleteDialog } from "@/components/shared/ConfirmDeleteDialog";
+import { format } from "date-fns";
 
 export default function SuperAdminPage() {
   const { data, isLoading, isError, refetch, isFetching } = useGetSuperUsersQuery();
@@ -101,7 +103,7 @@ export default function SuperAdminPage() {
   }
 
   return (
-    <div className="flex-1 flex flex-col min-h-0 bg-background/50 backdrop-blur-3xl overflow-hidden p-6 md:p-10 space-y-10">
+    <div className="flex-1 flex flex-col min-h-0 bg-background/50 backdrop-blur-3xl overflow-y-auto overflow-x-hidden p-4 md:p-10 space-y-10 custom-scrollbar">
       {/* Header Section */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 shrink-0">
         <div className="space-y-3">
@@ -131,7 +133,7 @@ export default function SuperAdminPage() {
       </div>
 
       {/* Statistics Section */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 shrink-0">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 shrink-0">
           {[
               { label: "Total Registrations", value: users.length, icon: UsersIcon, color: "text-primary", bg: "bg-primary/10" },
               { label: "Active Accounts", value: users.filter((u: any) => u.is_active).length, icon: ShieldCheck, color: "text-emerald-500", bg: "bg-emerald-500/10" },
@@ -184,10 +186,13 @@ export default function SuperAdminPage() {
                   <thead>
                     <tr className="border-b border-border/40 bg-muted/20">
                       <th className="px-6 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">Company</th>
-                      <th className="px-6 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">Admin User</th>
-                      <th className="px-6 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">Email</th>
+                      <th className="px-6 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60 hidden lg:table-cell">Admin User</th>
+                      <th className="px-6 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">Email & Status</th>
+                      <th className="px-6 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60 hidden xl:table-cell">Joined At</th>
+                      <th className="px-6 py-5 text-center text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60 hidden sm:table-cell">Users</th>
+                      <th className="px-6 py-5 text-center text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60 hidden sm:table-cell">Listings</th>
                       <th className="px-6 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">Verification</th>
-                      <th className="px-6 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">Activation Status</th>
+                      <th className="px-6 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">Activation</th>
                       <th className="px-6 py-5 text-right text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">Actions</th>
                     </tr>
                   </thead>
@@ -202,25 +207,54 @@ export default function SuperAdminPage() {
                       >
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-4">
-                            <div className="h-12 w-12 rounded-xl bg-muted/50 border border-border/20 flex items-center justify-center shrink-0">
-                               <Building2 className="h-6 w-6 text-muted-foreground" />
+                            <div className="h-12 w-12 rounded-xl bg-muted/50 border border-border/20 flex items-center justify-center shrink-0 overflow-hidden">
+                               {user.company?.logo ? (
+                                 <img src={user.company.logo} alt={user.company.company_name} className="h-full w-full object-contain p-1" />
+                               ) : (
+                                 <Building2 className="h-6 w-6 text-muted-foreground" />
+                               )}
                             </div>
-                            <span className="font-black text-sm tracking-tight truncate max-w-[200px]">
-                              {user.company?.company_name || 'N/A'}
-                            </span>
+                            <div className="flex flex-col gap-0.5">
+                              <span className="font-black text-sm tracking-tight truncate max-w-[150px]">
+                                {user.company?.company_name || 'N/A'}
+                              </span>
+                              <span className="lg:hidden text-[10px] font-bold text-muted-foreground uppercase">{user.name}</span>
+                            </div>
                           </div>
                         </td>
-                        <td className="px-6 py-4">
+                        <td className="px-6 py-4 hidden lg:table-cell">
                           <div className="flex items-center gap-2">
                              <UsersIcon className="h-3.5 w-3.5 text-muted-foreground" />
                              <span className="text-sm font-bold truncate max-w-[150px]">{user.name}</span>
                           </div>
                         </td>
                         <td className="px-6 py-4">
-                          <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
-                             <Mail className="h-3.5 w-3.5" />
-                             <span className="truncate max-w-[200px]">{user.email}</span>
+                          <div className="flex flex-col gap-1">
+                            <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
+                               <Mail className="h-3.5 w-3.5" />
+                               <span className="truncate max-w-[200px]">{user.email}</span>
+                            </div>
+                            <div className="xl:hidden flex items-center gap-1.5 text-[9px] font-black text-muted-foreground/50 uppercase">
+                               <Calendar className="h-3 w-3" />
+                               <span>{user.created_at ? format(new Date(user.created_at), "MMM dd") : "N/A"}</span>
+                            </div>
                           </div>
+                        </td>
+                        <td className="px-6 py-4 hidden xl:table-cell">
+                          <div className="flex items-center gap-2 text-xs font-black text-muted-foreground/70 uppercase tracking-tighter">
+                             <Calendar className="h-3.5 w-3.5 text-primary/50" />
+                             <span>{user.created_at ? format(new Date(user.created_at), "MMM dd, yyyy") : "N/A"}</span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 text-center hidden sm:table-cell">
+                           <span className="inline-flex items-center justify-center h-7 w-12 rounded-lg bg-primary/5 text-primary text-xs font-black border border-primary/10">
+                             {user.company?.users_count || 0}
+                           </span>
+                        </td>
+                        <td className="px-6 py-4 text-center hidden sm:table-cell">
+                           <span className="inline-flex items-center justify-center h-7 w-12 rounded-lg bg-emerald-500/5 text-emerald-500 text-xs font-black border border-emerald-500/10">
+                             {user.company?.properties_count || 0}
+                           </span>
                         </td>
                         <td className="px-6 py-4">
                           <div className={cn(
@@ -228,7 +262,7 @@ export default function SuperAdminPage() {
                             user.email_verified_at ? "bg-emerald-500/5 border-emerald-500/20 text-emerald-500" : "bg-red-500/5 border-red-500/20 text-red-500"
                           )}>
                             {user.email_verified_at ? <ShieldCheck className="h-3.5 w-3.5" /> : <ShieldAlert className="h-3.5 w-3.5" />}
-                            {user.email_verified_at ? 'Verified' : 'Unverified'}
+                            <span className="hidden md:inline">{user.email_verified_at ? 'Verified' : 'Unverified'}</span>
                           </div>
                         </td>
                         <td className="px-6 py-4">
@@ -236,21 +270,21 @@ export default function SuperAdminPage() {
                             onClick={() => handleToggleActive(user)}
                             disabled={isToggling}
                             className={cn(
-                              "h-10 px-4 rounded-xl font-black uppercase tracking-widest text-[9px] gap-2 transition-all",
+                              "h-9 px-3 md:h-10 md:px-4 rounded-xl font-black uppercase tracking-widest text-[9px] gap-2 transition-all",
                               user.is_active 
                                 ? "bg-red-500/10 text-red-500 hover:bg-red-500/20 border border-red-500/10" 
                                 : "bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg shadow-emerald-500/20"
                             )}
                           >
                             {user.is_active ? <PowerOff className="h-3.5 w-3.5" /> : <Power className="h-3.5 w-3.5" />}
-                            {user.is_active ? 'Deactivate' : 'Activate Now'}
+                            <span className="hidden md:inline">{user.is_active ? 'Deactivate' : 'Activate'}</span>
                           </Button>
                         </td>
                         <td className="px-6 py-4 text-right">
                            <Button 
                               onClick={() => handleDeleteClick(user)}
                               variant="outline" 
-                              className="h-10 w-10 rounded-xl border-2 border-destructive/10 text-destructive hover:bg-destructive hover:text-white transition-all active:scale-90"
+                              className="h-9 w-9 md:h-10 md:w-10 rounded-xl border-2 border-destructive/10 text-destructive hover:bg-destructive hover:text-white transition-all active:scale-90"
                             >
                               <Trash2 className="h-4 w-4" />
                             </Button>
@@ -282,6 +316,7 @@ export default function SuperAdminPage() {
         loading={isDeleting}
         itemName={userToDelete ? `${userToDelete.company?.company_name} (${userToDelete.email})` : ""}
         title="Full System Wipe?"
+        confirmText="Wipe System"
       />
     </div>
   );

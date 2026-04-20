@@ -109,8 +109,8 @@ export function LeadsTable({
       <div className="bg-card border border-border rounded-xl overflow-hidden flex flex-col h-full shadow-sm">
         {/* Tabs and Filters */}
         <div className="flex flex-col gap-1 p-3 border-b border-border/10">
-          <div className="flex items-center gap-1 overflow-x-auto overflow-y-hidden no-scrollbar pb-2">
-            <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mr-2 shrink-0">Portal:</span>
+          <div className="flex items-center gap-1 overflow-x-auto no-scrollbar pb-2 snap-x">
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40 mr-2 shrink-0">Portal</span>
             {sourceTabs.map((tab) => {
               const active: Record<string, string> = {
                 All: "bg-primary text-primary-foreground shadow-primary/20",
@@ -132,10 +132,10 @@ export function LeadsTable({
                   key={tab}
                   onClick={() => onSourceChange?.(tab)}
                   className={cn(
-                    "px-3 py-1.5 text-xs font-bold rounded-lg transition-all whitespace-nowrap relative group",
+                    "px-4 py-2 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all whitespace-nowrap snap-start",
                     filters.source === tab 
-                      ? cn(active[tab], "shadow-sm shadow-black/5") 
-                      : cn("text-muted-foreground hover:bg-muted/50", colors[tab])
+                      ? cn(active[tab], "shadow-lg") 
+                      : cn("text-muted-foreground bg-muted/30 border border-border/40 hover:bg-muted/80", colors[tab])
                   )}
                 >
                   {tab}
@@ -232,14 +232,16 @@ export function LeadsTable({
           <Table className="relative">
             <TableHeader className="sticky top-0 bg-card z-10 shadow-[0_1px_0_rgba(0,0,0,0.1)]">
               <TableRow>
+              <TableRow>
                 <TableHead className="w-[50px]"></TableHead>
-                <TableHead>Lead</TableHead>
-                <TableHead>Contact</TableHead>
-                <TableHead>Portal</TableHead>
-                <TableHead>Source</TableHead>
-                <TableHead>Property</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Inquiry Date</TableHead>
+                <TableHead className="font-black uppercase tracking-widest text-[10px]">Lead</TableHead>
+                <TableHead className="font-black uppercase tracking-widest text-[10px] hidden lg:table-cell">Contact</TableHead>
+                <TableHead className="font-black uppercase tracking-widest text-[10px] hidden md:table-cell">Portal</TableHead>
+                <TableHead className="font-black uppercase tracking-widest text-[10px] hidden xl:table-cell">Source</TableHead>
+                <TableHead className="font-black uppercase tracking-widest text-[10px]">Property</TableHead>
+                <TableHead className="font-black uppercase tracking-widest text-[10px]">Status</TableHead>
+                <TableHead className="font-black uppercase tracking-widest text-[10px] hidden sm:table-cell">Inquiry Date</TableHead>
+              </TableRow>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -282,8 +284,8 @@ export function LeadsTable({
                           </div>
                         </div>
                       </TableCell>
-                      <TableCell className="text-[11px] font-mono whitespace-nowrap text-foreground">{l.phone}</TableCell>
-                      <TableCell>
+                      <TableCell className="hidden lg:table-cell text-[11px] font-mono whitespace-nowrap text-foreground">{l.phone}</TableCell>
+                      <TableCell className="hidden md:table-cell">
                         <div className="flex items-center gap-2">
                             {portalLogos[l.source] ? (
                               <div className="relative h-4 w-8 shrink-0">
@@ -306,7 +308,7 @@ export function LeadsTable({
                           </span>
                         </div>
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="hidden xl:table-cell">
                         {l.sub_source && (
                            <div className="flex items-center gap-1.5">
                              {(() => {
@@ -334,7 +336,7 @@ export function LeadsTable({
                       <TableCell>
                         <Badge variant="outline" className={cn("text-[9px] font-black uppercase tracking-widest px-2 py-0", statusColors[l.status])}>{l.status}</Badge>
                       </TableCell>
-                      <TableCell className="text-[10px] font-medium text-muted-foreground/60">
+                      <TableCell className="hidden sm:table-cell text-[10px] font-medium text-muted-foreground/60">
                         {l.bitrix_created_at ? new Date(l.bitrix_created_at).toLocaleDateString() : 'N/A'}
                       </TableCell>
                     </TableRow>

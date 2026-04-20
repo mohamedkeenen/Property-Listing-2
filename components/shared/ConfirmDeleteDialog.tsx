@@ -10,6 +10,7 @@ interface ConfirmDeleteDialogProps {
   description?: string;
   loading?: boolean;
   itemName?: string;
+  confirmText?: string;
 }
 
 export function ConfirmDeleteDialog({
@@ -19,7 +20,8 @@ export function ConfirmDeleteDialog({
   title = "Are you sure you want to delete?",
   description = "This action cannot be undone. This will permanently delete the record from our servers.",
   loading = false,
-  itemName
+  itemName,
+  confirmText
 }: ConfirmDeleteDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -59,7 +61,7 @@ export function ConfirmDeleteDialog({
             className="flex-1 h-12 rounded-lg bg-red-600 hover:bg-red-700 text-white font-black text-[10px] uppercase tracking-[0.3em] shadow-lg shadow-red-500/20 active:scale-95 transition-all scroll-none"
             disabled={loading}
           >
-            {loading ? "Deleting..." : "Delete Listing"}
+            {loading ? "Deleting..." : (confirmText || "Delete")}
           </Button>
         </DialogFooter>
       </DialogContent>

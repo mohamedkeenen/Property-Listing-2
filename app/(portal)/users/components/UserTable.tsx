@@ -79,9 +79,9 @@ export function UserTable({ users, onEdit, onDelete, onView }: UserTableProps) {
           <TableHeader className="bg-muted/50">
             <TableRow className="border-border/50 hover:bg-transparent">
               <TableHead className="w-[80px] font-black uppercase tracking-widest text-[10px] py-6 px-6">Profile</TableHead>
-              <TableHead className="w-[60px] font-black uppercase tracking-widest text-[10px] py-6 text-center">ID</TableHead>
+              <TableHead className="w-[60px] font-black uppercase tracking-widest text-[10px] py-6 text-center hidden sm:table-cell">ID</TableHead>
               <TableHead className="font-black uppercase tracking-widest text-[10px] py-6">Name & Email</TableHead>
-              <TableHead className="font-black uppercase tracking-widest text-[10px] py-6">Role</TableHead>
+              <TableHead className="font-black uppercase tracking-widest text-[10px] py-6 hidden md:table-cell">Role</TableHead>
               <TableHead className="font-black uppercase tracking-widest text-[10px] py-6 text-right px-6">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -96,7 +96,7 @@ export function UserTable({ users, onEdit, onDelete, onView }: UserTableProps) {
                 </TableCell>
               </TableRow>
             ) : (
-              users.map((user) => (
+              users.map((user, index) => (
                 <TableRow key={user.id} className="group border-border/40 hover:bg-primary/5 transition-colors">
                   <TableCell className="py-4 px-6">
                     <Avatar className="h-12 w-12 rounded-xl border-2 border-background ring-4 ring-primary/5 shadow-lg transition-transform duration-500">
@@ -106,18 +106,19 @@ export function UserTable({ users, onEdit, onDelete, onView }: UserTableProps) {
                       </AvatarFallback>
                     </Avatar>
                   </TableCell>
-                  <TableCell className="py-4 text-center">
+                  <TableCell className="py-4 text-center hidden sm:table-cell">
                     <span className="font-mono text-xs font-black text-muted-foreground bg-muted/50 px-2 py-1 rounded-lg">
-                      #{user.id}
+                      #{index + 1}
                     </span>
                   </TableCell>
                   <TableCell className="py-4">
                     <div className="flex flex-col">
                       <span className="font-black text-foreground tracking-tight transition-colors">{user.name}</span>
-                      <span className="text-xs text-muted-foreground font-medium">{user.email}</span>
+                      <span className="text-xs text-muted-foreground font-medium truncate max-w-[150px] sm:max-w-none">{user.email}</span>
+                      <span className="md:hidden text-[9px] font-black uppercase tracking-widest text-primary/60 mt-1">{user.role}</span>
                     </div>
                   </TableCell>
-                  <TableCell className="py-4">
+                  <TableCell className="py-4 hidden md:table-cell">
                     <Badge className={cn("rounded-xl px-3 py-1 font-black text-[10px] uppercase tracking-widest border transition-all", getRoleBadgeColor(user.role))}>
                       {getRoleIcon(user.role)}
                       {user.role}

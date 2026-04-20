@@ -532,6 +532,7 @@ export function ListingsTable({ listings, onViewDetails, onEdit }: Props) {
         onConfirm={handleConfirmDelete}
         loading={isDeleting}
         itemName={`${listingToDelete?.reference}: ${listingToDelete?.title}`}
+        confirmText="Delete Listing"
       />
     </div>
   );

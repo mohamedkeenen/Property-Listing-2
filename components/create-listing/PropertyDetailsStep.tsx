@@ -247,7 +247,7 @@ export function PropertyDetailsStep({ form }: Props) {
             <ModernField label="Unit No" icon={Hash} required {...register("unitNo")} error={fieldError("unitNo")} value={watch("unitNo")} />
             
             <NumberSearchSelect 
-              label="Bedrooms (Studio/Room Count)" 
+              label="Bedrooms" 
               icon={BedDouble} 
               required 
               showStudio

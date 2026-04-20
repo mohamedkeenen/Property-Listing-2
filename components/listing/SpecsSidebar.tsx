@@ -46,7 +46,7 @@ export function SpecsSidebar({ category, status, type, purpose, updatedAt, porta
 
         <div className="pt-8 space-y-6 border-t border-border/50">
           <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Gateway Status</p>
-          <div className="flex items-center justify-between gap-2">
+          <div className="flex flex-wrap items-center gap-3">
             {[
               { id: 'bitrix', name: 'BITRIX', active: portals?.bitrix, color: '#2FC6F6', icon: 'https://res.cloudinary.com/devht0mp5/image/upload/v1775823210/download_1_eswdk2.png' },
               { id: 'website', name: 'WEBSITE', active: portals?.website, color: '#3B82F6', icon: 'https://res.cloudinary.com/devht0mp5/image/upload/v1772529258/web_xgqvbi.png' },
@@ -54,12 +54,12 @@ export function SpecsSidebar({ category, status, type, purpose, updatedAt, porta
               { id: 'bayut', name: 'BAYUT', active: portals?.bayut, color: '#2ABB66', icon: 'https://res.cloudinary.com/devht0mp5/image/upload/v1772105511/bayut_gy4ev2.png' },
               { id: 'dubizzle', name: 'DUBIZZLE', active: portals?.dubizzle, color: '#E52E2E', icon: 'https://res.cloudinary.com/devht0mp5/image/upload/v1775823210/download_gzle7f.png' },
             ].map((portal) => (
-              <div key={portal.id} className="flex flex-col items-center gap-2">
+              <div key={portal.id} className="flex flex-col items-center gap-2 min-w-0">
                 <div 
                   className={cn(
-                    "h-10 w-10 rounded-lg flex items-center justify-center transition-all duration-500 border relative overflow-hidden",
+                    "h-10 w-10 rounded-xl flex items-center justify-center transition-all duration-500 border relative overflow-hidden shrink-0",
                     portal.active 
-                      ? "border-transparent shadow-md text-white" 
+                      ? "border-transparent shadow-lg text-white" 
                       : "bg-muted border-border/50 grayscale opacity-20"
                   )}
                   style={{ backgroundColor: portal.active ? portal.color : undefined }}
@@ -67,12 +67,13 @@ export function SpecsSidebar({ category, status, type, purpose, updatedAt, porta
                   <img 
                     src={portal.icon} 
                     alt={portal.name} 
-                    className={cn("h-5 w-5 object-contain transition-all", portal.active ? "brightness-0 invert" : "opacity-50")}
+                    className={cn("h-4.5 w-4.5 object-contain transition-all", portal.active ? "brightness-0 invert" : "opacity-50")}
                   />
+                  {portal.active && <div className="absolute inset-0 bg-gradient-to-tr from-white/20 to-transparent pointer-events-none" />}
                 </div>
                 <span className={cn(
-                  "text-[7px] font-black tracking-tighter transition-colors",
-                  portal.active ? "text-foreground" : "text-muted-foreground"
+                  "text-[9px] font-black tracking-widest transition-colors text-center truncate px-1",
+                  portal.active ? "text-foreground" : "text-muted-foreground/50"
                 )}>
                   {portal.name}
                 </span>

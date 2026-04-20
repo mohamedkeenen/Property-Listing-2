@@ -106,8 +106,8 @@ export function ListingsFilters({ onApply, agentOptions }: Props) {
         </div>
       </div>
 
-      <div className="p-8 pt-0 space-y-8">
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+      <div className="p-4 sm:p-8 pt-0 space-y-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 sm:gap-4">
             <div className="space-y-1.5">
                <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Ref ID</label>
                <input 

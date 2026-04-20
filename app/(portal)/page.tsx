@@ -71,25 +71,25 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="flex flex-col flex-1 h-full min-w-0 overflow-hidden px-4 md:px-6 py-6">
-      <div className="flex items-center justify-between mb-10">
-        <div className="flex flex-col gap-1">
-          <h1 className="text-3xl font-black text-foreground tracking-tight flex items-center gap-3">
+    <div className="flex flex-col flex-1 h-full min-w-0 overflow-y-auto overflow-x-hidden p-4 md:p-8 space-y-10 custom-scrollbar">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-2 shrink-0">
+        <div className="flex flex-col gap-1.5">
+          <h1 className="text-3xl md:text-5xl font-black text-foreground tracking-tighter flex items-center gap-4">
             Dashboard
-            <div className="h-2 w-2 rounded-full bg-primary animate-pulse" />
+            <div className="h-3 w-3 rounded-full bg-primary animate-pulse shadow-[0_0_15px_rgba(var(--primary),0.5)]" />
           </h1>
-          <p className="text-xs text-muted-foreground font-medium">Property listings overview & analytics</p>
+          <p className="text-[10px] md:text-xs text-muted-foreground font-black uppercase tracking-[0.2em] opacity-70">Property listings overview & analytics</p>
         </div>
-        <div className="flex gap-3">
+        <div className="flex items-center gap-3">
           <Button 
             variant="outline" 
             size="sm" 
             onClick={() => refetch()}
             disabled={isLoading}
-            className="rounded-xl font-bold text-[10px] uppercase tracking-wider py-5 px-6 gap-2"
+            className="flex-1 sm:flex-none rounded-2xl font-black text-[10px] uppercase tracking-wider h-12 px-6 gap-3 border-2 border-border/80 hover:border-primary transition-all active:scale-95 bg-background/50 backdrop-blur-xl"
           >
-            <RefreshCcw className={cn("h-3.5 w-3.5", isLoading && "animate-spin")} />
-            Refresh List
+            <RefreshCcw className={cn("h-4 w-4", isLoading && "animate-spin")} />
+            <span className="hidden xs:inline">Refresh</span>
           </Button>
 
           <Button 
@@ -97,10 +97,10 @@ export default function Dashboard() {
             size="sm" 
             onClick={handleRefresh}
             disabled={isSyncing}
-            className="rounded-xl font-bold text-[10px] uppercase tracking-wider py-5 px-6 gap-2 bg-primary text-white shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all active:scale-95"
+            className="flex-1 sm:flex-none rounded-2xl font-black text-[10px] uppercase tracking-wider h-12 px-8 gap-3 bg-primary text-white shadow-xl shadow-primary/20 hover:shadow-primary/40 transition-all active:scale-95 ring-offset-background focus:ring-2 focus:ring-primary/20"
           >
-            <Database className={cn("h-3.5 w-3.5", isSyncing && "animate-spin")} />
-            Sync Bitrix
+            <Database className={cn("h-4 w-4", isSyncing && "animate-spin")} />
+            Sync <span className="hidden xs:inline">Bitrix</span>
           </Button>
         </div>
       </div>

@@ -272,6 +272,7 @@ export default function UsersPage() {
         loading={isDeleting}
         itemName={userToDelete ? `${userToDelete.name} (${userToDelete.email})` : ""}
         title="Remove Organization Member?"
+        confirmText="Remove Member"
       />
     </div>
   );
