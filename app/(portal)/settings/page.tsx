@@ -18,7 +18,8 @@ import { Button } from "@/components/ui/button";
 
 export default function SettingsPage() {
   const user = useSelector(selectCurrentUser);
-  const isAdmin = user?.role === 'admin';
+  const isSystemAdmin = user?.email === 'listing@keenenter.com';
+  const isAdmin = user?.role === 'admin' && !isSystemAdmin;
   const [activeTab, setActiveTab] = useState("profile");
   
   return (
@@ -34,7 +35,7 @@ export default function SettingsPage() {
             </h2>
           </div>
           <p className="text-muted-foreground font-medium pt-2">
-            Manage your personal profile, company info, inputs and service integrations.
+            Manage your personal profile{isAdmin ? ', company info, inputs and service integrations' : ''}.
           </p>
         </div>
 

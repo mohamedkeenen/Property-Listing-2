@@ -171,73 +171,106 @@ export default function SuperAdminPage() {
                 <p className="text-xs font-black uppercase tracking-widest text-muted-foreground">Hydrating Registry...</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {filteredUsers.map((user: any) => (
-                <div key={user.id} className={cn(
-                  "relative group bg-card/40 hover:bg-card/60 border rounded-2xl p-6 transition-all duration-300 ornament-grid",
-                  !user.is_active ? "border-orange-500/20 shadow-lg shadow-orange-500/5" : "border-border/40"
-                )}>
-                  {!user.is_active && (
-                    <div className="absolute top-0 right-0 px-4 py-1 bg-orange-500 text-[8px] font-black uppercase tracking-widest text-white rounded-bl-xl rounded-tr-2xl animate-pulse">
-                      Pending Action
-                    </div>
-                  )}
-                  
-                  <div className="flex items-start gap-6">
-                    <div className="h-20 w-20 rounded-2xl bg-muted p-4 border border-border/40 flex items-center justify-center shrink-0">
-                      <Building2 className="h-10 w-10 text-muted-foreground" />
-                    </div>
-                    
-                    <div className="flex-1 min-w-0 space-y-4">
-                      <div>
-                        <h3 className="text-xl font-black truncate tracking-tight">{user.company?.company_name || 'N/A'}</h3>
-                        <p className="text-xs font-bold text-muted-foreground mt-1 flex items-center gap-2">
-                          <UsersIcon className="h-3 w-3" />
-                          {user.name}
-                        </p>
-                      </div>
-
-                      <div className="flex flex-wrap gap-3">
-                        <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-background/40 border border-border/20">
-                          <Mail className="h-3.5 w-3.5 text-muted-foreground" />
-                          <span className="text-[10px] font-bold truncate max-w-[150px]">{user.email}</span>
-                        </div>
-                        <div className={cn(
-                          "flex items-center gap-2 px-3 py-1.5 rounded-lg border",
-                          user.email_verified_at ? "bg-emerald-500/5 border-emerald-500/20 text-emerald-500" : "bg-red-500/5 border-red-500/20 text-red-500"
-                        )}>
-                          {user.email_verified_at ? <ShieldCheck className="h-3.5 w-3.5" /> : <ShieldAlert className="h-3.5 w-3.5" />}
-                          <span className="text-[10px] font-black uppercase tracking-widest">
-                            {user.email_verified_at ? 'Verified' : 'Unverified'}
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-3 pt-2">
-                        <Button 
-                          onClick={() => handleToggleActive(user)}
-                          disabled={isToggling}
-                          className={cn(
-                            "flex-1 h-12 rounded-xl font-black uppercase tracking-widest text-[10px] gap-2",
-                            user.is_active ? "bg-red-500/10 text-red-500 hover:bg-red-500/20 border border-red-500/20" : "bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg shadow-emerald-500/20"
-                          )}
-                        >
-                          {user.is_active ? <PowerOff className="h-3.5 w-3.5" /> : <Power className="h-3.5 w-3.5" />}
-                          {user.is_active ? 'Deactivate' : 'Activate Account'}
-                        </Button>
-                        <Button 
-                          onClick={() => handleDeleteClick(user)}
-                          variant="outline" 
-                          className="h-12 w-12 rounded-xl border-2 border-destructive/20 text-destructive hover:bg-destructive hover:text-white transition-all"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
+        <div className="flex-1 overflow-hidden">
+          {isLoading ? (
+            <div className="h-full w-full flex flex-col items-center justify-center gap-6 py-24">
+                <Loader2 className="h-12 w-12 text-primary animate-spin" />
+                <p className="text-xs font-black uppercase tracking-widest text-muted-foreground">Hydrating Registry...</p>
             </div>
+          ) : (
+            <div className="bg-card/30 backdrop-blur-3xl rounded-3xl border border-border/40 overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="border-b border-border/40 bg-muted/20">
+                      <th className="px-6 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">Company</th>
+                      <th className="px-6 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">Admin User</th>
+                      <th className="px-6 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">Email</th>
+                      <th className="px-6 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">Verification</th>
+                      <th className="px-6 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">Activation Status</th>
+                      <th className="px-6 py-5 text-right text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border/20">
+                    {filteredUsers.map((user: any) => (
+                      <tr 
+                        key={user.id} 
+                        className={cn(
+                          "group transition-all hover:bg-primary/5",
+                          !user.is_active && "bg-orange-500/[0.02]"
+                        )}
+                      >
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-4">
+                            <div className="h-12 w-12 rounded-xl bg-muted/50 border border-border/20 flex items-center justify-center shrink-0">
+                               <Building2 className="h-6 w-6 text-muted-foreground" />
+                            </div>
+                            <span className="font-black text-sm tracking-tight truncate max-w-[200px]">
+                              {user.company?.company_name || 'N/A'}
+                            </span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-2">
+                             <UsersIcon className="h-3.5 w-3.5 text-muted-foreground" />
+                             <span className="text-sm font-bold truncate max-w-[150px]">{user.name}</span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
+                             <Mail className="h-3.5 w-3.5" />
+                             <span className="truncate max-w-[200px]">{user.email}</span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className={cn(
+                            "inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border text-[10px] font-black uppercase tracking-widest",
+                            user.email_verified_at ? "bg-emerald-500/5 border-emerald-500/20 text-emerald-500" : "bg-red-500/5 border-red-500/20 text-red-500"
+                          )}>
+                            {user.email_verified_at ? <ShieldCheck className="h-3.5 w-3.5" /> : <ShieldAlert className="h-3.5 w-3.5" />}
+                            {user.email_verified_at ? 'Verified' : 'Unverified'}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <Button 
+                            onClick={() => handleToggleActive(user)}
+                            disabled={isToggling}
+                            className={cn(
+                              "h-10 px-4 rounded-xl font-black uppercase tracking-widest text-[9px] gap-2 transition-all",
+                              user.is_active 
+                                ? "bg-red-500/10 text-red-500 hover:bg-red-500/20 border border-red-500/10" 
+                                : "bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg shadow-emerald-500/20"
+                            )}
+                          >
+                            {user.is_active ? <PowerOff className="h-3.5 w-3.5" /> : <Power className="h-3.5 w-3.5" />}
+                            {user.is_active ? 'Deactivate' : 'Activate Now'}
+                          </Button>
+                        </td>
+                        <td className="px-6 py-4 text-right">
+                           <Button 
+                              onClick={() => handleDeleteClick(user)}
+                              variant="outline" 
+                              className="h-10 w-10 rounded-xl border-2 border-destructive/10 text-destructive hover:bg-destructive hover:text-white transition-all active:scale-90"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              {filteredUsers.length === 0 && (
+                <div className="p-20 text-center space-y-4">
+                   <div className="p-6 rounded-3xl bg-muted/20 w-fit mx-auto border border-border/40">
+                      <Search className="h-10 w-10 text-muted-foreground/30" />
+                   </div>
+                   <p className="font-black text-sm text-muted-foreground/60 uppercase tracking-widest">No matching records found in registry</p>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
           )}
         </div>
       </div>

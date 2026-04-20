@@ -96,8 +96,11 @@ export function AppSidebar() {
     return `${API_BASE_URL}/storage/${logo}?v=${settingsLastUpdated}`;
   };
 
-  const logoUrl = getLogoUrl(companyLogo);
-  const nameParts = (companyName || 'Organization').split(' ');
+  const isSuperAdmin = user?.email === 'listing@keenenter.com';
+  const logoUrl = isSuperAdmin ? "/favicon.ico" : getLogoUrl(companyLogo);
+  const effectiveCompanyName = isSuperAdmin ? "KEEN ENTERPRISERS" : (companyName || 'Organization');
+  
+  const nameParts = effectiveCompanyName.split(' ');
   const firstPart = nameParts[0];
   const secondPart = nameParts.slice(1).join(' ');
 
@@ -118,7 +121,7 @@ export function AppSidebar() {
                   {logoUrl ? (
                     <img
                       src={logoUrl}
-                      alt={companyName}
+                      alt={effectiveCompanyName}
                       className="object-contain transition-transform duration-700 group-hover/brand:scale-105 w-full h-full max-h-[70px] dark:drop-shadow-[0_0_10px_rgba(255,255,255,0.2)]"
                     />
                   ) : (
