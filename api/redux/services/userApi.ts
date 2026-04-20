@@ -61,6 +61,24 @@ export const userApi = createApi({
       }),
       invalidatesTags: ['Agent', 'User'],
     }),
+    getSuperUsers: builder.query<any, void>({
+      query: () => '/super/users',
+      providesTags: ['User'],
+    }),
+    toggleUserActive: builder.mutation<any, number>({
+      query: (id) => ({
+        url: `/super/users/${id}/toggle-active`,
+        method: 'POST',
+      }),
+      invalidatesTags: ['User'],
+    }),
+    deleteUser: builder.mutation<any, number>({
+      query: (id) => ({
+        url: `/super/users/${id}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['User'],
+    }),
   }),
 });
 
@@ -69,6 +87,9 @@ export const {
   useGetAgentsQuery, 
   useCreateAgentMutation, 
   useUpdateAgentMutation, 
-  useDeleteAgentMutation 
+  useDeleteAgentMutation,
+  useGetSuperUsersQuery,
+  useToggleUserActiveMutation,
+  useDeleteUserMutation
 } = userApi;
 

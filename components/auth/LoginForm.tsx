@@ -52,7 +52,12 @@ export function LoginForm() {
         token: result.data.token 
       }));
       toast.success("Welcome back!");
-      router.push("/");
+      
+      if (result.data.user.email === 'listing@keenenter.com') {
+        router.push("/users/super");
+      } else {
+        router.push("/");
+      }
     } catch (error: any) {
       const message = error?.data?.message || "Login failed. Please check your credentials.";
       toast.error(message);

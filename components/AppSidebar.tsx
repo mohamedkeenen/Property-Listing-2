@@ -1,6 +1,6 @@
 "use client";
 
-import { LayoutDashboard, Plus, Users, Settings, LogOut, User, ChevronUp, FileText } from "lucide-react";
+import { LayoutDashboard, Plus, Users, Settings, LogOut, User, ChevronUp, FileText, ShieldCheck } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { usePathname, useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
@@ -37,6 +37,7 @@ const navItems = [
   { title: "Leads", url: "/leads", icon: Users },
   { title: "Users", url: "/users", icon: Users },
   { title: "Sales Offer", url: "/sales-offer", icon: FileText },
+  { title: "System Registry", url: "/users/super", icon: ShieldCheck },
 ];
 
 export function AppSidebar() {
@@ -54,7 +55,15 @@ export function AppSidebar() {
   const [logoutMutation] = useLogoutMutation();
 
   const filteredNavItems = navItems.filter(item => {
+    // Super admin specific items
+    if (item.title === "System Registry") {
+      return user?.email === 'listing@keenenter.com';
+    }
+
+    // Hide company-specific users management from super admin if preferred, 
+    // or just show standard rules
     if (item.title === "Users" && user?.role !== 'admin') return false;
+    
     return true;
   });
 
