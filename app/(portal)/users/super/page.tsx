@@ -91,6 +91,12 @@ export default function SuperAdminPage() {
     }
   };
 
+  const getLogoUrl = (logo: string) => {
+    if (!logo) return null;
+    if (logo.startsWith('http') || logo.startsWith('data:image')) return logo;
+    return `https://property-listing.keenenter.com/api/storage/${logo}`;
+  };
+
   if (!isAdmin) {
     return (
       <div className="flex-1 flex flex-col items-center justify-center p-8 text-center space-y-6">
@@ -209,7 +215,7 @@ export default function SuperAdminPage() {
                           <div className="flex items-center gap-4">
                             <div className="h-12 w-12 rounded-xl bg-muted/50 border border-border/20 flex items-center justify-center shrink-0 overflow-hidden">
                                {user.company?.logo ? (
-                                 <img src={user.company.logo} alt={user.company.company_name} className="h-full w-full object-contain p-1" />
+                                 <img src={getLogoUrl(user.company.logo) || ''} alt={user.company.company_name} className="h-full w-full object-contain p-1" />
                                ) : (
                                  <Building2 className="h-6 w-6 text-muted-foreground" />
                                )}
@@ -234,16 +240,23 @@ export default function SuperAdminPage() {
                                <Mail className="h-3.5 w-3.5" />
                                <span className="truncate max-w-[200px]">{user.email}</span>
                             </div>
-                            <div className="xl:hidden flex items-center gap-1.5 text-[9px] font-black text-muted-foreground/50 uppercase">
-                               <Calendar className="h-3 w-3" />
-                               <span>{user.created_at ? format(new Date(user.created_at), "MMM dd") : "N/A"}</span>
+                            <div className="xl:hidden flex flex-col gap-0.5 mt-1">
+                               <div className="flex items-center gap-1 text-[9px] font-black text-muted-foreground/50 uppercase">
+                                  <Calendar className="h-3 w-3" />
+                                  <span>{user.created_at ? format(new Date(user.created_at), "MMM dd, HH:mm") : "N/A"}</span>
+                               </div>
                             </div>
                           </div>
                         </td>
                         <td className="px-6 py-4 hidden xl:table-cell">
-                          <div className="flex items-center gap-2 text-xs font-black text-muted-foreground/70 uppercase tracking-tighter">
-                             <Calendar className="h-3.5 w-3.5 text-primary/50" />
-                             <span>{user.created_at ? format(new Date(user.created_at), "MMM dd, yyyy") : "N/A"}</span>
+                          <div className="flex flex-col">
+                            <div className="flex items-center gap-2 text-xs font-black text-muted-foreground/70 uppercase tracking-tighter">
+                               <Calendar className="h-3.5 w-3.5 text-primary/50" />
+                               <span>{user.created_at ? format(new Date(user.created_at), "MMM dd, yyyy") : "N/A"}</span>
+                            </div>
+                            <span className="text-[10px] font-bold text-muted-foreground/40 uppercase pl-5.5">
+                              {user.created_at ? format(new Date(user.created_at), "HH:mm") : ""}
+                            </span>
                           </div>
                         </td>
                         <td className="px-6 py-4 text-center hidden sm:table-cell">

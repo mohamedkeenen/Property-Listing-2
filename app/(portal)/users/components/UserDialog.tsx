@@ -238,7 +238,7 @@ export function UserDialog({ open, onOpenChange, user, onSubmit, isLoading }: Us
                 <SelectTrigger className="h-12 rounded-xl bg-muted/20 border-border/10 focus:ring-primary/20 font-semibold text-xs transition-all">
                   <SelectValue placeholder="Select role" />
                 </SelectTrigger>
-                <SelectContent className="rounded-2xl border-border/10 shadow-2xl bg-[#161B22]/95 backdrop-blur-2xl">
+                <SelectContent className="rounded-2xl border-border/10 shadow-2xl bg-popover/95 backdrop-blur-2xl">
                   <SelectItem value="admin" className="rounded-lg cursor-pointer">Administrator</SelectItem>
                   <SelectItem value="agent" className="rounded-lg cursor-pointer">Organization Agent</SelectItem>
                 </SelectContent>

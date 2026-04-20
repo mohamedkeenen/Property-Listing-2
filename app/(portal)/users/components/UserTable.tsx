@@ -29,6 +29,8 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 
+import { format } from "date-fns";
+
 interface User {
   id: number;
   name: string;
@@ -36,6 +38,7 @@ interface User {
   role: string;
   photo?: string;
   phone?: string;
+  created_at?: string;
 }
 
 interface UserTableProps {
@@ -81,6 +84,7 @@ export function UserTable({ users, onEdit, onDelete, onView }: UserTableProps) {
               <TableHead className="w-[80px] font-black uppercase tracking-widest text-[10px] py-6 px-6">Profile</TableHead>
               <TableHead className="w-[60px] font-black uppercase tracking-widest text-[10px] py-6 text-center hidden sm:table-cell">ID</TableHead>
               <TableHead className="font-black uppercase tracking-widest text-[10px] py-6">Name & Email</TableHead>
+              <TableHead className="font-black uppercase tracking-widest text-[10px] py-6 hidden lg:table-cell">Created At</TableHead>
               <TableHead className="font-black uppercase tracking-widest text-[10px] py-6 hidden md:table-cell">Role</TableHead>
               <TableHead className="font-black uppercase tracking-widest text-[10px] py-6 text-right px-6">Actions</TableHead>
             </TableRow>
@@ -88,7 +92,7 @@ export function UserTable({ users, onEdit, onDelete, onView }: UserTableProps) {
           <TableBody>
             {users.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} className="h-64 text-center">
+                <TableCell colSpan={6} className="h-64 text-center">
                   <div className="flex flex-col items-center justify-center space-y-3 opacity-50">
                     <UserIcon className="h-12 w-12 text-muted-foreground" />
                     <p className="text-sm font-black uppercase tracking-widest">No users found in this company</p>
@@ -115,7 +119,22 @@ export function UserTable({ users, onEdit, onDelete, onView }: UserTableProps) {
                     <div className="flex flex-col">
                       <span className="font-black text-foreground tracking-tight transition-colors">{user.name}</span>
                       <span className="text-xs text-muted-foreground font-medium truncate max-w-[150px] sm:max-w-none">{user.email}</span>
-                      <span className="md:hidden text-[9px] font-black uppercase tracking-widest text-primary/60 mt-1">{user.role}</span>
+                      <div className="lg:hidden flex flex-col gap-0.5 mt-1">
+                        <span className="text-[9px] font-black uppercase tracking-widest text-primary/60">{user.role}</span>
+                        <span className="text-[8px] font-bold text-muted-foreground/50 uppercase">
+                           {user.created_at ? format(new Date(user.created_at), "MMM dd, HH:mm") : "N/A"}
+                        </span>
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell className="py-4 hidden lg:table-cell">
+                    <div className="flex flex-col">
+                      <span className="text-xs font-black text-muted-foreground/70 uppercase tracking-tighter">
+                        {user.created_at ? format(new Date(user.created_at), "MMM dd, yyyy") : "N/A"}
+                      </span>
+                      <span className="text-[10px] font-bold text-muted-foreground/40 uppercase">
+                        {user.created_at ? format(new Date(user.created_at), "HH:mm") : ""}
+                      </span>
                     </div>
                   </TableCell>
                   <TableCell className="py-4 hidden md:table-cell">
