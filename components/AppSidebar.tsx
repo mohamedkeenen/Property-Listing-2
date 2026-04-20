@@ -91,8 +91,8 @@ export function AppSidebar() {
   const secondPart = nameParts.slice(1).join(' ');
 
   return (
-    <Sidebar collapsible="icon">
-      <SidebarHeader className="border-b border-sidebar-border/40 bg-sidebar px-0 pb-0">
+    <Sidebar collapsible="icon" className="group-data-[side=left]:border-r-0 md:group-data-[side=left]:border-r border-sidebar-border/10 bg-slate-900/40 backdrop-blur-xl">
+      <SidebarHeader className="border-b border-sidebar-border/10 bg-transparent px-0 pb-0">
         <div className={cn(
           "flex flex-col gap-6",
           collapsed ? "p-3 pb-6 border-b border-sidebar-border/10" : "p-6"
@@ -143,9 +143,9 @@ export function AppSidebar() {
             Navigation
           </SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu>
+            <SidebarMenu className={cn(collapsed && "items-center")}>
               {filteredNavItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
+                <SidebarMenuItem key={item.title} className={cn(collapsed && "flex justify-center")}>
                   <SidebarMenuButton asChild isActive={pathname === item.url}>
                     <NavLink
                       href={item.url}
@@ -168,15 +168,15 @@ export function AppSidebar() {
       </SidebarContent>
 
       <SidebarFooter className="border-t border-sidebar-border/20 p-3 mt-auto">
-        <SidebarMenu>
-          <SidebarMenuItem>
+        <SidebarMenu className={cn(collapsed && "items-center")}>
+          <SidebarMenuItem className={cn(collapsed && "w-full flex justify-center")}>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton className={cn(
                   "w-full h-14 rounded-xl hover:bg-sidebar-accent/50 transition-all group-hover:scale-[1.02] active:scale-[0.98]",
                   collapsed ? "justify-center px-0" : "justify-between px-3"
                 )}>
-                  <div className={cn("flex items-center gap-3", collapsed && "justify-center w-full")}>
+                  <div className={cn("flex items-center gap-3", collapsed && "justify-center")}>
                     <div className={cn(
                       "rounded-full bg-primary/10 flex items-center justify-center text-primary group-data-[state=open]:ring-2 group-data-[state=open]:ring-primary/20 transition-all overflow-hidden relative border border-border/40 shrink-0 aspect-square",
                       collapsed ? "w-8 h-8" : "w-10 h-10"

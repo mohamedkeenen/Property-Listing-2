@@ -1,264 +1,43 @@
 "use client";
 
-import { forwardRef, useState, useMemo } from "react";
+import { useMemo } from "react";
 import { UseFormReturn } from "react-hook-form";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { filterOptions } from "@/data/mockData";
 import { cn } from "@/lib/utils";
 import {
   Home, Building2, BedDouble, Bath, Car, Maximize, Tag, DollarSign, FileText, Sparkles,
-  Calendar, User, Hash, CalendarCheck, Info, X, PlusCircle, CheckCircle2, AlertCircle, Mail,
-  LayoutGrid, Type, Layers
+  Calendar, User, Hash, CalendarCheck, Info, CheckCircle2, AlertCircle, Paintbrush, PlusCircle
 } from "lucide-react";
 import { ModernField } from "@/components/ui/modern-field";
 import { ModernSelect } from "@/components/ui/modern-select";
 import { NumberSearchSelect } from "@/components/ui/number-search-select";
-import { CreditCard as CreditCardIcon, Paintbrush } from "lucide-react";
+import { CreditCard as CreditCardIcon } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { useGetUsersQuery } from "@/api/redux/services/userApi";
-import { useGetCustomFieldsQuery } from "@/api/redux/services/settingsApi";
-import { useSelector } from "react-redux";
-import { selectCompanyLogo, selectSettingsLastUpdated } from "@/api/redux/slices/settingsSlice";
-import { selectToken } from "@/api/redux/slices/authSlice";
-import { Upload, Image as ImageIcon, Video, RotateCw, QrCode, StickyNote } from "lucide-react";
-import { useRef, useEffect } from "react";
 
 interface Props {
   form: UseFormReturn<any>;
 }
 
-
 export function PropertyDetailsStep({ form }: Props) {
   const { register, setValue, watch, formState: { errors } } = form;
   const category = watch("category");
   const purpose = watch("purpose");
-
-  const AMENITIES_LIST = filterOptions.amenities;
   const pricePeriod = watch("pricePeriod");
 
+  const AMENITIES_LIST = filterOptions.amenities;
   const { data: usersData } = useGetUsersQuery();
-
 
   const agentOptions = useMemo(() => 
     usersData?.data?.map((u: any) => ({ label: u.name, value: u.id.toString() })) || [], 
   [usersData]);
 
-  const companyLogo = useSelector(selectCompanyLogo);
-  const token = useSelector(selectToken);
-  const settingsLastUpdated = useSelector(selectSettingsLastUpdated);
-  const [activePreviewIndex, setActivePreviewIndex] = useState(0);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const docInputRef = useRef<HTMLInputElement>(null);
-
-  const images = watch("images") || [];
-  const documents = watch("documents") || [];
-  const notes = watch("notes") || "";
-
-  const { data: customFieldsData } = useGetCustomFieldsQuery();
-  const customFields = customFieldsData?.data || [];
-  const customValues = watch("custom_values") || {};
-  const [activeCustomFieldId, setActiveCustomFieldId] = useState<number | null>(null);
-  const fileInputCustomRef = useRef<HTMLInputElement>(null);
-
-  const handleCustomFieldChange = (fieldId: number, value: any) => {
-    setValue("custom_values", {
-      ...customValues,
-      [fieldId]: value
-    });
-  };
-
-  const handleCustomImageClick = (fieldId: number) => {
-    setActiveCustomFieldId(fieldId);
-    fileInputCustomRef.current?.click();
-  };
-
-  const onCustomImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (!files || !files.length || activeCustomFieldId === null) return;
-    
-    const file = files[0];
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const base64 = event.target?.result as string;
-      const field = customFields.find((f: any) => f.id === activeCustomFieldId);
-      
-      if (field?.type === 'text_image') {
-        handleCustomFieldChange(activeCustomFieldId, {
-          ...(customValues[activeCustomFieldId] || {}),
-          image: base64
-        });
-      } else {
-        handleCustomFieldChange(activeCustomFieldId, base64);
-      }
-    };
-    reader.readAsDataURL(file);
-    e.target.value = "";
-  };
-
-  const getLogoUrl = (logoStr: string) => {
-    if (!logoStr) return null;
-    if (logoStr.startsWith('http') || logoStr.startsWith('data:image')) return logoStr;
-    const apiUrl = (process.env.NEXT_PUBLIC_API_URL || 'https://property-listing.keenenter.com/api').replace('/api', '');
-    return `${apiUrl}/storage/${logoStr}?v=${settingsLastUpdated}`;
-  };
-
-  const applyWatermark = (base64Image: string, logoUrl: string): Promise<string> => {
-    return new Promise((resolve) => {
-      const img = new Image();
-      img.crossOrigin = "anonymous";
-      img.onload = () => {
-        const canvas = document.createElement("canvas");
-        canvas.width = img.width;
-        canvas.height = img.height;
-        const ctx = canvas.getContext("2d");
-        if (!ctx) return resolve(base64Image);
-        
-        ctx.drawImage(img, 0, 0);
-        
-        const logo = new Image();
-        if (!logoUrl.startsWith('data:')) {
-           logo.crossOrigin = "anonymous";
-        }
-        logo.onload = () => {
-          const logoTargetWidth = canvas.width * 0.4; // Slightly larger logo
-          const logoTargetHeight = (logo.height / logo.width) * logoTargetWidth;
-          const x = (canvas.width - logoTargetWidth) / 2;
-          const y = (canvas.height - logoTargetHeight) / 2;
-          
-          ctx.save();
-          ctx.globalAlpha = 0.4; // 40% opacity for the logo itself
-          ctx.drawImage(logo, x, y, logoTargetWidth, logoTargetHeight);
-          ctx.restore();
-          resolve(canvas.toDataURL("image/jpeg", 0.8));
-        };
-        logo.onerror = () => {
-          console.warn("Watermark logo failed to load", logoUrl);
-          resolve(base64Image);
-        };
-        logo.src = logoUrl;
-      };
-      img.onerror = () => resolve(base64Image);
-      img.src = base64Image;
-    });
-  };
-
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (!files || files.length === 0) return;
-
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://property-listing.keenenter.com/api';
-    
-    // 1. Fetch the logo as data URL first to avoid CORS issues in canvas
-    let watermarkedLogoUrl: string | null = null;
-    if (token) {
-      try {
-        const response = await fetch(`${apiUrl}/settings/logo`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-        if (response.ok) {
-          const blob = await response.blob();
-          watermarkedLogoUrl = await new Promise((resolve) => {
-            const reader = new FileReader();
-            reader.onloadend = () => resolve(reader.result as string);
-            reader.readAsDataURL(blob);
-          });
-        }
-      } catch (error) {
-        console.error("Failed to fetch watermark logo:", error);
-      }
-    }
-
-    // 2. Process all images sequentially/batched
-    const filesArray = Array.from(files);
-    const newProcessedImages: string[] = [];
-
-    for (const file of filesArray) {
-      const base64FromFile = await new Promise<string>((resolve) => {
-        const reader = new FileReader();
-        reader.onloadend = () => resolve(reader.result as string);
-        reader.readAsDataURL(file);
-      });
-
-      const processed = watermarkedLogoUrl 
-        ? await applyWatermark(base64FromFile, watermarkedLogoUrl) 
-        : base64FromFile;
-      
-      newProcessedImages.push(processed);
-    }
-
-    // 3. Update the form state once with all images
-    const currentImages = watch("images") || [];
-    setValue("images", [...currentImages, ...newProcessedImages], { shouldValidate: true });
-    
-    // Clear input so same file can be uploaded again if needed
-    if (fileInputRef.current) fileInputRef.current.value = "";
-  };
-
-  const removeImage = (index: number) => {
-    const newList = images.filter((_: any, i: number) => i !== index);
-    setValue("images", newList, { shouldValidate: true });
-    if (activePreviewIndex >= newList.length) {
-      setActivePreviewIndex(Math.max(0, newList.length - 1));
-    }
-  };
-
-  const handleDocUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (!files) return;
-    Array.from(files).forEach((file) => {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const docEntry = JSON.stringify({
-          name: file.name,
-          size: `${(file.size / 1024).toFixed(1)} KB`,
-          type: file.type || "Document",
-          data: reader.result as string
-        });
-        const currentDocs = watch("documents") || [];
-        setValue("documents", [...currentDocs, docEntry], { shouldValidate: true });
-      };
-      reader.readAsDataURL(file);
-    });
-  };
-
-  const removeDoc = (index: number) => {
-    const newList = documents.filter((_: any, i: number) => i !== index);
-    setValue("documents", newList, { shouldValidate: true });
-  };
-
-  const handleDragStart = (e: React.DragEvent, index: number) => {
-    e.dataTransfer.setData("draggedIndex", index.toString());
-    const target = e.currentTarget as HTMLElement;
-    target.style.opacity = "0.5";
-  };
-
-  const handleDragEnd = (e: React.DragEvent) => {
-    const target = e.currentTarget as HTMLElement;
-    target.style.opacity = "1";
-  };
-
-  const handleDrop = (e: React.DragEvent, targetIndex: number) => {
-    e.preventDefault();
-    const sourceIndex = parseInt(e.dataTransfer.getData("draggedIndex"));
-    if (isNaN(sourceIndex) || sourceIndex === targetIndex) return;
-
-    const newImages = [...images];
-    const [movedItem] = newImages.splice(sourceIndex, 1);
-    newImages.splice(targetIndex, 0, movedItem);
-
-    setValue("images", newImages, { shouldValidate: true });
-    setActivePreviewIndex(targetIndex);
-  };
-
   const fieldError = (name: string) => errors[name]?.message as string | undefined;
 
   return (
-    <div className="max-w-6xl mx-auto">
+    <div>
       <div className="space-y-8 pb-20">
         {/* Section 1: Property Type */}
         <section className="space-y-6">
@@ -271,146 +50,148 @@ export function PropertyDetailsStep({ form }: Props) {
             <Info className="h-4 w-4 text-muted-foreground/30" />
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Residential Card */}
-            <div 
-              onClick={() => setValue("category", "Residential", { shouldValidate: true })}
-              className={cn(
-                "group relative overflow-hidden rounded-4xl border-2 p-8 transition-all duration-500 cursor-pointer hover:shadow-2xl hover:shadow-primary/5 hover:-translate-y-1",
-                category === "Residential" 
-                  ? "border-primary bg-linear-to-br from-primary/10 to-indigo-500/10 shadow-2xl shadow-primary/10" 
-                  : "border-border/40 bg-card hover:border-primary/20"
-              )}
-            >
-              <div className="flex items-center justify-between mb-8">
-                <div className="flex items-center gap-5">
-                  <div className={cn(
-                    "p-4 rounded-2xl transition-all duration-500 shadow-xl",
-                    category === "Residential" 
-                      ? "bg-linear-to-br from-primary to-indigo-600 text-white scale-110 shadow-primary/30" 
-                      : "bg-muted text-muted-foreground group-hover:scale-105"
-                  )}>
-                    <Home className="h-7 w-7" />
-                  </div>
-                  <div>
-                    <span className={cn(
-                      "text-xl font-black tracking-tight transition-colors block",
-                      category === "Residential" ? "text-primary dark:text-white" : "text-muted-foreground"
-                    )}>Residential</span>
-                    <p className="text-[9px] uppercase tracking-[0.2em] font-black text-muted-foreground/50 mt-1">Villas, Apartments, & Lands</p>
-                  </div>
-                </div>
-                {category === "Residential" && (
-                  <div className="bg-primary text-white p-1.5 rounded-full shadow-lg shadow-primary/50 animate-in zoom-in-50 duration-500">
-                    <CheckCircle2 className="h-5 w-5" />
-                  </div>
+          <div className="bg-card/30 p-8 rounded-4xl border border-border/20">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {/* Residential Card */}
+              <div 
+                onClick={() => setValue("category", "Residential", { shouldValidate: true })}
+                className={cn(
+                  "group relative overflow-hidden rounded-4xl border-2 p-8 transition-all duration-500 cursor-pointer hover:shadow-2xl hover:shadow-primary/5 hover:-translate-y-1",
+                  category === "Residential" 
+                    ? "border-primary bg-primary/10 shadow-2xl shadow-primary/10" 
+                    : "border-border/40 bg-card/40 hover:border-primary/20"
                 )}
-              </div>
-              
-              <div className="flex bg-muted p-1.5 rounded-2xl gap-1.5 backdrop-blur-sm border border-border">
-                <button
-                  type="button"
-                  onClick={(e) => { 
-                    e.stopPropagation(); 
-                    setValue("category", "Residential", { shouldValidate: true }); 
-                    setValue("purpose", "Rent", { shouldValidate: true }); 
-                  }}
-                  className={cn(
-                    "flex-1 py-2.5 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-2",
-                    (category === "Residential" && purpose === "Rent") 
-                      ? "bg-background text-primary shadow-sm ring-1 ring-border" 
-                      : "text-muted-foreground hover:text-foreground"
+              >
+                <div className="flex items-center justify-between mb-8">
+                  <div className="flex items-center gap-5">
+                    <div className={cn(
+                      "p-4 rounded-2xl transition-all duration-500 shadow-xl",
+                      category === "Residential" 
+                        ? "bg-linear-to-br from-primary to-indigo-600 text-white scale-110 shadow-primary/30" 
+                        : "bg-muted text-muted-foreground group-hover:scale-105"
+                    )}>
+                      <Home className="h-7 w-7" />
+                    </div>
+                    <div>
+                      <span className={cn(
+                        "text-xl font-black tracking-tight transition-colors block",
+                        category === "Residential" ? "text-primary dark:text-white" : "text-muted-foreground"
+                      )}>Residential</span>
+                      <p className="text-[9px] uppercase tracking-[0.2em] font-black text-muted-foreground/50 mt-1">Villas, Apartments, & Lands</p>
+                    </div>
+                  </div>
+                  {category === "Residential" && (
+                    <div className="bg-primary text-white p-1.5 rounded-full shadow-lg shadow-primary/50 animate-in zoom-in-50 duration-500">
+                      <CheckCircle2 className="h-5 w-5" />
+                    </div>
                   )}
-                >
-                  <Tag className="h-3.5 w-3.5" /> For Rent
-                </button>
-                <button
-                  type="button"
-                  onClick={(e) => { 
-                    e.stopPropagation(); 
-                    setValue("category", "Residential", { shouldValidate: true }); 
-                    setValue("purpose", "Sale", { shouldValidate: true }); 
-                  }}
-                  className={cn(
-                    "flex-1 py-2.5 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-2",
-                    (category === "Residential" && purpose === "Sale") 
-                      ? "bg-background text-primary shadow-sm ring-1 ring-border" 
-                      : "text-muted-foreground hover:text-foreground"
-                  )}
-                >
-                  <DollarSign className="h-3.5 w-3.5" /> For Sale
-                </button>
+                </div>
+                
+                <div className="flex bg-muted p-1.5 rounded-2xl gap-1.5 backdrop-blur-sm border border-border">
+                  <button
+                    type="button"
+                    onClick={(e) => { 
+                      e.stopPropagation(); 
+                      setValue("category", "Residential", { shouldValidate: true }); 
+                      setValue("purpose", "Rent", { shouldValidate: true }); 
+                    }}
+                    className={cn(
+                      "flex-1 py-2.5 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-2",
+                      (category === "Residential" && purpose === "Rent") 
+                        ? "bg-background text-primary shadow-sm ring-1 ring-border" 
+                        : "text-muted-foreground hover:text-foreground"
+                    )}
+                  >
+                    <Tag className="h-3.5 w-3.5" /> For Rent
+                  </button>
+                  <button
+                    type="button"
+                    onClick={(e) => { 
+                      e.stopPropagation(); 
+                      setValue("category", "Residential", { shouldValidate: true }); 
+                      setValue("purpose", "Sale", { shouldValidate: true }); 
+                    }}
+                    className={cn(
+                      "flex-1 py-2.5 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-2",
+                      (category === "Residential" && purpose === "Sale") 
+                        ? "bg-background text-primary shadow-sm ring-1 ring-border" 
+                        : "text-muted-foreground hover:text-foreground"
+                    )}
+                  >
+                    <Tag className="h-3.5 w-3.5" /> For Sale
+                  </button>
+                </div>
               </div>
-            </div>
 
-            {/* Commercial Card */}
-            <div 
-              onClick={() => setValue("category", "Commercial", { shouldValidate: true })}
-              className={cn(
-                "group relative overflow-hidden rounded-4xl border-2 p-8 transition-all duration-500 cursor-pointer hover:shadow-2xl hover:shadow-orange-500/5 hover:-translate-y-1",
-                category === "Commercial" 
-                  ? "border-orange-500 bg-linear-to-br from-orange-500/10 to-red-500/10 shadow-2xl shadow-orange-500/10" 
-                  : "border-border/40 bg-card hover:border-orange-500/20"
-              )}
-            >
-              <div className="flex items-center justify-between mb-8">
-                <div className="flex items-center gap-5">
-                  <div className={cn(
-                    "p-4 rounded-2xl transition-all duration-500 shadow-xl",
-                    category === "Commercial" 
-                      ? "bg-linear-to-br from-orange-500 to-red-600 text-white scale-110 shadow-orange-500/30" 
-                      : "bg-muted text-muted-foreground group-hover:scale-105"
-                  )}>
-                    <Building2 className="h-7 w-7" />
-                  </div>
-                  <div>
-                    <span className={cn(
-                      "text-xl font-black tracking-tight transition-colors block",
-                      category === "Commercial" ? "text-orange-500" : "text-muted-foreground"
-                    )}>Commercial</span>
-                    <p className="text-[9px] uppercase tracking-[0.2em] font-black text-muted-foreground/50 mt-1">Offices, Shops, & Industrial</p>
-                  </div>
-                </div>
-                {category === "Commercial" && (
-                  <div className="bg-orange-500 text-white p-1.5 rounded-full shadow-lg shadow-orange-500/50 animate-in zoom-in-50 duration-500">
-                    <CheckCircle2 className="h-5 w-5" />
-                  </div>
+              {/* Commercial Card */}
+              <div 
+                onClick={() => setValue("category", "Commercial", { shouldValidate: true })}
+                className={cn(
+                  "group relative overflow-hidden rounded-4xl border-2 p-8 transition-all duration-500 cursor-pointer hover:shadow-2xl hover:shadow-orange-500/5 hover:-translate-y-1",
+                  category === "Commercial" 
+                    ? "border-orange-500 bg-orange-500/10 shadow-2xl shadow-orange-500/10" 
+                    : "border-border/40 bg-card/40 hover:border-orange-500/20"
                 )}
-              </div>
-              
-              <div className="flex bg-muted/20 p-2 rounded-2xl gap-2 backdrop-blur-sm border border-border/40">
-                <button
-                  type="button"
-                  onClick={(e) => { 
-                    e.stopPropagation(); 
-                    setValue("category", "Commercial", { shouldValidate: true }); 
-                    setValue("purpose", "Rent", { shouldValidate: true }); 
-                  }}
-                  className={cn(
-                    "flex-1 py-3 rounded-xl text-[10px] font-black tracking-widest transition-all flex items-center justify-center gap-2",
-                    (category === "Commercial" && purpose === "Rent") 
-                      ? "bg-white text-orange-600 shadow-xl" 
-                      : "text-muted-foreground hover:text-foreground"
+              >
+                <div className="flex items-center justify-between mb-8">
+                  <div className="flex items-center gap-5">
+                    <div className={cn(
+                      "p-4 rounded-2xl transition-all duration-500 shadow-xl",
+                      category === "Commercial" 
+                        ? "bg-linear-to-br from-orange-500 to-red-600 text-white scale-110 shadow-orange-500/30" 
+                        : "bg-muted text-muted-foreground group-hover:scale-105"
+                    )}>
+                      <Building2 className="h-7 w-7" />
+                    </div>
+                    <div>
+                      <span className={cn(
+                        "text-xl font-black tracking-tight transition-colors block",
+                        category === "Commercial" ? "text-orange-500 dark:text-orange-400" : "text-muted-foreground"
+                      )}>Commercial</span>
+                      <p className="text-[9px] uppercase tracking-[0.2em] font-black text-muted-foreground/50 mt-1">Offices, Shops, & Industrial</p>
+                    </div>
+                  </div>
+                  {category === "Commercial" && (
+                    <div className="bg-orange-500 text-white p-1.5 rounded-full shadow-lg shadow-orange-500/50 animate-in zoom-in-50 duration-500">
+                      <CheckCircle2 className="h-5 w-5" />
+                    </div>
                   )}
-                >
-                  <Tag className="h-3.5 w-3.5" /> For Rent
-                </button>
-                <button
-                  type="button"
-                  onClick={(e) => { 
-                    e.stopPropagation(); 
-                    setValue("category", "Commercial", { shouldValidate: true }); 
-                    setValue("purpose", "Sale", { shouldValidate: true }); 
-                  }}
-                  className={cn(
-                    "flex-1 py-3 rounded-xl text-[10px] font-black tracking-widest transition-all flex items-center justify-center gap-2",
-                    (category === "Commercial" && purpose === "Sale") 
-                      ? "bg-white text-orange-600 shadow-xl" 
-                      : "text-muted-foreground hover:text-foreground"
-                  )}
-                >
-                  <DollarSign className="h-3.5 w-3.5" /> For Sale
-                </button>
+                </div>
+                
+                <div className="flex bg-muted p-1.5 rounded-2xl gap-1.5 backdrop-blur-sm border border-border">
+                  <button
+                    type="button"
+                    onClick={(e) => { 
+                      e.stopPropagation(); 
+                      setValue("category", "Commercial", { shouldValidate: true }); 
+                      setValue("purpose", "Rent", { shouldValidate: true }); 
+                    }}
+                    className={cn(
+                      "flex-1 py-2.5 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-2",
+                      (category === "Commercial" && purpose === "Rent") 
+                        ? "bg-background text-orange-600 shadow-sm ring-1 ring-border" 
+                        : "text-muted-foreground hover:text-foreground"
+                    )}
+                  >
+                    <Tag className="h-3.5 w-3.5" /> For Rent
+                  </button>
+                  <button
+                    type="button"
+                    onClick={(e) => { 
+                      e.stopPropagation(); 
+                      setValue("category", "Commercial", { shouldValidate: true }); 
+                      setValue("purpose", "Sale", { shouldValidate: true }); 
+                    }}
+                    className={cn(
+                      "flex-1 py-2.5 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-2",
+                      (category === "Commercial" && purpose === "Sale") 
+                        ? "bg-background text-orange-600 shadow-sm ring-1 ring-border" 
+                        : "text-muted-foreground hover:text-foreground"
+                    )}
+                  >
+                    <Tag className="h-3.5 w-3.5" /> For Sale
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -427,7 +208,7 @@ export function PropertyDetailsStep({ form }: Props) {
              <Maximize className="h-4 w-4 text-muted-foreground/30" />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-8 bg-card/30 p-8 rounded-4xl border border-border/20">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-8 bg-card/30 p-8 rounded-4xl border border-border/20">
             <ModernField 
               label="Title deed" 
               icon={FileText} 
@@ -446,13 +227,17 @@ export function PropertyDetailsStep({ form }: Props) {
               error={fieldError("type")}
             />
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 col-span-1 md:col-span-2">
-              <ModernField label="Size (Total)" icon={Maximize} required type="number" {...register("size")} error={fieldError("size")} value={watch("size")} />
-              <ModernField label="UNIT" icon={Maximize} value="SQ. FT" readOnly />
-            </div>
+            <ModernField 
+              label="Size (Total)" 
+              icon={Maximize} 
+              required 
+              type="number" 
+              {...register("size")} 
+              error={fieldError("size")} 
+              value={watch("size")} 
+            />
 
             <ModernField label="Unit No" icon={Hash} required {...register("unitNo")} error={fieldError("unitNo")} value={watch("unitNo")} />
-            <ModernField label="Location ID (PF)" icon={Hash} type="number" {...register("locationId")} value={watch("locationId")} />
             
             <NumberSearchSelect 
               label="Bedrooms" 
@@ -479,6 +264,8 @@ export function PropertyDetailsStep({ form }: Props) {
               error={fieldError("bathrooms")}
             />
 
+            <ModernField label="Location ID (PF)" icon={Hash} type="number" {...register("locationId")} value={watch("locationId")} />
+
             <ModernField label="No of parking spaces" icon={Car} type="number" {...register("parking")} value={watch("parking")} />
 
             <ModernSelect 
@@ -492,6 +279,22 @@ export function PropertyDetailsStep({ form }: Props) {
                 { label: "Furnished", value: "furnished" }
               ]}
             />
+
+            {watch("furnishingType") === "partly-furnished" && (
+              <div className="col-span-1 md:col-span-2 lg:col-span-3">
+                <div className="flex items-start gap-4 p-5 bg-orange-500/5 rounded-3xl border border-orange-500/20 animate-in fade-in slide-in-from-top-2 duration-500">
+                  <div className="p-2 rounded-xl bg-orange-500/10 text-orange-500 shrink-0">
+                    <AlertCircle className="h-4 w-4" />
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-orange-600 dark:text-orange-400">Bayut Feed Optimization</p>
+                    <p className="text-xs text-orange-600/80 dark:text-orange-400/80 leading-relaxed font-medium">
+                      "Semi-furnished" will be sent as <strong className="font-black">"No" (Unfurnished)</strong> to Bayut as per their official documentation mapping requirements.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
 
             <ModernSelect 
               label="Project Status" 
@@ -563,6 +366,16 @@ export function PropertyDetailsStep({ form }: Props) {
               onValueChange={(v) => setValue("finishingType", v, { shouldValidate: true })}
               options={filterOptions.finishingTypes}
             />
+            
+            <ModernSelect 
+              label="Listing Agent" 
+              icon={User} 
+              required
+              value={watch("listingAgent")} 
+              onValueChange={(v) => setValue("listingAgent", v, { shouldValidate: true })}
+              options={agentOptions}
+              error={fieldError("listingAgent")}
+            />
           </div>
         </section>
 
@@ -577,52 +390,48 @@ export function PropertyDetailsStep({ form }: Props) {
              <CheckCircle2 className="h-4 w-4 text-muted-foreground/30" />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 bg-card/30 p-8 rounded-4xl border border-border/20">
-            <div className="space-y-4">
-              <div className="flex items-center justify-between p-4 bg-muted/20 rounded-2xl border border-border/40">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-500">
-                    <Sparkles className="h-4 w-4" />
-                  </div>
-                  <div>
-                    <Label className="text-xs font-bold">Has Garden</Label>
-                    <p className="text-[10px] text-muted-foreground">Private or community garden</p>
-                  </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 bg-card/30 p-8 rounded-4xl border border-border/20">
+            <div className="flex items-center justify-between p-4 bg-muted/20 rounded-2xl border border-border/40">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-500">
+                  <Sparkles className="h-4 w-4" />
                 </div>
-                <Switch checked={!!watch("hasGarden")} onCheckedChange={(v) => setValue("hasGarden", v, { shouldValidate: true })} />
-              </div>
-
-              <div className="flex items-center justify-between p-4 bg-muted/20 rounded-2xl border border-border/40">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-orange-500/10 text-orange-500">
-                    <Sparkles className="h-4 w-4" />
-                  </div>
-                  <div>
-                    <Label className="text-xs font-bold">Has Kitchen</Label>
-                    <p className="text-[10px] text-muted-foreground">Ready kitchen installation</p>
-                  </div>
+                <div>
+                  <Label className="text-xs font-bold">Has Garden</Label>
+                  <p className="text-[10px] text-muted-foreground">Private or community garden</p>
                 </div>
-                <Switch checked={!!watch("hasKitchen")} onCheckedChange={(v) => setValue("hasKitchen", v, { shouldValidate: true })} />
               </div>
-
-              <div className="flex items-center justify-between p-4 bg-muted/20 rounded-2xl border border-border/40">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-blue-500/10 text-blue-500">
-                    <Car className="h-4 w-4" />
-                  </div>
-                  <div>
-                    <Label className="text-xs font-bold">Has Parking</Label>
-                    <p className="text-[10px] text-muted-foreground">On-site dedicated parking</p>
-                  </div>
-                </div>
-                <Switch checked={!!watch("hasParking")} onCheckedChange={(v) => setValue("hasParking", v, { shouldValidate: true })} />
-              </div>
+              <Switch checked={!!watch("hasGarden")} onCheckedChange={(v) => setValue("hasGarden", v, { shouldValidate: true })} />
             </div>
 
-            <div className="space-y-6">
-              <ModernField label="License No" icon={Hash} {...register("licenseNo")} value={watch("licenseNo")} />
-              <ModernField label="Ad Issue Date" icon={Calendar} type="date" {...register("adIssueDate")} value={watch("adIssueDate")} />
+            <div className="flex items-center justify-between p-4 bg-muted/20 rounded-2xl border border-border/40">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-orange-500/10 text-orange-500">
+                  <Sparkles className="h-4 w-4" />
+                </div>
+                <div>
+                  <Label className="text-xs font-bold">Has Kitchen</Label>
+                  <p className="text-[10px] text-muted-foreground">Ready kitchen installation</p>
+                </div>
+              </div>
+              <Switch checked={!!watch("hasKitchen")} onCheckedChange={(v) => setValue("hasKitchen", v, { shouldValidate: true })} />
             </div>
+
+            <div className="flex items-center justify-between p-4 bg-muted/20 rounded-2xl border border-border/40">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-blue-500/10 text-blue-500">
+                  <Car className="h-4 w-4" />
+                </div>
+                <div>
+                  <Label className="text-xs font-bold">Has Parking</Label>
+                  <p className="text-[10px] text-muted-foreground">On-site dedicated parking</p>
+                </div>
+              </div>
+              <Switch checked={!!watch("hasParking")} onCheckedChange={(v) => setValue("hasParking", v, { shouldValidate: true })} />
+            </div>
+
+            <ModernField label="License No" icon={Hash} {...register("licenseNo")} value={watch("licenseNo")} />
+            <ModernField label="Ad Issue Date" icon={Calendar} type="date" {...register("adIssueDate")} value={watch("adIssueDate")} />
           </div>
         </section>
 
@@ -638,7 +447,7 @@ export function PropertyDetailsStep({ form }: Props) {
           </div>
 
           {purpose === "Sale" ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-8 bg-card/30 p-8 rounded-4xl border border-border/20">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-8 bg-card/30 p-8 rounded-4xl border border-border/20">
               <ModernField 
                 label="Price" 
                 icon={DollarSign} 
@@ -745,7 +554,7 @@ export function PropertyDetailsStep({ form }: Props) {
                 })}
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-8 bg-card/30 p-8 rounded-4xl border border-border/20">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-8 bg-card/30 p-8 rounded-4xl border border-border/20">
                 <ModernSelect 
                   label="Payment Method" 
                   icon={CreditCardIcon} 
@@ -790,67 +599,71 @@ export function PropertyDetailsStep({ form }: Props) {
           </div>
 
           <div className="bg-card/30 p-8 rounded-4xl border border-border/20">
-            <Tabs defaultValue="english" className="w-full">
-              <div className="flex justify-end mb-8">
-                <TabsList className="bg-muted/10 border border-border/20 h-10 p-1.5 gap-1.5 rounded-xl">
-                  <TabsTrigger value="english" className="text-[10px] font-black uppercase tracking-widest h-7 px-6 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-white">English</TabsTrigger>
-                  <TabsTrigger value="arabic" className="text-[10px] font-black uppercase tracking-widest h-7 px-6 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-white font-arabic">العربية</TabsTrigger>
-                </TabsList>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+              {/* English Version */}
+              <div className="space-y-8">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="h-2 w-2 rounded-full bg-primary" />
+                  <span className="text-[10px] font-black uppercase tracking-widest text-primary">English Version</span>
+                </div>
+                
+                <ModernField 
+                  label="English Listing Title" 
+                  required 
+                  icon={FileText} 
+                  {...register("title")} 
+                  error={fieldError("title")} 
+                  value={watch("title")} 
+                  onClear={() => setValue("title", "", { shouldValidate: true })}
+                />
+                
+                <ModernField 
+                  label="English Description" 
+                  required 
+                  icon={FileText}
+                  value={watch("description")}
+                  error={fieldError("description")}
+                  onClear={() => setValue("description", "", { shouldValidate: true })}
+                  alignTop
+                >
+                  <textarea 
+                    {...register("description")} 
+                    className="w-full min-h-[160px] bg-transparent border-none focus:ring-0 text-sm font-bold text-foreground dark:text-white outline-none p-0 resize-none overflow-hidden placeholder:text-muted-foreground/40 leading-relaxed"
+                  />
+                </ModernField>
               </div>
-              
-              <TabsContent value="english" className="space-y-8 mt-0 outline-none">
-                 <ModernField 
-                   label="English Listing Title" 
-                   required 
-                   icon={FileText} 
-                   {...register("title")} 
-                   error={fieldError("title")} 
-                   value={watch("title")} 
-                   onClear={() => setValue("title", "", { shouldValidate: true })}
-                 />
-                 
-                 <ModernField 
-                   label="English Description" 
-                   required 
-                   icon={FileText}
-                   value={watch("description")}
-                   error={fieldError("description")}
-                   onClear={() => setValue("description", "", { shouldValidate: true })}
-                   alignTop
-                 >
-                   <textarea 
-                     {...register("description")} 
-                     className="w-full min-h-[160px] bg-transparent border-none focus:ring-0 text-sm font-bold text-foreground dark:text-white outline-none p-0 resize-none overflow-hidden placeholder:text-muted-foreground/40 leading-relaxed"
-                   />
-                 </ModernField>
-              </TabsContent>
-              
-              <TabsContent value="arabic" className="space-y-8 mt-0 outline-none">
-                 <ModernField 
-                   label="عنوان القائمة (بالعربية)" 
-                   icon={FileText} 
-                   {...register("titleAr")} 
-                   value={watch("titleAr")} 
-                   dir="rtl"
-                   onClear={() => setValue("titleAr", "", { shouldValidate: true })}
-                 />
-                 
-                 <ModernField 
-                   label="الوصف بالعربية" 
-                   icon={FileText}
-                   value={watch("descriptionAr")}
-                   dir="rtl"
-                   onClear={() => setValue("descriptionAr", "", { shouldValidate: true })}
-                   alignTop
-                 >
-                   <textarea 
-                     {...register("descriptionAr")} 
-                     className="w-full min-h-[160px] bg-transparent border-none focus:ring-0 text-sm font-bold text-foreground dark:text-white outline-none p-0 resize-none overflow-hidden text-right placeholder:text-muted-foreground/40 leading-relaxed font-arabic"
-                     dir="rtl"
-                   />
-                 </ModernField>
-              </TabsContent>
-            </Tabs>
+
+              {/* Arabic Version */}
+              <div className="space-y-8">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="h-2 w-2 rounded-full bg-blue-500" />
+                  <span className="text-[10px] font-black uppercase tracking-widest text-blue-500 font-arabic">ARABIC VERSION (النسخة العربية)</span>
+                </div>
+
+                <ModernField 
+                  label="عنوان القائمة (بالعربية)" 
+                  icon={FileText} 
+                  {...register("titleAr")} 
+                  value={watch("titleAr")} 
+                  dir="rtl"
+                  onClear={() => setValue("titleAr", "", { shouldValidate: true })}
+                />
+                
+                <ModernField 
+                  label="الوصف بالعربية" 
+                  icon={FileText}
+                  value={watch("descriptionAr")}
+                  dir="rtl"
+                  onClear={() => setValue("descriptionAr", "", { shouldValidate: true })}
+                  alignTop
+                >
+                  <textarea 
+                    {...register("descriptionAr")} 
+                    className="w-full min-h-[160px] bg-transparent border-none focus:ring-0 text-sm font-bold text-foreground dark:text-white outline-none p-0 resize-none overflow-hidden placeholder:text-muted-foreground/40 leading-relaxed font-arabic"
+                  />
+                </ModernField>
+              </div>
+            </div>
           </div>
         </section>
 
@@ -865,7 +678,7 @@ export function PropertyDetailsStep({ form }: Props) {
              <PlusCircle className="h-4 w-4 text-muted-foreground/30" />
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3">
             {AMENITIES_LIST.map((amenity) => {
               const selected = (watch("amenities") || []).includes(amenity);
               return (
@@ -902,273 +715,7 @@ export function PropertyDetailsStep({ form }: Props) {
             })}
           </div>
         </section>
-        {/* Section 6: Media & Photos */}
-        <section className="space-y-6">
-          <div className="flex items-center gap-3">
-             <div className="p-2 rounded-xl bg-blue-500/10 text-blue-500">
-                <ImageIcon className="h-4 w-4" />
-             </div>
-             <h3 className="text-sm font-bold text-foreground">Media & Photographs</h3>
-             <div className="h-px flex-1 bg-border/20" />
-             <Upload className="h-4 w-4 text-muted-foreground/30" />
-          </div>
-
-          <div className="bg-card/30 p-8 rounded-4xl border border-border/20 space-y-8">
-            <div className="flex flex-wrap gap-4 min-h-[120px]">
-              {images.map((url: string, i: number) => (
-                <div 
-                  key={`${url}-${i}`} 
-                  draggable
-                  onDragStart={(e) => handleDragStart(e, i)}
-                  onDragEnd={handleDragEnd}
-                  onDragOver={(e) => e.preventDefault()}
-                  onDrop={(e) => handleDrop(e, i)}
-                  className={cn(
-                    "relative group w-28 h-28 rounded-2xl overflow-hidden shadow-sm border border-border/40 transition-all hover:shadow-lg hover:-translate-y-1 cursor-move active:scale-95",
-                    activePreviewIndex === i ? "ring-2 ring-primary" : ""
-                  )}
-                  onClick={() => setActivePreviewIndex(i)}
-                >
-                  <img src={url} alt={`Upload ${i}`} className="w-full h-full object-cover" />
-                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                    <button
-                      type="button"
-                      onClick={(e) => { e.stopPropagation(); removeImage(i); }}
-                      className="bg-white/20 backdrop-blur-md hover:bg-destructive/80 text-white rounded-xl p-2 transition-all"
-                    >
-                      <X className="h-4 w-4" />
-                    </button>
-                  </div>
-                </div>
-              ))}
-              <button
-                type="button"
-                onClick={() => fileInputRef.current?.click()}
-                className="w-28 h-28 flex flex-col items-center justify-center border-2 border-dashed border-border rounded-2xl hover:border-primary/50 hover:bg-primary/5 transition-all group"
-              >
-                <Upload className="h-5 w-5 text-muted-foreground group-hover:text-primary mb-2" />
-                <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground group-hover:text-primary">Upload</span>
-                <input ref={fileInputRef} type="file" multiple accept="image/*" className="hidden" onChange={handleImageUpload} />
-              </button>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <ModernField label="Video Tour URL" icon={Video} {...register("videoUrl")} value={watch("videoUrl")} />
-              <ModernField label="View 360 URL" icon={RotateCw} {...register("view360Url")} value={watch("view360Url")} />
-              <ModernField label="QR Code URL" icon={QrCode} {...register("qrUrl")} value={watch("qrUrl")} />
-            </div>
-          </div>
-        </section>
-
-        {/* Section 7: Documents */}
-        <section className="space-y-6">
-          <div className="flex items-center gap-3">
-             <div className="p-2 rounded-xl bg-amber-500/10 text-amber-500">
-                <FileText className="h-4 w-4" />
-             </div>
-             <h3 className="text-sm font-bold text-foreground">Internal Documents</h3>
-             <div className="h-px flex-1 bg-border/20" />
-             <PlusCircle className="h-4 w-4 text-muted-foreground/30" />
-          </div>
-
-          <div className="bg-card/30 p-8 rounded-4xl border border-border/20">
-            <div className="space-y-4">
-              <button
-                type="button"
-                onClick={() => docInputRef.current?.click()}
-                className="w-full py-4 border-2 border-dashed border-border rounded-2xl flex items-center justify-center gap-3 hover:border-primary/50 hover:bg-primary/5 transition-all text-xs font-bold text-muted-foreground"
-              >
-                <PlusCircle className="h-4 w-4" /> Add Document
-                <input ref={docInputRef} type="file" multiple className="hidden" onChange={handleDocUpload} />
-              </button>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {documents.map((docJson: string, i: number) => {
-                  const doc = JSON.parse(docJson);
-                  return (
-                    <div key={i} className="flex items-center justify-between bg-muted/20 border border-border/40 rounded-2xl p-4">
-                      <div className="flex items-center gap-3 overflow-hidden">
-                        <FileText className="h-4 w-4 text-primary shrink-0" />
-                        <div className="truncate">
-                          <p className="text-xs font-bold truncate">{doc.name}</p>
-                          <p className="text-[10px] text-muted-foreground">{doc.size}</p>
-                        </div>
-                      </div>
-                      <button type="button" onClick={() => removeDoc(i)} className="text-muted-foreground hover:text-destructive p-1">
-                        <X className="h-4 w-4" />
-                      </button>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Section 8: Internal Notes */}
-        <section className="space-y-6">
-          <div className="flex items-center gap-3">
-             <div className="p-2 rounded-xl bg-gray-500/10 text-gray-500">
-                <StickyNote className="h-4 w-4" />
-             </div>
-             <h3 className="text-sm font-bold text-foreground">Internal Notes</h3>
-             <div className="h-px flex-1 bg-border/20" />
-             <FileText className="h-4 w-4 text-muted-foreground/30" />
-          </div>
-
-          <div className="bg-card/30 p-8 rounded-4xl border border-border/20">
-            <ModernField 
-              label="Private Remarks" 
-              icon={StickyNote} 
-              value={watch("notes")}
-              onClear={() => setValue("notes", "", { shouldValidate: true })}
-              alignTop
-            >
-              <textarea 
-                {...register("notes")} 
-                className="w-full min-h-[120px] bg-transparent border-none focus:ring-0 text-sm font-bold text-foreground outline-none p-0 resize-none placeholder:text-muted-foreground/20 leading-relaxed"
-                placeholder="Internal notes only, not visible to clients..."
-              />
-            </ModernField>
-          </div>
-        </section>
-
-        {/* Section 9: Custom Inputs */}
-        {customFields.length > 0 && (
-          <section className="space-y-6">
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-xl bg-primary/10 text-primary">
-                <LayoutGrid className="h-4 w-4" />
-              </div>
-              <h3 className="text-sm font-bold text-foreground">Custom Listing Details</h3>
-            <div className="h-px flex-1 bg-border/20" />
-            <Layers className="h-4 w-4 text-muted-foreground/30" />
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-8 bg-card/30 p-8 rounded-4xl border border-border/20">
-              {customFields.map((field: any) => {
-                const value = customValues[field.id];
-
-                if (field.type === 'text' || field.type === 'number') {
-                  return (
-                    <ModernField 
-                      key={field.id}
-                      label={field.name} 
-                      icon={field.type === 'number' ? Hash : Type} 
-                      value={value || ""}
-                      type={field.type === 'number' ? 'number' : 'text'}
-                      onChange={(e) => handleCustomFieldChange(field.id, e.target.value)}
-                      onClear={() => handleCustomFieldChange(field.id, "")}
-                      placeholder={`Enter ${field.name}...`}
-                    />
-                  );
-                }
-
-                if (field.type === 'image') {
-                   return (
-                     <div key={field.id} className="space-y-3">
-                       <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">
-                         {field.name}
-                       </Label>
-                       <div 
-                         onClick={() => handleCustomImageClick(field.id)}
-                         className={cn(
-                           "h-32 rounded-3xl border-2 border-dashed flex flex-col items-center justify-center gap-2 cursor-pointer transition-all overflow-hidden relative",
-                           value ? "border-primary/30" : "border-border/50 hover:border-primary/50 hover:bg-primary/5"
-                         )}
-                       >
-                         {value ? (
-                           <>
-                             <img src={value} className="w-full h-full object-cover" />
-                             <div className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 flex items-center justify-center transition-opacity">
-                               <PlusCircle className="h-8 w-8 text-white" />
-                             </div>
-                           </>
-                         ) : (
-                           <>
-                             <ImageIcon className="h-6 w-6 text-muted-foreground/30" />
-                             <span className="text-[10px] font-bold text-muted-foreground">Upload Image</span>
-                           </>
-                         )}
-                       </div>
-                     </div>
-                   );
-                }
-
-                if (field.type === 'text_image') {
-                  const textVal = value?.text || "";
-                  const imgVal = value?.image || "";
-
-                  return (
-                    <div key={field.id} className="md:col-span-2">
-                      <div className={cn(
-                        "relative flex w-full rounded-xl border transition-all duration-300 bg-background p-2 gap-4 min-h-[80px] items-center",
-                        "border-border hover:border-primary/20 focus-within:border-primary focus-within:ring-4 focus-within:ring-primary/5 shadow-sm"
-                      )}>
-                        <div 
-                          onClick={() => handleCustomImageClick(field.id)}
-                          className={cn(
-                            "h-20 w-32 rounded-lg border-2 border-dashed flex items-center justify-center cursor-pointer transition-all overflow-hidden relative shrink-0",
-                            imgVal ? "border-primary/30" : "border-border/50 hover:border-primary/50 hover:bg-primary/5"
-                          )}
-                        >
-                          {imgVal ? (
-                             <>
-                               <img src={imgVal} className="w-full h-full object-cover" />
-                               <div className="absolute inset-0 bg-black/20 hover:bg-black/40 flex items-center justify-center transition-all">
-                                 <ImageIcon className="h-4 w-4 text-white" />
-                               </div>
-                             </>
-                          ) : (
-                            <div className="flex flex-col items-center gap-1">
-                              <ImageIcon className="h-4 w-4 text-muted-foreground/30" />
-                              <span className="text-[8px] font-black uppercase text-muted-foreground/40 text-center">Attach Image</span>
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Text Part - Second */}
-                        <div className="flex-1 relative h-full flex flex-col justify-center">
-                          <input 
-                            type="text"
-                            value={textVal}
-                            onChange={(e) => handleCustomFieldChange(field.id, { ...value, text: e.target.value })}
-                            className="w-full bg-transparent border-none focus:ring-0 text-sm font-bold text-foreground outline-none p-0 placeholder:text-muted-foreground/20"
-                            placeholder={`Enter ${field.name} description...`}
-                          />
-                          <label className="absolute -top-6 left-0 text-[10px] font-black uppercase tracking-widest text-primary bg-background px-1">
-                            {field.name}
-                          </label>
-                        </div>
-
-                        {textVal && (
-                          <button 
-                            type="button" 
-                            onClick={() => handleCustomFieldChange(field.id, { ...value, text: "" })}
-                            className="shrink-0 text-muted-foreground hover:text-foreground transition-all p-1.5 rounded-full hover:bg-muted/50"
-                          >
-                            <X className="h-3.5 w-3.5" />
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  );
-                }
-                return null;
-              })}
-            </div>
-          </section>
-        )}
-
-        <input 
-          type="file" 
-          ref={fileInputCustomRef} 
-          className="hidden" 
-          accept="image/*"
-          onChange={onCustomImageUpload}
-        />
       </div>
-
     </div>
   );
 }

@@ -1,5 +1,6 @@
-import { CheckCircle2, ChevronRight } from "lucide-react";
+import { CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import React from "react";
 
 interface Props {
   currentStep: number;
@@ -10,16 +11,17 @@ interface Props {
 export function StepIndicator({ currentStep, steps, onStepClick }: Props) {
   return (
     <div className="w-full">
-      <div className="flex items-center justify-between">
+      <div className="flex items-start justify-between w-full relative px-4 md:px-16">
         {steps.map((step, i) => {
           const isComplete = i < currentStep;
           const isCurrent = i === currentStep;
           
           return (
-            <div key={step} className="flex items-center flex-1 last:flex-none">
+            <React.Fragment key={step}>
+              {/* Step Marker Container */}
               <div 
                 className={cn(
-                  "flex flex-col items-center gap-3",
+                  "flex flex-col items-center shrink-0 w-10 md:w-12 relative z-10",
                   onStepClick && "cursor-pointer group"
                 )}
                 onClick={() => onStepClick?.(i)}
@@ -43,18 +45,24 @@ export function StepIndicator({ currentStep, steps, onStepClick }: Props) {
                     <div className="absolute inset-0 bg-linear-to-tr from-white/20 to-transparent pointer-events-none" />
                   )}
                 </div>
-                <span
-                  className={cn(
-                    "text-[9px] md:text-[10px] font-black uppercase tracking-[0.15em] transition-all duration-500 mt-1",
-                    isCurrent ? "text-primary translate-y-0 opacity-100" : isComplete ? "text-foreground/60 dark:text-white/60 group-hover:text-foreground" : "text-muted-foreground/40 dark:text-white/10 group-hover:text-muted-foreground/60"
-                  )}
-                >
-                  {step}
-                </span>
+                
+                {/* Responsive Label Container */}
+                <div className="mt-4 absolute top-10 md:top-12 left-1/2 -translate-x-1/2 w-max">
+                  <span
+                    className={cn(
+                      "text-[8px] md:text-[10px] font-black uppercase tracking-[0.12em] transition-all duration-500 whitespace-nowrap text-center block",
+                      isCurrent ? "text-primary translate-y-0 opacity-100" : isComplete ? "text-foreground/60 dark:text-white/60 group-hover:text-foreground" : "text-muted-foreground/40 dark:text-white/10 group-hover:text-muted-foreground/60",
+                      !isCurrent && "hidden md:block"
+                    )}
+                  >
+                    {step}
+                  </span>
+                </div>
               </div>
               
+              {/* Connector Line Connector */}
               {i < steps.length - 1 && (
-                <div className="flex-1 mx-6 h-px bg-muted dark:bg-white/10 relative rounded-full overflow-hidden min-w-[40px]">
+                <div className="flex-1 mt-5 md:mt-6 h-[2px] bg-muted dark:bg-white/10 relative overflow-hidden z-0">
                   <div 
                     className={cn(
                       "absolute inset-0 bg-linear-to-r from-primary to-blue-400 transition-all duration-1000 ease-in-out",
@@ -63,7 +71,7 @@ export function StepIndicator({ currentStep, steps, onStepClick }: Props) {
                   />
                 </div>
               )}
-            </div>
+            </React.Fragment>
           );
         })}
       </div>

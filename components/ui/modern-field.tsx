@@ -22,18 +22,33 @@ const ModernField = forwardRef<HTMLInputElement, ModernFieldProps>(
   ({ label, required, error, icon: Icon, flag, isSelect, onClear, children, value, isFocused: externalFocused, alignTop, ...props }, ref) => {
     const [internalFocused, setInternalFocused] = useState(false);
     const [hasInternalValue, setHasInternalValue] = useState(false);
+    const internalInputRef = (ref as any) || useState<HTMLInputElement | null>(null)[0];
     
     const isFocused = externalFocused || internalFocused;
     const isDate = props.type === "date";
-    const isFilled = isDate || (value !== undefined && value !== "" && value !== null) || (props.defaultValue !== undefined && props.defaultValue !== "" && props.defaultValue !== null) || isFocused || hasInternalValue || alignTop;
+    const isRTL = props.dir === "rtl";
+    const isFilled = (value !== undefined && value !== "" && value !== null) || (props.defaultValue !== undefined && props.defaultValue !== "" && props.defaultValue !== null) || isFocused || hasInternalValue;
+
+    const handleContainerClick = () => {
+      const input = (internalInputRef as any)?.current;
+      if (input) {
+        input.focus();
+        if (isDate && 'showPicker' in input) {
+          try {
+            (input as any).showPicker();
+          } catch (e) {}
+        }
+      }
+    };
 
     return (
-      <div className="relative w-full group">
+      <div className="relative w-full group" dir={props.dir}>
         <div 
+          onClick={handleContainerClick}
           onFocusCapture={() => setInternalFocused(true)}
           onBlurCapture={() => setInternalFocused(false)}
           className={cn(
-            "relative flex w-full rounded-xl border transition-all duration-300 overflow-visible px-4 gap-3 bg-background py-3",
+            "relative flex w-full rounded-xl border transition-all duration-300 overflow-visible px-4 gap-3 bg-background py-3 cursor-text",
             alignTop ? "items-start" : "items-center min-h-14 h-auto",
             isFocused ? "border-primary ring-4 ring-primary/5 shadow-sm" : "border-border hover:border-primary/20",
             error ? "border-destructive ring-destructive/10" : ""
@@ -47,11 +62,20 @@ const ModernField = forwardRef<HTMLInputElement, ModernFieldProps>(
               {flag}
             </div>
           ) : Icon && (
-            <div className={cn(
-              "shrink-0 transition-all duration-300",
-              isFocused ? "text-primary scale-110" : "text-muted-foreground",
-              alignTop && "mt-1"
-            )}>
+            <div 
+              onClick={(e) => {
+                if (isDate) {
+                  e.stopPropagation();
+                  handleContainerClick();
+                }
+              }}
+              className={cn(
+                "shrink-0 transition-all duration-300",
+                isFocused ? "text-primary scale-110" : "text-foreground/50",
+                alignTop && "mt-1",
+                isDate && "cursor-pointer hover:text-primary transition-colors"
+              )}
+            >
               <Icon className="h-5 w-5" strokeWidth={2.5} />
             </div>
           )}
@@ -70,9 +94,9 @@ const ModernField = forwardRef<HTMLInputElement, ModernFieldProps>(
             ) : (
             <input
                 {...props as any}
-                ref={ref}
+                ref={ref || internalInputRef}
                 value={value ?? ""}
-                placeholder={isFocused || isDate ? props.placeholder : ""}
+                placeholder={isFocused || (isDate && isFilled) ? props.placeholder : ""}
                 min={props.type === "number" ? (props.min ?? 0) : props.min}
                 onInput={(e) => {
                   setHasInternalValue(!!e.currentTarget.value);
@@ -89,7 +113,8 @@ const ModernField = forwardRef<HTMLInputElement, ModernFieldProps>(
                 }}
                 className={cn(
                   "w-full bg-transparent border-none focus:ring-0 text-sm font-bold text-foreground outline-none h-full placeholder:text-muted-foreground/30",
-                  isDate && !isFocused && !value && "text-transparent"
+                  isDate && !isFocused && !value && "text-transparent",
+                  isRTL && "text-right"
                 )}
               />
             )}
@@ -97,7 +122,7 @@ const ModernField = forwardRef<HTMLInputElement, ModernFieldProps>(
             <label
               className={cn(
                 "absolute pointer-events-none transition-all duration-300 px-1 font-bold select-none z-10 uppercase tracking-[0.15em] whitespace-nowrap",
-                props.dir === "rtl" ? "right-0" : "left-0",
+                isRTL ? "right-0" : "left-0",
                 isFilled 
                   ? "-top-[26px] text-[10px] text-primary bg-background py-0.5" 
                   : alignTop 

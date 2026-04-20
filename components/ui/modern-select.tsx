@@ -59,10 +59,17 @@ export function ModernSelect({
       required={required} 
       error={error}
       value={value}
-      onClear={value ? () => onValueChange("") : undefined}
+      onClear={value ? () => {
+        onValueChange("");
+        const activeElement = document.activeElement as HTMLElement;
+        if (activeElement && activeElement.tagName === 'BUTTON') {
+          activeElement.blur();
+        }
+      } : undefined}
     >
       <Select value={value} onValueChange={onValueChange}>
-        <SelectTrigger className="border-none p-0 h-full w-full shadow-none focus:ring-0 text-sm font-bold text-foreground bg-transparent flex items-center justify-between group/trigger [&_svg]:ml-2 [&_svg]:shrink-0 [&_svg]:text-muted-foreground/50 [&_svg]:group-hover/trigger:text-primary [&_svg]:transition-colors">
+        <SelectTrigger 
+          className="border-none p-0 h-full w-full shadow-none focus:ring-0 text-sm font-bold text-foreground bg-transparent flex items-center justify-between group/trigger [&_svg]:ml-2 [&_svg]:shrink-0 [&_svg]:text-muted-foreground/50 [&_svg]:group-hover/trigger:text-primary [&_svg]:transition-colors">
           <SelectValue placeholder=" " />
         </SelectTrigger>
         <SelectContent className="rounded-xl border-border shadow-xl p-2 max-h-[400px]">

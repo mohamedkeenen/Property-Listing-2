@@ -112,6 +112,13 @@ export function CompletedStep({ form }: Props) {
       notes: values.notes,
       documents: values.documents,
       custom_values: values.custom_values,
+      floor_plan_image: values.floorPlanImage || null,
+      built_up_area: values.builtUpArea || null,
+      layout_type: values.layoutType || null,
+      title_deed: values.titleDeed || null,
+      build_year: values.buildYear || null,
+      ownership: values.ownership || null,
+      currency: values.currency || "Dirham",
     };
 
     try {
