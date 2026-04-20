@@ -1,6 +1,6 @@
 import { useState } from "react";
 import NextImage from "next/image";
-import { Search, MessageCircle, Mail, Phone, MoreHorizontal, Eye, ChevronLeft, ChevronRight, Globe, Facebook, Users, RefreshCw, ChevronDown, Trash2 } from "lucide-react";
+import { Search, MessageCircle, Mail, Phone, MoreHorizontal, Eye, ChevronLeft, ChevronRight, Globe, Facebook, Users, RefreshCw, ChevronDown } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -232,7 +232,6 @@ export function LeadsTable({
           <Table className="relative">
             <TableHeader className="sticky top-0 bg-card z-10 shadow-[0_1px_0_rgba(0,0,0,0.1)]">
               <TableRow>
-              <TableRow>
                 <TableHead className="w-[50px]"></TableHead>
                 <TableHead className="font-black uppercase tracking-widest text-[10px]">Lead</TableHead>
                 <TableHead className="font-black uppercase tracking-widest text-[10px] hidden lg:table-cell">Contact</TableHead>
@@ -241,7 +240,6 @@ export function LeadsTable({
                 <TableHead className="font-black uppercase tracking-widest text-[10px]">Property</TableHead>
                 <TableHead className="font-black uppercase tracking-widest text-[10px]">Status</TableHead>
                 <TableHead className="font-black uppercase tracking-widest text-[10px] hidden sm:table-cell">Inquiry Date</TableHead>
-              </TableRow>
               </TableRow>
             </TableHeader>
             <TableBody>

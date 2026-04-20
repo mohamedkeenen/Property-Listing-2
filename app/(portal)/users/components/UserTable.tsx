@@ -21,7 +21,6 @@ import {
   Trash2, 
   Eye, 
   User as UserIcon,
-  Shield,
   ShieldCheck,
   UserCheck
 } from "lucide-react";

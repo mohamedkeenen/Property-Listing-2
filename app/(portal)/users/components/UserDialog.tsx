@@ -28,7 +28,6 @@ import {
   User as UserIcon, 
   Mail, 
   Lock, 
-  Shield, 
   PhoneCall, 
   Loader2,
   CheckCircle2,

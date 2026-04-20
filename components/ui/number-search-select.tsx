@@ -41,7 +41,6 @@ const NumberSearchSelect = ({
           label={label} 
           icon={icon} 
           required={required} 
-          isSelect 
           value={value}
           error={error}
           isFocused={open}

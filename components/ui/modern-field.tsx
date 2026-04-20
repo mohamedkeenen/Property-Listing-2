@@ -1,6 +1,6 @@
 "use client";
 
-import { forwardRef, useState } from "react";
+import { forwardRef, useState, useRef } from "react";
 import { cn } from "@/lib/utils";
 import { X } from "lucide-react";
 
@@ -10,7 +10,6 @@ interface ModernFieldProps extends React.InputHTMLAttributes<HTMLInputElement | 
   error?: string;
   icon?: any;
   flag?: string | null;
-  isSelect?: boolean;
   onClear?: () => void;
   children?: React.ReactNode;
   value?: any;
@@ -19,10 +18,10 @@ interface ModernFieldProps extends React.InputHTMLAttributes<HTMLInputElement | 
 }
 
 const ModernField = forwardRef<HTMLInputElement, ModernFieldProps>(
-  ({ label, required, error, icon: Icon, flag, isSelect, onClear, children, value, isFocused: externalFocused, alignTop, ...props }, ref) => {
+  ({ label, required, error, icon: Icon, flag, onClear, children, value, isFocused: externalFocused, alignTop, ...props }, ref) => {
     const [internalFocused, setInternalFocused] = useState(false);
     const [hasInternalValue, setHasInternalValue] = useState(false);
-    const internalInputRef = (ref as any) || useState<HTMLInputElement | null>(null)[0];
+    const internalInputRef = useRef<HTMLInputElement>(null);
     
     const isFocused = externalFocused || internalFocused;
     const isDate = props.type === "date";

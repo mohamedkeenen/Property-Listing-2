@@ -10,7 +10,7 @@ import {
   SelectTrigger, 
   SelectValue 
 } from "@/components/ui/select";
-import { ChevronDown, Search } from "lucide-react";
+import { Search } from "lucide-react";
 
 interface ModernSelectProps {
   label: string;

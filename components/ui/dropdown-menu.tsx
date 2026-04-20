@@ -167,15 +167,9 @@ export {
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
-  
-  
-  
+  DropdownMenuCheckboxItem,
+  DropdownMenuRadioItem,
+  DropdownMenuLabel,
   DropdownMenuSeparator,
-  
-  
-  
-  
-  
-  
   
 };
