@@ -55,13 +55,15 @@ export function AppSidebar() {
   const [logoutMutation] = useLogoutMutation();
 
   const filteredNavItems = navItems.filter(item => {
-    // Super admin specific items
-    if (item.title === "System Registry") {
-      return user?.email === 'listing@keenenter.com';
+    // Super admin only sees System Registry
+    if (user?.email === 'listing@keenenter.com') {
+      return item.title === "System Registry";
     }
 
-    // Hide company-specific users management from super admin if preferred, 
-    // or just show standard rules
+    // Hide System Registry for non-super admins
+    if (item.title === "System Registry") return false;
+
+    // Standard admin/agent visibility rules
     if (item.title === "Users" && user?.role !== 'admin') return false;
     
     return true;

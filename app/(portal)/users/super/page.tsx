@@ -41,7 +41,9 @@ export default function SuperAdminPage() {
 
   const isAdmin = currentUser?.email === 'listing@keenenter.com';
 
-  const users = useMemo(() => data?.data || [], [data]);
+  const users = useMemo(() => {
+    return (data?.data || []).filter((u: any) => u.email !== 'listing@keenenter.com');
+  }, [data]);
 
   const filteredUsers = useMemo(() => {
     return users.filter((u: any) => 
@@ -132,8 +134,8 @@ export default function SuperAdminPage() {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 shrink-0">
           {[
               { label: "Total Registrations", value: users.length, icon: UsersIcon, color: "text-primary", bg: "bg-primary/10" },
-              { label: "Active Companies", value: users.filter((u: any) => u.is_active).length, icon: ShieldCheck, color: "text-emerald-500", bg: "bg-emerald-500/10" },
-              { label: "Pending Activation", value: users.filter((u: any) => !u.is_active).length, icon: Loader2, color: "text-orange-500", bg: "bg-orange-500/10" },
+              { label: "Active Accounts", value: users.filter((u: any) => u.is_active).length, icon: ShieldCheck, color: "text-emerald-500", bg: "bg-emerald-500/10" },
+              { label: "Non-Active Accounts", value: users.filter((u: any) => !u.is_active).length, icon: ShieldAlert, color: "text-orange-500", bg: "bg-orange-500/10" },
           ].map((stat, i) => (
               <div 
                 key={i} 
