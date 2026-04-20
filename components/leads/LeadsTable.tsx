@@ -22,7 +22,6 @@ const subSourceIcon: Record<string, { icon: typeof MessageCircle; color: string 
 const portalLogos: Record<string, string> = {
   "Property Finder": "https://res.cloudinary.com/devht0mp5/image/upload/v1772105511/PF_ljkahc.png",
   "Bayut": "https://res.cloudinary.com/devht0mp5/image/upload/v1772105511/bayut_gy4ev2.png",
-  "Skyloov": "https://res.cloudinary.com/devht0mp5/image/upload/v1773486432/Logo-rebrand-blue_dwxrba.svg",
   "Facebook": "https://upload.wikimedia.org/wikipedia/commons/b/b8/2021_Facebook_icon.svg",
 };
 
@@ -33,7 +32,7 @@ const statusColors: Record<string, string> = {
   Lost: "bg-red-500/10 text-red-500 dark:text-red-400 border-red-200 dark:border-red-500/30",
 };
 
-const sourceTabs = ["All", "Property Finder", "Bayut", "Facebook", "Skyloov", "Website"];
+const sourceTabs = ["All", "Property Finder", "Bayut", "Facebook", "Website"];
 const statusTabs = ["All Statuses", "New", "Contacted", "Qualified", "Lost"];
 
 import { useGetPropertiesQuery } from "@/api/redux/services/propertyApi";
@@ -107,7 +106,7 @@ export function LeadsTable({
 
   return (
     <>
-      <div className="bg-card border border-border rounded-lg overflow-hidden flex flex-col h-full shadow-sm">
+      <div className="bg-card border border-border rounded-xl overflow-hidden flex flex-col h-full shadow-sm">
         {/* Tabs and Filters */}
         <div className="flex flex-col gap-1 p-3 border-b border-border/10">
           <div className="flex items-center gap-1 overflow-x-auto overflow-y-hidden no-scrollbar pb-2">
@@ -131,24 +130,15 @@ export function LeadsTable({
               return (
                 <button
                   key={tab}
-                  onClick={() => { 
-                    if (tab === "Skyloov") return;
-                    onSourceChange?.(tab); 
-                  }}
+                  onClick={() => onSourceChange?.(tab)}
                   className={cn(
                     "px-3 py-1.5 text-xs font-bold rounded-lg transition-all whitespace-nowrap relative group",
                     filters.source === tab 
                       ? cn(active[tab], "shadow-sm shadow-black/5") 
-                      : cn("text-muted-foreground hover:bg-muted/50", colors[tab]),
-                    tab === "Skyloov" && "opacity-40 cursor-not-allowed grayscale pointer-events-none"
+                      : cn("text-muted-foreground hover:bg-muted/50", colors[tab])
                   )}
                 >
                   {tab}
-                  {tab === "Skyloov" && (
-                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[6px] font-black px-1 py-0.5 rounded shadow-sm opacity-100 uppercase transform rotate-2">
-                      Soon
-                    </span>
-                  )}
                 </button>
               );
             })}
@@ -450,7 +440,7 @@ export function LeadsTable({
       </div>
 
       <Dialog open={!!selectedLead} onOpenChange={() => setSelectedLead(null)}>
-        <DialogContent className="max-w-lg rounded-3xl">
+        <DialogContent className="max-w-lg rounded-xl">
           {selectedLead && (
             <>
               <DialogHeader>

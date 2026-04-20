@@ -73,7 +73,7 @@ export function UserTable({ users, onEdit, onDelete, onView }: UserTableProps) {
   };
 
   return (
-    <div className="relative rounded-3xl border border-border/50 bg-card/30 backdrop-blur-xl overflow-hidden shadow-2xl">
+    <div className="relative rounded-xl border border-border/50 bg-card/30 backdrop-blur-xl overflow-hidden shadow-2xl">
       <div className="overflow-x-auto no-scrollbar">
         <Table>
           <TableHeader className="bg-muted/50">
@@ -99,7 +99,7 @@ export function UserTable({ users, onEdit, onDelete, onView }: UserTableProps) {
               users.map((user) => (
                 <TableRow key={user.id} className="group border-border/40 hover:bg-primary/5 transition-colors">
                   <TableCell className="py-4 px-6">
-                    <Avatar className="h-12 w-12 rounded-2xl border-2 border-background ring-4 ring-primary/5 shadow-lg group-hover:scale-110 transition-transform duration-500">
+                    <Avatar className="h-12 w-12 rounded-xl border-2 border-background ring-4 ring-primary/5 shadow-lg transition-transform duration-500">
                       <AvatarImage src={getPhotoUrl(user.photo || '')} alt={user.name} className="object-cover" />
                       <AvatarFallback className="bg-primary/10 text-primary font-black">
                         {user.name.charAt(0).toUpperCase()}
@@ -113,7 +113,7 @@ export function UserTable({ users, onEdit, onDelete, onView }: UserTableProps) {
                   </TableCell>
                   <TableCell className="py-4">
                     <div className="flex flex-col">
-                      <span className="font-black text-foreground tracking-tight group-hover:text-primary transition-colors">{user.name}</span>
+                      <span className="font-black text-foreground tracking-tight transition-colors">{user.name}</span>
                       <span className="text-xs text-muted-foreground font-medium">{user.email}</span>
                     </div>
                   </TableCell>
@@ -126,7 +126,7 @@ export function UserTable({ users, onEdit, onDelete, onView }: UserTableProps) {
                   <TableCell className="py-4 text-right px-6">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl hover:bg-primary/10 hover:text-primary transition-all active:scale-95 group-hover:rotate-90">
+                        <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl hover:bg-primary/10 hover:text-primary transition-all active:scale-95">
                           <MoreVertical className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>

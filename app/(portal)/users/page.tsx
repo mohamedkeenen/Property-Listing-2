@@ -8,10 +8,9 @@ import {
 } from "@/api/redux/services/userApi";
 import { UserTable } from "./components/UserTable";
 import { UserDialog } from "./components/UserDialog";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { 
   Users as UsersIcon, 
-  UserPlus, 
   Search, 
   LayoutGrid, 
   ChevronRight, 
@@ -47,11 +46,23 @@ export default function UsersPage() {
   const [userToDelete, setUserToDelete] = useState<any>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const users = data?.data || [];
-  const filteredUsers = users.filter((u: any) => 
-    u.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    u.email.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const users = useMemo(() => {
+    const apiUsers = data?.data || [];
+    if (!currentUser) return apiUsers;
+    
+    const exists = apiUsers.find((u: any) => u.email === currentUser.email);
+    if (!exists) {
+        return [currentUser, ...apiUsers];
+    }
+    return apiUsers;
+  }, [data, currentUser]);
+
+  const filteredUsers = useMemo(() => {
+    return users.filter((u: any) => 
+        u.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        u.email?.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [users, searchQuery]);
 
   const handleCreate = () => {
     setSelectedUser(null);
@@ -186,9 +197,9 @@ export default function UsersPage() {
           ].map((stat, i) => (
               <div 
                 key={i} 
-                className="group relative bg-card/60 backdrop-blur-2xl rounded-[2.5rem] border border-border/40 p-6 flex items-center gap-6 transition-all hover:shadow-2xl hover:-translate-y-1 cursor-default ornament-grid"
+                className="group relative bg-card/60 backdrop-blur-2xl rounded-xl border border-border/40 p-6 flex items-center gap-6 transition-all cursor-default ornament-grid"
               >
-                  <div className={cn("h-16 w-16 rounded-3xl flex items-center justify-center shadow-lg transition-transform group-hover:scale-110 duration-500", stat.bg)}>
+                  <div className={cn("h-16 w-16 rounded-xl flex items-center justify-center shadow-lg transition-transform duration-500", stat.bg)}>
                       <stat.icon className={cn("h-8 w-8", stat.color)} />
                   </div>
                   <div className="space-y-1">
@@ -215,7 +226,7 @@ export default function UsersPage() {
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
                 <Input
                     placeholder="Fast search by name or identification..."
-                    className="pl-12 h-14 rounded-[1.25rem] bg-card/50 border-border/30 backdrop-blur-xl focus:bg-background focus:ring-primary/20 transition-all font-bold text-sm tracking-tight shadow-xl"
+                    className="pl-12 h-14 rounded-xl bg-card/50 border-border/30 backdrop-blur-xl focus:bg-background focus:ring-primary/20 transition-all font-bold text-sm tracking-tight shadow-xl"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                 />

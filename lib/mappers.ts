@@ -18,20 +18,6 @@ const getImageUrl = (path: string) => {
   return `${baseUrl}/api/storage/${cleanPath}`;
 };
 
-const mapCustomValues = (values: any, fields: any[] = []) => {
-  const result = { ...values };
-  fields.forEach(f => {
-    const val = result[f.id];
-    if (!val) return;
-
-    if (f.type === 'image' && typeof val === 'string') {
-      result[f.id] = getImageUrl(val);
-    } else if (f.type === 'text_image' && val.image) {
-      result[f.id] = { ...val, image: getImageUrl(val.image) };
-    }
-  });
-  return result;
-};
 
 export const mapBackendPropertyToFrontend = (p: any): PropertyListing => {
   const imagesList = p.images || [];
@@ -89,7 +75,7 @@ export const mapBackendPropertyToFrontend = (p: any): PropertyListing => {
       bayut: p.is_on_bayut || false,
       website: p.is_on_website || false,
       dubizzle: p.is_on_dubizzle || false,
-      bitrix: p.is_on_bitrix || true, // Defaulting to true for now since user wants it first and active
+      bitrix: p.is_on_bitrix || true,
     },
     uaeEmirate: p.uae_emirate || "",
     pfStatus: p.pf_status || null,
@@ -116,6 +102,7 @@ export const mapBackendPropertyToFrontend = (p: any): PropertyListing => {
     })),
     custom_values: p.custom_values || {},
     custom_fields: customFields,
+    floorPlanImage: p.floor_plan_image ? getImageUrl(p.floor_plan_image) : undefined,
     projectName: p.project_name || "",
     developers: p.developer_name || "",
   };
@@ -145,6 +132,7 @@ export const mapBackendPropertyToFormValues = (p: any): any => {
     pricePeriod: p.rent_frequency || "Yearly",
     currency: p.currency || "Dirham",
     listingAgent: p.agent_id?.toString() || "",
+    listingAdmin: p.listing_admin_id?.toString() || "",
     listingOwner: p.owner_id?.toString() || "",
     projectName: p.project_name || "",
     developers: p.developer_name || "",
@@ -193,7 +181,10 @@ export const mapBackendPropertyToFormValues = (p: any): any => {
       size: doc.size || "Unknown"
     })),
     notes: typeof p.notes === 'string' ? p.notes : (Array.isArray(p.notes) ? p.notes.map((n: any) => n.content || n).join('\n') : ""),
-    custom_values: p.custom_values || {},
+    custom_values: (p.custom_fields || []).reduce((acc: any, field: any) => {
+      acc[field.id] = field.value;
+      return acc;
+    }, {}),
     portals: {
       propertyFinder: !!p.is_on_pf,
       bayutEnabled: !!p.is_on_bayut,

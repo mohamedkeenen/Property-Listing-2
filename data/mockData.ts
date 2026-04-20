@@ -56,6 +56,7 @@ export interface PropertyListing {
   developers?: string;
   custom_fields?: any[];
   custom_values?: Record<string, any>;
+  floorPlanImage?: string;
 }
 
 export interface Lead {

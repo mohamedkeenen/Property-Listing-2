@@ -27,7 +27,7 @@ export function SpecsSidebar({ category, status, type, purpose, updatedAt, porta
 
   return (
     <div className="space-y-10">
-      <div className="bg-card backdrop-blur-3xl border border-border rounded-[2.5rem] px-6 py-5 space-y-8 shadow-sm hover:bg-muted/50 transition-all">
+      <div className="bg-card backdrop-blur-3xl border border-border rounded-xl px-6 py-5 space-y-8 shadow-sm hover:bg-muted/50 transition-all">
         <h3 className="text-sm font-black text-foreground uppercase tracking-[0.2em]">Digital Specifications</h3>
         <div className="space-y-6">
           {specs.map((s, i) => (

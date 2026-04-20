@@ -1,9 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { Play, Search, FileText, Download, Loader2 } from "lucide-react";
+import { Play, Search, FileText, Download, Loader2, Video } from "lucide-react";
+import { Dialog, DialogContent, DialogTrigger, DialogTitle } from "@/components/ui/dialog";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
+import { cn } from "@/lib/utils";
 
-export function VirtualTour({ videoUrl, poster, title }: { videoUrl?: string; poster?: string; title?: string }) {
+/**
+ * BIG VIDEO PLAYER COMPONENT
+ */
+export function VirtualTourPlayer({ videoUrl, poster, title }: { videoUrl?: string; poster?: string; title?: string }) {
   const [isPlaying, setIsPlaying] = useState(false);
   if (!videoUrl) return null;
 
@@ -17,7 +23,7 @@ export function VirtualTour({ videoUrl, poster, title }: { videoUrl?: string; po
   };
 
   return (
-    <div className="relative aspect-video rounded-3xl md:rounded-[2.5rem] overflow-hidden group shadow-xl border border-border bg-black">
+    <div className="relative aspect-video rounded-xl overflow-hidden group shadow-xl bg-black">
       {isPlaying ? (
         <iframe 
           src={getEmbedUrl(videoUrl)}
@@ -27,7 +33,7 @@ export function VirtualTour({ videoUrl, poster, title }: { videoUrl?: string; po
         />
       ) : (
         <>
-          <img src={poster || "https://images.unsplash.com/photo-1600585154340-be6199fbfd1e?w=1200"} className="w-full h-full object-cover brightness-50 group-hover:scale-105 transition-transform duration-700" alt="3D" />
+          <img src={poster || "https://images.unsplash.com/photo-1600585154340-be6199fbfd1e?w=1200"} className="w-full h-full object-cover brightness-50 group-hover:scale-105 transition-transform duration-700" alt="Video Background" />
           <div className="absolute inset-0 bg-linear-to-t from-black/80 to-transparent flex flex-col justify-end p-10 space-y-4">
             <h3 className="text-3xl font-black text-white uppercase tracking-tight line-clamp-2">{title || "Explore the Space"}</h3>
             <p className="text-sm text-slate-300 font-medium max-w-md">Experience property walkthrough and immersive 3D environment.</p>
@@ -45,40 +51,153 @@ export function VirtualTour({ videoUrl, poster, title }: { videoUrl?: string; po
   );
 }
 
-export function FloorPlans() {
+/**
+ * ASSET CARD TEMPLATE FOR SIDEBAR
+ */
+interface AssetCardProps {
+  title: string;
+  badgeLabel: string;
+  iconColor: string;
+  url: string;
+  previewContent: React.ReactNode;
+  modalContent: React.ReactNode;
+  expandLabel: string;
+  size?: "sm" | "md" | "lg";
+}
+
+function AssetCard({ title, badgeLabel, iconColor, url, previewContent, modalContent, expandLabel, size = "lg" }: AssetCardProps) {
+  const sizeClasses = {
+    sm: "max-w-md",
+    md: "max-w-xl",
+    lg: "max-w-3xl"
+  };
+
   return (
-    <div className="bg-card backdrop-blur-3xl border border-border rounded-[2.5rem] p-10 space-y-8 shadow-sm">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <div className="h-10 w-1 bg-emerald-500 rounded-full" />
-          <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Floor Plans</h3>
+    <Dialog>
+      <div className="bg-card backdrop-blur-3xl border border-border rounded-xl p-5 space-y-5 shadow-sm">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className={cn("h-6 w-0.5 rounded-full", iconColor)} />
+            <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">{title}</h3>
+          </div>
+          <DialogTrigger asChild>
+            <button className="text-[10px] font-black text-primary uppercase tracking-widest hover:text-primary/80 transition-colors">
+              {expandLabel}
+            </button>
+          </DialogTrigger>
         </div>
-        <button className="text-[10px] font-black text-primary uppercase tracking-widest hover:text-primary/80 transition-colors">
-          Download PDF
-        </button>
+
+        <DialogTrigger asChild>
+          <div className="relative aspect-square md:aspect-16/10 rounded-md bg-muted/20 flex items-center justify-center group overflow-hidden cursor-pointer">
+            <div className="absolute inset-0 bg-background/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-10 backdrop-blur-sm">
+              <div className="bg-primary text-white px-6 py-2.5 rounded-2xl font-black uppercase tracking-widest text-[9px] shadow-2xl shadow-primary/40">
+                Click to View
+              </div>
+            </div>
+            {previewContent}
+          </div>
+        </DialogTrigger>
       </div>
 
-      <div className="relative aspect-square rounded-3xl bg-muted border border-border flex items-center justify-center group overflow-hidden">
-        <div className="absolute inset-0 bg-background/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-10">
-           <button className="bg-primary text-white px-6 py-2 rounded-xl font-bold transition-transform hover:scale-105 shadow-xl">View Full Plan</button>
-        </div>
-        <img 
-          src="https://images.unsplash.com/photo-1574362848149-11496d93a7c7?w=800" 
-          alt="Floor plan" 
-          className="w-full h-full object-cover opacity-60 grayscale dark:brightness-125 dark:invert"
-        />
-      </div>
-    </div>
+      <DialogContent className={cn(
+        "w-[95vw] max-h-[90vh] p-0 overflow-hidden bg-background/95 backdrop-blur-xl border-none shadow-2xl rounded-xl transition-all duration-500",
+        sizeClasses[size]
+      )}>
+        <VisuallyHidden>
+            <DialogTitle>{title} Full View</DialogTitle>
+        </VisuallyHidden>
+        {modalContent}
+      </DialogContent>
+    </Dialog>
   );
 }
 
-function DocumentRow({ doc }: { doc: any }) {
+/**
+ * FLOOR PLANS SIDEBAR CARD
+ */
+export function FloorPlans({ url }: { url?: string }) {
+  if (!url) return null;
+  return (
+    <AssetCard 
+      title="Floor Plan"
+      badgeLabel="Plan"
+      iconColor="bg-emerald-500"
+      url={url}
+      expandLabel="Enlarge"
+      size="md"
+      previewContent={
+        <img src={url} alt="Floor plan preview" className="max-w-full max-h-full object-contain p-2 transition-transform duration-700 group-hover:scale-105" />
+      }
+      modalContent={
+        <div className="relative w-full h-full flex items-center justify-center p-8">
+          <img src={url} alt="Floor plan full view" className="max-w-full max-h-full object-contain shadow-2xl rounded-xl" />
+        </div>
+      }
+    />
+  );
+}
+
+/**
+ * QR CODE SIDEBAR CARD
+ */
+export function QRCode({ url }: { url?: string }) {
+  if (!url) return null;
+  return (
+    <AssetCard 
+      title="Digital Passport (QR)"
+      badgeLabel="Passport"
+      iconColor="bg-blue-500"
+      url={url}
+      expandLabel="Expand"
+      size="md"
+      previewContent={
+        <div className="bg-white p-4 w-full h-full flex items-center justify-center">
+            <img src={url} alt="QR Code preview" className="max-w-full max-h-full object-contain transition-transform duration-700 group-hover:scale-105" />
+        </div>
+      }
+      modalContent={
+        <div className="relative w-full h-full flex items-center justify-center p-20 bg-white">
+          <img src={url} alt="QR Code full view" className="max-w-full max-h-full object-contain shadow-xl rounded-xl" />
+        </div>
+      }
+    />
+  );
+}
+
+/**
+ * VIRTUAL TOUR SIDEBAR CARD
+ */
+export function VirtualTourCard({ url, poster }: { url?: string, poster?: string }) {
+  if (!url) return null;
+  return (
+    <AssetCard 
+      title="Virtual Tour"
+      badgeLabel="Video"
+      iconColor="bg-amber-500"
+      url={url}
+      expandLabel="Play"
+      previewContent={
+        <div className="relative w-full h-full">
+            <img src={poster || "https://images.unsplash.com/photo-1600585154340-be6199fbfd1e?w=800"} className="w-full h-full object-cover brightness-50" alt="Video Preview" />
+            <Play className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-8 w-8 text-white fill-white/20" />
+        </div>
+      }
+      modalContent={
+        <VirtualTourPlayer videoUrl={url} title="Virtual Walkthrough" />
+      }
+    />
+  );
+}
+
+/**
+ * DOCUMENT ROW
+ */
+export function DocumentRow({ doc }: { doc: any }) {
   const [isDownloading, setIsDownloading] = useState(false);
 
   const handleDownload = async () => {
     if (!doc.url) return;
     setIsDownloading(true);
-    
     try {
       const response = await fetch(doc.url);
       const blob = await response.blob();
@@ -91,7 +210,6 @@ function DocumentRow({ doc }: { doc: any }) {
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
     } catch (error) {
-      // Fallback for CORS issues or other errors
       window.open(doc.url, '_blank');
     } finally {
       setIsDownloading(false);
@@ -112,7 +230,7 @@ function DocumentRow({ doc }: { doc: any }) {
       <button 
         onClick={handleDownload}
         disabled={isDownloading}
-        className="h-8 w-8 rounded-lg border border-border flex items-center justify-center text-muted-foreground group-hover:border-primary group-hover:text-primary transition-all disabled:opacity-50"
+        className="h-8 w-8 rounded-md border border-border flex items-center justify-center text-muted-foreground group-hover:border-primary group-hover:text-primary transition-all disabled:opacity-50"
       >
         {isDownloading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
       </button>
@@ -120,11 +238,31 @@ function DocumentRow({ doc }: { doc: any }) {
   );
 }
 
+/**
+ * AGENT REMARK COMPONENT
+ */
+export function AgentRemark({ note }: { note: any }) {
+    return (
+        <div className="bg-muted p-5 rounded-lg border border-border space-y-2">
+            <p className="text-[12px] text-foreground/80 font-medium leading-relaxed italic">
+                "{note.content}"
+            </p>
+            <div className="flex items-center justify-between text-[8px] font-black uppercase tracking-tighter text-muted-foreground">
+                <span>{note.user}</span>
+                <span>{new Date(note.date).toLocaleDateString()}</span>
+            </div>
+        </div>
+    );
+}
+
+/**
+ * BIG DOCUMENTS AND NOTES SIDEBAR CONTAINER
+ */
 export function DocumentsAndNotes({ documents, notes }: { documents: any[], notes: any[] }) {
   if (documents.length === 0 && notes.length === 0) return null;
 
   return (
-    <div className="bg-card backdrop-blur-3xl border border-border rounded-[2.5rem] p-8 space-y-8 shadow-sm">
+    <div className="bg-card backdrop-blur-3xl border border-border rounded-xl p-6 space-y-8 shadow-sm">
       {documents.length > 0 && (
         <div className="space-y-6">
           <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Documents</h3>
@@ -141,15 +279,7 @@ export function DocumentsAndNotes({ documents, notes }: { documents: any[], note
           <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Agent Remarks</h3>
           <div className="space-y-3">
             {notes.map((note, i) => (
-              <div key={i} className="bg-muted p-5 rounded-3xl border border-border space-y-2">
-                <p className="text-[12px] text-foreground/80 font-medium leading-relaxed italic">
-                  "{note.content}"
-                </p>
-                <div className="flex items-center justify-between text-[8px] font-black uppercase tracking-tighter text-muted-foreground">
-                  <span>{note.user}</span>
-                  <span>{new Date(note.date).toLocaleDateString()}</span>
-                </div>
-              </div>
+              <AgentRemark key={i} note={note} />
             ))}
           </div>
         </div>

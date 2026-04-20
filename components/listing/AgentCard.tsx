@@ -9,7 +9,7 @@ interface AgentCardProps {
 
 export function AgentCard({ name, avatar, phone, email }: AgentCardProps) {
   return (
-    <div className="bg-card backdrop-blur-3xl border border-border rounded-[2.5rem] px-6 py-5 space-y-8 text-center relative overflow-hidden shadow-sm hover:bg-muted/50 transition-all">
+    <div className="bg-card backdrop-blur-3xl border border-border rounded-xl px-6 py-5 space-y-8 text-center relative overflow-hidden shadow-sm hover:bg-muted/50 transition-all">
       
       <div className="space-y-6 relative z-10">
         <div className="flex items-center justify-center gap-2">

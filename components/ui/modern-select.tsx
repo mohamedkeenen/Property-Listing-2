@@ -16,7 +16,7 @@ interface ModernSelectProps {
   label: string;
   value?: string;
   onValueChange: (value: string) => void;
-  options: string[] | { label: string; value: string }[];
+  options: string[] | { label: string; value: string; badge?: string; badgeColor?: string }[];
   icon?: any;
   required?: boolean;
   error?: string;
@@ -92,7 +92,17 @@ export function ModernSelect({
                 value={opt.value} 
                 className="text-xs font-medium rounded-lg mb-0.5 hover:bg-primary/5 focus:bg-primary/10 transition-colors"
               >
-                {opt.label}
+                <div className="flex items-center justify-between w-full gap-4">
+                  <span>{opt.label}</span>
+                  {opt.badge && (
+                    <span className={cn(
+                      "text-[8px] font-black uppercase tracking-tighter px-1.5 py-0.5 rounded-md",
+                      opt.badgeColor || "bg-orange-500/10 text-orange-500 border border-orange-500/20"
+                    )}>
+                      {opt.badge}
+                    </span>
+                  )}
+                </div>
               </SelectItem>
             )) : (
               <div className="py-8 text-center text-[10px] text-muted-foreground font-black uppercase tracking-widest opacity-50">No results found</div>

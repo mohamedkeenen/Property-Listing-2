@@ -96,10 +96,10 @@ export function ListingsFilters({ onApply, agentOptions }: Props) {
   };
 
   return (
-    <div className="bg-card border-2 border-border rounded-[2.5rem] overflow-hidden shadow-sm transition-all hover:shadow-xl">
+    <div className="bg-card border-2 border-border rounded-xl overflow-hidden shadow-sm transition-all hover:shadow-xl">
       <div className="w-full flex items-center justify-between p-7 text-sm font-black uppercase tracking-[0.2em] text-foreground">
         <div className="flex items-center gap-4">
-          <div className="h-10 w-10 flex items-center justify-center rounded-2xl bg-primary/10 text-primary">
+          <div className="h-10 w-10 flex items-center justify-center rounded-lg bg-primary/10 text-primary">
             <Search className="h-5 w-5" />
           </div>
           <span>Advanced Search Filters</span>

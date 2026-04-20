@@ -26,7 +26,7 @@ export function ImageGallery({ images }: ImageGalleryProps) {
 
   return (
     <div className="relative group">
-      <div className="relative aspect-square md:aspect-16/7.5 rounded-3xl md:rounded-[2.5rem] overflow-hidden shadow-2xl bg-muted">
+      <div className="relative aspect-square md:aspect-16/7.5 rounded-xl overflow-hidden shadow-2xl bg-muted">
         <img
           src={images[activeImage]}
           alt="Property"
@@ -57,7 +57,7 @@ export function ImageGallery({ images }: ImageGalleryProps) {
         </div>
 
         {/* Vertical Focused Thumbnail Slider - 3 Image System - Hidden on Mobile */}
-        <div className="absolute left-6 top-1/2 -translate-y-1/2 hidden md:flex flex-col gap-4 p-4 rounded-[2.5rem] bg-background/15 backdrop-blur-3xl border border-border z-20 h-[320px] overflow-hidden">
+        <div className="absolute left-6 top-1/2 -translate-y-1/2 hidden md:flex flex-col gap-4 p-4 rounded-xl bg-background/15 backdrop-blur-3xl border border-border z-20 h-[320px] overflow-hidden">
           <div 
             className="flex flex-col gap-6 transition-all duration-700 cubic-bezier(0.4, 0, 0.2, 1)"
             style={{ 
@@ -74,10 +74,10 @@ export function ImageGallery({ images }: ImageGalleryProps) {
                   key={i}
                   onClick={() => setActiveImage(i)}
                   className={cn(
-                    "relative shrink-0 w-24 md:w-32 aspect-video rounded-2xl overflow-hidden border-2 transition-all duration-500",
+                    "relative shrink-0 w-24 md:w-32 aspect-video rounded-lg overflow-hidden transition-all duration-500",
                     isActive 
-                      ? "border-primary ring-8 ring-primary/20 shadow-2xl scale-110 z-10" 
-                      : "border-transparent opacity-20 grayscale scale-90"
+                      ? "ring-4 ring-primary shadow-2xl scale-110 z-10" 
+                      : "opacity-20 grayscale scale-90"
                   )}
                   style={{
                     height: '70px',

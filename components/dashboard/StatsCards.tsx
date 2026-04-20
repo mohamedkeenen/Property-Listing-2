@@ -3,8 +3,7 @@ import { cn } from "@/lib/utils";
 import NextImage from "next/image";
 import { PropertyListing } from "@/data/mockData";
 import { useGetCompanySettingsQuery } from "@/api/redux/services/settingsApi";
-import { ExternalLink, Copy, Check } from "lucide-react";
-import { useState } from "react";
+import { Copy } from "lucide-react";
 import { toast } from "react-hot-toast";
 
 interface Props {
@@ -99,14 +98,15 @@ export function StatsCards({ listings }: Props) {
           key={s.label} 
           className="flex flex-col gap-2"
         >
-          {s.label === "Website" ? (
-            <div className="flex items-center justify-between px-1">
-               <div className="flex items-center gap-1.5 overflow-hidden">
-                <Globe className="h-3 w-3 text-cyan-600 shrink-0" />
-                <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground whitespace-nowrap">API Endpoint</span>
-               </div>
-               {companySettings?.data?.id && (
-                 <button 
+          <div className="h-6 mb-2">
+            {s.label === "Website" ? (
+              <div className="flex items-center justify-between px-1">
+                <div className="flex items-center gap-1.5 overflow-hidden">
+                  <Globe className="h-3 w-3 text-cyan-600 shrink-0" />
+                  <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground whitespace-nowrap">API Endpoint</span>
+                </div>
+                {companySettings?.data?.id && (
+                  <button 
                   onClick={() => {
                     const baseUrl = process.env.NEXT_PUBLIC_API_URL || "https://property-listing.keenenter.com/api";
                     const feedToken = companySettings?.data?.outbound_handler_token || companySettings?.data?.id;
@@ -115,20 +115,20 @@ export function StatsCards({ listings }: Props) {
                     toast.success("API URL copied!");
                   }}
                   className="flex items-center gap-1 text-[9px] font-bold text-cyan-600 hover:text-cyan-700 transition-colors uppercase tracking-tight"
-                 >
-                   <Copy className="h-2.5 w-2.5" />
-                   Copy URL
-                 </button>
-               )}
-            </div>
-          ) : s.label === "Bayut & Dubizzle" ? (
-            <div className="flex items-center justify-between px-1">
-               <div className="flex items-center gap-1.5 overflow-hidden">
-                <FileText className="h-3 w-3 text-emerald-600 shrink-0" />
-                <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground whitespace-nowrap">XML Feed</span>
-               </div>
-               {companySettings?.data?.id && (
-                 <button 
+                  >
+                    <Copy className="h-2.5 w-2.5" />
+                    Copy URL
+                  </button>
+                )}
+              </div>
+            ) : s.label === "Bayut & Dubizzle" ? (
+              <div className="flex items-center justify-between px-1">
+                <div className="flex items-center gap-1.5 overflow-hidden">
+                  <FileText className="h-3 w-3 text-emerald-600 shrink-0" />
+                  <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground whitespace-nowrap">XML Feed</span>
+                </div>
+                {companySettings?.data?.id && (
+                  <button 
                   onClick={() => {
                     const baseUrl = (process.env.NEXT_PUBLIC_API_URL || "https://property-listing.keenenter.com/api").replace('/api', '');
                     const feedToken = companySettings?.data?.outbound_handler_token || companySettings?.data?.id;
@@ -137,30 +137,21 @@ export function StatsCards({ listings }: Props) {
                     toast.success("Feed URL copied!");
                   }}
                   className="flex items-center gap-1 text-[9px] font-bold text-emerald-600 hover:text-emerald-700 transition-colors uppercase tracking-tight"
-                 >
-                   <Copy className="h-2.5 w-2.5" />
-                   Copy URL
-                 </button>
-               )}
-            </div>
-          ) : (
-            <div className="h-[26px]" /> // Updated height to match flex container
-          )}
+                  >
+                    <Copy className="h-2.5 w-2.5" />
+                    Copy URL
+                  </button>
+                )}
+              </div>
+            ) : null}
+          </div>
 
           <div 
             className={cn(
               "relative bg-card rounded-xl shadow-sm border border-border border-r-[3px] overflow-hidden transition-all hover:shadow-md h-full",
-              s.borderColor,
-              s.label === "Skyloov" && "opacity-60 grayscale-[0.5]"
+              s.borderColor
             )}
           >
-          {s.label === "Skyloov" && (
-            <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/20 backdrop-blur-[1px] group">
-              <span className="bg-primary/90 text-white text-[8px] font-black uppercase tracking-[0.2em] px-2 py-1 rounded shadow-lg transform -rotate-12 transition-transform group-hover:rotate-0">
-                Coming Soon
-              </span>
-            </div>
-          )}
           <div className="p-4 px-5">
             {/* Header */}
             <div className="flex items-center justify-between mb-2">

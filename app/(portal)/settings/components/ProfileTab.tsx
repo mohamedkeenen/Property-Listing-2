@@ -7,7 +7,8 @@ import {
   Camera, 
   Lock, 
   Eye,
-  EyeOff
+  EyeOff,
+  Phone
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ModernField } from "@/components/ui/modern-field";
@@ -28,6 +29,7 @@ export function ProfileTab({ user }: ProfileTabProps) {
   const token = useSelector(selectToken);
   const [name, setName] = useState(user?.name || "");
   const [email, setEmail] = useState(user?.email || "");
+  const [phone, setPhone] = useState(user?.phone || "");
   const [photo, setPhoto] = useState<string>(user?.photo || "");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -62,6 +64,7 @@ export function ProfileTab({ user }: ProfileTabProps) {
       const result = await updateProfile({
         name,
         email,
+        phone,
         photo: photo.startsWith('data:image') ? photo : undefined
       }).unwrap();
       
@@ -117,7 +120,7 @@ export function ProfileTab({ user }: ProfileTabProps) {
     <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-7">
       <div className="col-span-4 space-y-8">
         {/* Basic Info */}
-        <Card className="rounded-2xl border-border/50 shadow-xl overflow-hidden backdrop-blur-sm bg-card/50">
+        <Card className="rounded-xl border-border/50 shadow-xl overflow-hidden backdrop-blur-sm bg-card/50">
           <CardHeader className="border-b border-border/10 bg-muted/30 pb-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -127,18 +130,18 @@ export function ProfileTab({ user }: ProfileTabProps) {
                 <div>
                   <div className="flex items-center gap-2">
                     <CardTitle className="font-black text-xl">Personal Information</CardTitle>
-                    <Badge variant="secondary" className="bg-primary/10 text-primary border-none font-black px-3 py-1 rounded-lg uppercase tracking-wider text-[10px]">
-                      {user?.role || "Agent"}
+                    <Badge variant="secondary" className="bg-primary/10 text-primary border-none font-black px-3 py-1 rounded-lg uppercase tracking-wider text-[10px] ml-2">
+                      {user?.role === 'admin' ? 'ADMIN' : 'AGENT'}
                     </Badge>
                   </div>
-                  <CardDescription className="font-medium">Update your profile details and email address.</CardDescription>
+                  <CardDescription className="font-medium">Update your profile details and contact information.</CardDescription>
                 </div>
               </div>
             </div>
           </CardHeader>
           <CardContent className="pt-8">
             <form id="profile-info-form" onSubmit={handleProfileUpdate} className="space-y-6">
-              <div className="grid gap-6 md:grid-cols-2">
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 <ModernField 
                   label="Full Name" 
                   placeholder="John Doe" 
@@ -153,13 +156,20 @@ export function ProfileTab({ user }: ProfileTabProps) {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                 />
+                <ModernField 
+                  label="Phone Number" 
+                  placeholder="+971 XXX XXX XXX" 
+                  icon={Phone} 
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                />
               </div>
             </form>
           </CardContent>
         </Card>
 
         {/* Security */}
-        <Card className="rounded-2xl border-border/50 shadow-xl overflow-hidden backdrop-blur-sm bg-card/50">
+        <Card className="rounded-xl border-border/50 shadow-xl overflow-hidden backdrop-blur-sm bg-card/50">
           <CardHeader className="border-b border-border/10 bg-muted/30 pb-4">
             <div className="flex items-center gap-3">
               <div className="p-2 rounded-lg bg-primary/10 text-primary">
@@ -218,7 +228,7 @@ export function ProfileTab({ user }: ProfileTabProps) {
       </div>
 
       <div className="col-span-3">
-        <Card className="rounded-2xl border-border/50 shadow-xl overflow-hidden backdrop-blur-sm bg-card/50 sticky top-8">
+        <Card className="rounded-xl border-border/50 shadow-xl overflow-hidden backdrop-blur-sm bg-card/50 sticky top-8">
           <CardHeader className="border-b border-border/10 bg-muted/30 pb-4">
             <div className="flex items-center gap-3">
               <div className="p-2 rounded-lg bg-primary/10 text-primary">

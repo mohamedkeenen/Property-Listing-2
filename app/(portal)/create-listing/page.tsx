@@ -122,7 +122,7 @@ function CreateListingContent() {
     let fields: (keyof ListingFormValues)[] = [];
     
     if (stepIndex === 0) { // Property Details
-      fields = ["category", "purpose", "type", "unitNo", "bedrooms", "bathrooms", "size", "price", "title", "listingAgent"];
+      fields = ["category", "purpose", "type", "unitNo", "bedrooms", "bathrooms", "size", "price", "title", "description", "listingAgent", "listingOwner"];
     } else if (stepIndex === 1) { // Media
       fields = ["images"];
     } else if (stepIndex === 2) { // Location
@@ -231,8 +231,8 @@ function CreateListingContent() {
                 <Button variant="ghost" className="h-10 md:h-11 rounded-xl md:rounded-[1.25rem] font-black text-[9px] md:text-[10px] uppercase tracking-widest text-muted-foreground hover:text-destructive hover:bg-destructive/5 dark:hover:bg-destructive/10 transition-all duration-500 px-2 md:px-8" type="button">
                   Discard
                 </Button>
-                <Button variant="outline" className="h-10 md:h-11 rounded-xl md:rounded-[1.25rem] border-border/60 bg-white/50 dark:bg-white/5 text-slate-500 dark:text-slate-400 font-black text-[9px] md:text-[10px] uppercase tracking-widest px-2 md:px-10 hover:border-primary hover:bg-white/50 dark:hover:bg-white/5 transition-all duration-500 shadow-sm hover:shadow-primary/5 gap-1.5 md:gap-2.5 group/save" type="button">
-                  <Save className="h-3 w-3 md:h-3.5 md:w-3.5 text-slate-400 dark:text-slate-500 group-hover/save:text-primary transition-colors duration-500 shrink-0" /> <span className="truncate">Save Draft</span>
+                <Button variant="outline" className="h-10 md:h-11 rounded-xl md:rounded-[1.25rem] border-primary/20 bg-white dark:bg-white/5 text-primary dark:text-slate-400 font-black text-[9px] md:text-[10px] uppercase tracking-widest px-2 md:px-10 hover:border-primary hover:bg-primary/5 dark:hover:bg-white/5 transition-all duration-500 shadow-sm hover:shadow-primary/5 gap-1.5 md:gap-2.5 group/save" type="button">
+                  <Save className="h-3 w-3 md:h-3.5 md:w-3.5 text-primary/60 dark:text-slate-500 group-hover/save:text-primary transition-colors duration-500 shrink-0" /> <span className="truncate text-primary">Save Draft</span>
                 </Button>
                 <Button 
                   onClick={handleNext}
@@ -293,11 +293,11 @@ function CreateListingContent() {
               <div className="grid grid-cols-2 md:flex gap-3 md:gap-5 w-full md:w-auto">
                 <Button 
                   variant="outline" 
-                   className="w-full md:w-auto rounded-2xl border-border bg-background text-slate-500 dark:text-slate-400 font-black text-[9px] md:text-[10px] uppercase tracking-widest md:tracking-[0.2em] px-2 md:px-12 h-12 md:h-14 transition-all duration-500 hover:scale-[1.02] active:scale-95 shadow-lg shadow-black/5 hover:border-primary hover:bg-background hover:shadow-primary/10 group/save-bottom"
+                   className="w-full md:w-auto rounded-2xl border-primary/20 bg-background text-primary dark:text-slate-400 font-black text-[9px] md:text-[10px] uppercase tracking-widest md:tracking-[0.2em] px-2 md:px-12 h-12 md:h-14 transition-all duration-500 hover:scale-[1.02] active:scale-95 shadow-lg shadow-black/5 hover:border-primary hover:bg-primary/5 hover:shadow-primary/10 group/save-bottom"
                   type="button"
                 >
-                  <Save className="h-3.5 w-3.5 md:h-4 md:w-4 mr-1.5 md:mr-3 text-slate-400 dark:text-slate-500 group-hover/save-bottom:text-primary transition-colors duration-500 shrink-0" />
-                  <span className="truncate">Save Draft</span>
+                  <Save className="h-3.5 w-3.5 md:h-4 md:w-4 mr-1.5 md:mr-3 text-primary/60 dark:text-slate-500 group-hover/save-bottom:text-primary transition-colors duration-500 shrink-0" />
+                  <span className="truncate text-primary dark:text-inherit">Save Draft</span>
                 </Button>
                 <Button 
                   onClick={handleNext}

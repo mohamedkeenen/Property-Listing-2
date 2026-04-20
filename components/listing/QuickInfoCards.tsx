@@ -20,8 +20,8 @@ export function QuickInfoCards({ bedrooms, bathrooms, size, parking }: QuickInfo
   return (
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
       {specs.map((spec, i) => (
-        <div key={i} className="bg-card backdrop-blur-xl border border-border rounded-4xl px-6 py-4 flex items-center gap-5 shadow-sm hover:bg-muted/50 transition-all">
-          <div className={`h-14 w-14 rounded-2xl flex items-center justify-center shrink-0 ${spec.bg.replace('bg-', 'bg-')}/10`}>
+        <div key={i} className="bg-card backdrop-blur-xl border border-border rounded-xl px-6 py-4 flex items-center gap-5 shadow-sm hover:bg-muted/50 transition-all">
+          <div className={`h-14 w-14 rounded-lg flex items-center justify-center shrink-0 ${spec.bg.replace('bg-', 'bg-')}/10`}>
             <spec.icon className={`h-7 w-7 ${spec.iconColor}`} />
           </div>
           <div className="flex flex-col min-w-0">

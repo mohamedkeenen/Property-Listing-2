@@ -1,6 +1,6 @@
 "use client";
 
-import { MapPin, Heart, Share2, Circle, ArrowLeft } from "lucide-react";
+import { MapPin, Circle, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface PropertyHeaderProps {

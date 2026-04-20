@@ -73,8 +73,8 @@ export function DashboardCharts({ listings }: { listings: PropertyListing[] }) {
     },
     { 
       name: "Facebook", 
-      value: listings.filter((l) => l.portals.website && false).length, // Placeholder logic or based on leads if you want
-      color: COLORS.blue,
+      value: 0,
+      color: COLORS.purple,
       breakdown: []
     },
   ];
@@ -155,7 +155,7 @@ export function DashboardCharts({ listings }: { listings: PropertyListing[] }) {
       const breakdown = data.breakdown;
       
       return (
-        <div className="bg-slate-950/95 backdrop-blur-xl border border-white/10 p-4 rounded-2xl shadow-2xl flex flex-col gap-3 min-w-[160px]">
+        <div className="bg-slate-950/95 backdrop-blur-xl border border-white/10 p-4 rounded-xl shadow-2xl flex flex-col gap-3 min-w-[160px]">
           <div className="flex items-center gap-4">
             {portalLogos[name] ? (
               <div className="relative h-7 w-20 shrink-0 bg-white/5 rounded-lg p-1 transition-colors">
@@ -193,7 +193,7 @@ export function DashboardCharts({ listings }: { listings: PropertyListing[] }) {
                 {breakdown.map((item: any, i: number) => (
                   <div key={i} className="flex items-center justify-between gap-4 px-2 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
                     <div className="flex items-center gap-2">
-                       {portalLogos[item.name] ? (
+                        {portalLogos[item.name] ? (
                          <div className="relative h-3.5 w-10 shrink-0 opacity-90">
                             <NextImage src={portalLogos[item.name]} alt={item.name} fill className="object-contain" />
                          </div>
@@ -225,7 +225,7 @@ export function DashboardCharts({ listings }: { listings: PropertyListing[] }) {
     cursor: { fill: 'var(--muted)', opacity: 0.1 }
   };
 
-  const cardClass = "bg-card border border-border/40 rounded-[2rem] overflow-hidden shadow-sm transition-all hover:shadow-lg hover:border-primary/20";
+  const cardClass = "bg-card border border-border/40 rounded-xl overflow-hidden shadow-sm transition-all hover:shadow-lg hover:border-primary/20";
   const labelClass = "text-lg font-black text-foreground flex items-center gap-3 capitalize tracking-tight";
 
   return (

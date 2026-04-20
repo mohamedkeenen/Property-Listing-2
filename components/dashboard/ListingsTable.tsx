@@ -203,7 +203,7 @@ export function ListingsTable({ listings, onViewDetails, onEdit }: Props) {
   };
 
   return (
-    <div className="bg-card border border-border rounded-lg w-full overflow-hidden flex flex-col h-full">
+    <div className="bg-card border border-border rounded-xl w-full overflow-hidden flex flex-col h-full">
       {/* Tabs */}
       <div className="flex items-center gap-1 p-3 border-b border-border overflow-x-auto overflow-y-hidden no-scrollbar">
         {statusTabs.map((tab) => {
@@ -230,7 +230,7 @@ export function ListingsTable({ listings, onViewDetails, onEdit }: Props) {
               key={tab.value}
               onClick={() => { setActiveTab(tab.value); setPage(1); }}
               className={cn(
-                "px-4 py-2 text-[11px] font-bold rounded-lg whitespace-nowrap transition-all duration-200",
+                "px-4 py-2 text-[11px] font-bold rounded-md whitespace-nowrap transition-all duration-200",
                 activeTab === tab.value
                   ? cn(activeColors[tab.value], "shadow-sm shadow-black/5")
                   : cn("text-muted-foreground/70 active:scale-95", tabStyles[tab.value])
@@ -308,7 +308,7 @@ export function ListingsTable({ listings, onViewDetails, onEdit }: Props) {
               </TableHead>
               <TableHead>
                 <div className="flex items-center gap-2">
-                  <ArrowUpDown className="h-3 w-3" /> Admin
+                  <ArrowUpDown className="h-3 w-3" /> Listing Owner
                 </div>
               </TableHead>
               <TableHead>

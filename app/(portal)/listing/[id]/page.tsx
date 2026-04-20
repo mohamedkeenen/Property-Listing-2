@@ -12,12 +12,13 @@ import { ImageGallery } from "@/components/listing/ImageGallery";
 import { QuickInfoCards } from "@/components/listing/QuickInfoCards";
 import { AgentCard } from "@/components/listing/AgentCard";
 import { SpecsSidebar } from "@/components/listing/SpecsSidebar";
-import { VirtualTour, FloorPlans, DocumentsAndNotes } from "@/components/listing/PropertyAssets";
+import { VirtualTourPlayer, VirtualTourCard, FloorPlans, QRCode, DocumentsAndNotes } from "@/components/listing/PropertyAssets";
 import { PropertyDescriptions, PremiumDetails } from "@/components/listing/PropertyDetails";
 import { LocationMap } from "@/components/listing/LocationMap";
 import { ListingSkeleton } from "@/components/listing/ListingSkeleton";
 
 import "./listing.css";
+import { cn } from "@/lib/utils";
 
 export default function PropertyDetail({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -94,9 +95,13 @@ export default function PropertyDetail({ params }: { params: Promise<{ id: strin
               titleAr={listing.titleAr}
             />
 
-            {listing.video_url && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                <VirtualTour videoUrl={listing.video_url} poster={imgs[0]} title={listing.title} />
+            {(listing.video_url || listing.virtual_tour_url) && (
+              <div className={cn("grid grid-cols-1 gap-10", (listing.video_url || listing.virtual_tour_url) && listing.property_location ? "md:grid-cols-2" : "")}>
+                <VirtualTourPlayer 
+                  videoUrl={listing.virtual_tour_url || listing.video_url} 
+                  poster={imgs[0]} 
+                  title={listing.title} 
+                />
                 {listing.property_location && (
                   <LocationMap location={listing.community} />
                 )}
@@ -106,8 +111,6 @@ export default function PropertyDetail({ params }: { params: Promise<{ id: strin
             <div className="grid grid-cols-1 gap-8">
                 <PremiumDetails fields={listing.custom_fields ?? []} />
             </div>
-
-
 
           </div>
 
@@ -129,6 +132,12 @@ export default function PropertyDetail({ params }: { params: Promise<{ id: strin
                 phone={listing.agentPhone}
                 email={listing.agentEmail}
               />
+
+              <VirtualTourCard url={listing.virtual_tour_url || listing.video_url} poster={imgs[0]} />
+
+              <FloorPlans url={listing.floorPlanImage} />
+
+              <QRCode url={listing.qr_url} />
               
               <DocumentsAndNotes documents={listing.documents ?? []} notes={listing.notes ?? []} />
             </div>

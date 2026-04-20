@@ -8,7 +8,7 @@ import { filterOptions } from "@/data/mockData";
 import { cn } from "@/lib/utils";
 import {
   Home, Building2, BedDouble, Bath, Car, Maximize, Tag, DollarSign, FileText, Sparkles,
-  Calendar, User, Hash, CalendarCheck, Info, CheckCircle2, AlertCircle, Paintbrush, PlusCircle
+  Calendar, User, Hash, CalendarCheck, Info, CheckCircle2, AlertCircle, Paintbrush, PlusCircle, Shield
 } from "lucide-react";
 import { ModernField } from "@/components/ui/modern-field";
 import { ModernSelect } from "@/components/ui/modern-select";
@@ -30,8 +30,16 @@ export function PropertyDetailsStep({ form }: Props) {
   const AMENITIES_LIST = filterOptions.amenities;
   const { data: usersData } = useGetUsersQuery();
 
+  const adminOptions = useMemo(() => 
+    usersData?.data
+      ?.filter((u: any) => u.role === 'admin')
+      ?.map((u: any) => ({ label: u.name, value: u.id.toString() })) || [], 
+  [usersData]);
+
   const agentOptions = useMemo(() => 
-    usersData?.data?.map((u: any) => ({ label: u.name, value: u.id.toString() })) || [], 
+    usersData?.data
+      ?.filter((u: any) => u.role === 'agent' || u.role === 'admin') // Agents are focus, but admins can be agents too
+      ?.map((u: any) => ({ label: u.name, value: u.id.toString() })) || [], 
   [usersData]);
 
   const fieldError = (name: string) => errors[name]?.message as string | undefined;
@@ -123,7 +131,6 @@ export function PropertyDetailsStep({ form }: Props) {
                 </div>
               </div>
 
-              {/* Commercial Card */}
               <div 
                 onClick={() => setValue("category", "Commercial", { shouldValidate: true })}
                 className={cn(
@@ -240,7 +247,7 @@ export function PropertyDetailsStep({ form }: Props) {
             <ModernField label="Unit No" icon={Hash} required {...register("unitNo")} error={fieldError("unitNo")} value={watch("unitNo")} />
             
             <NumberSearchSelect 
-              label="Bedrooms" 
+              label="Bedrooms (Studio/Room Count)" 
               icon={BedDouble} 
               required 
               showStudio
@@ -275,26 +282,14 @@ export function PropertyDetailsStep({ form }: Props) {
               onValueChange={(v) => setValue("furnishingType", v, { shouldValidate: true })}
               options={[
                 { label: "Unfurnished", value: "unfurnished" },
-                { label: "Semi-furnished", value: "partly-furnished" },
+                { 
+                  label: "Semi-furnished", 
+                  value: "partly-furnished",
+                  badge: "Bayut: No"
+                },
                 { label: "Furnished", value: "furnished" }
               ]}
             />
-
-            {watch("furnishingType") === "partly-furnished" && (
-              <div className="col-span-1 md:col-span-2 lg:col-span-3">
-                <div className="flex items-start gap-4 p-5 bg-orange-500/5 rounded-3xl border border-orange-500/20 animate-in fade-in slide-in-from-top-2 duration-500">
-                  <div className="p-2 rounded-xl bg-orange-500/10 text-orange-500 shrink-0">
-                    <AlertCircle className="h-4 w-4" />
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-orange-600 dark:text-orange-400">Bayut Feed Optimization</p>
-                    <p className="text-xs text-orange-600/80 dark:text-orange-400/80 leading-relaxed font-medium">
-                      "Semi-furnished" will be sent as <strong className="font-black">"No" (Unfurnished)</strong> to Bayut as per their official documentation mapping requirements.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
 
             <ModernSelect 
               label="Project Status" 
@@ -349,7 +344,16 @@ export function PropertyDetailsStep({ form }: Props) {
               onClear={() => setValue("developers", "", { shouldValidate: true })}
             />
 
-            <ModernField label="Build Year" icon={Calendar} type="number" {...register("buildYear")} value={watch("buildYear")} />
+            <ModernSelect 
+              label="Build Year" 
+              icon={Calendar} 
+              value={watch("buildYear")?.toString()} 
+              onValueChange={(v) => setValue("buildYear", v, { shouldValidate: true })}
+              options={Array.from({ length: new Date().getFullYear() - 1950 + 10 }, (_, i) => {
+                const year = (new Date().getFullYear() + 9 - i).toString();
+                return { label: year, value: year };
+              })}
+            />
 
             <ModernSelect 
               label="Currency" 
@@ -367,6 +371,16 @@ export function PropertyDetailsStep({ form }: Props) {
               options={filterOptions.finishingTypes}
             />
             
+            <ModernSelect 
+              label="Listing Owner" 
+              icon={Shield} 
+              required
+              value={watch("listingOwner")} 
+              onValueChange={(v) => setValue("listingOwner", v, { shouldValidate: true })}
+              options={adminOptions}
+              error={fieldError("listingOwner")}
+            />
+
             <ModernSelect 
               label="Listing Agent" 
               icon={User} 

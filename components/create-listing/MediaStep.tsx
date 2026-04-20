@@ -222,54 +222,44 @@ export function MediaStep({ form }: Props) {
           </div>
 
           <div className="bg-card/30 p-8 rounded-4xl border border-border/20">
-            <div className="flex flex-col items-center justify-center border-2 border-dashed border-border/40 rounded-3xl p-10 bg-muted/5 transition-all hover:bg-muted/10 group cursor-pointer relative overflow-hidden min-h-[300px]" onClick={() => {
-              const input = document.createElement('input');
-              input.type = 'file';
-              input.accept = 'image/*';
-              input.onchange = async (e) => {
-                const target = e.target as HTMLInputElement;
-                if (target.files?.[0]) {
-                  const reader = new FileReader();
-                  reader.onloadend = () => {
-                    setValue("floorPlanImage", reader.result as string, { shouldValidate: true });
-                  };
-                  reader.readAsDataURL(target.files[0]);
-                }
-              };
-              input.click();
-            }}>
+            <div className="flex flex-wrap gap-4 min-h-[120px]">
               {watch("floorPlanImage") ? (
-                <div className="relative group w-full h-full flex items-center justify-center">
-                  <img 
-                    src={watch("floorPlanImage")} 
-                    alt="Floor Plan" 
-                    className="max-h-[250px] rounded-2xl shadow-xl transition-all duration-700" 
-                  />
-                  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-all flex flex-col items-center justify-center gap-4 rounded-2xl">
-                    <span className="text-white text-[10px] font-black uppercase tracking-widest bg-primary/20 p-2 px-4 rounded-full backdrop-blur-md">Change Floor Plan</span>
-                    <button 
-                       onClick={(e) => {
-                         e.stopPropagation();
-                         setValue("floorPlanImage", null);
-                       }}
-                       className="text-white/60 hover:text-white transition-colors"
+                <div className="relative group w-40 h-40 rounded-2xl overflow-hidden shadow-sm border border-border/40 transition-all hover:shadow-lg hover:-translate-y-1 cursor-pointer">
+                  <img src={watch("floorPlanImage")} alt="Floor Plan" className="w-full h-full object-cover" />
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <button
+                      type="button"
+                      onClick={(e) => { e.stopPropagation(); setValue("floorPlanImage", null); }}
+                      className="bg-white/20 backdrop-blur-md hover:bg-destructive/80 text-white rounded-xl p-2 transition-all"
                     >
-                       Remove
+                      <X className="h-4 w-4" />
                     </button>
                   </div>
                 </div>
               ) : (
-                <>
-                  <div className="h-16 w-16 rounded-full bg-linear-to-br from-primary/10 to-indigo-600/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500">
-                    <ImageIcon className="h-8 w-8 text-primary/40 group-hover:text-primary transition-colors" />
-                  </div>
-                  <div className="text-center space-y-2">
-                    <p className="text-xs font-black uppercase tracking-widest text-foreground">Upload 2D/3D Floor Plan</p>
-                    <p className="text-[10px] text-muted-foreground max-w-xs mx-auto leading-relaxed">
-                      High quality JPG or PNG floor plan. This will be specifically tagged as Floor_Plan in XML feeds.
-                    </p>
-                  </div>
-                </>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const input = document.createElement('input');
+                    input.type = 'file';
+                    input.accept = 'image/*';
+                    input.onchange = async (e) => {
+                      const target = e.target as HTMLInputElement;
+                      if (target.files?.[0]) {
+                        const reader = new FileReader();
+                        reader.onloadend = () => {
+                          setValue("floorPlanImage", reader.result as string, { shouldValidate: true });
+                        };
+                        reader.readAsDataURL(target.files[0]);
+                      }
+                    };
+                    input.click();
+                  }}
+                  className="w-40 h-40 flex flex-col items-center justify-center border-2 border-dashed border-border rounded-2xl hover:border-primary/50 hover:bg-primary/5 transition-all group"
+                >
+                  <Upload className="h-5 w-5 text-muted-foreground group-hover:text-primary mb-2" />
+                  <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground group-hover:text-primary">Upload Floor Plan</span>
+                </button>
               )}
             </div>
           </div>
