@@ -202,7 +202,7 @@ export default function SuperAdminPage() {
                         key={user.id} 
                         className={cn(
                           "group transition-all hover:bg-primary/5",
-                          !user.is_active && "bg-orange-500/[0.02]"
+                          !user.is_active && "bg-orange-500/2"
                         )}
                       >
                         <td className="px-6 py-4">

@@ -69,7 +69,7 @@ export function SpecsSidebar({ category, status, type, purpose, updatedAt, porta
                     alt={portal.name} 
                     className={cn("h-4.5 w-4.5 object-contain transition-all", portal.active ? "brightness-0 invert" : "opacity-50")}
                   />
-                  {portal.active && <div className="absolute inset-0 bg-gradient-to-tr from-white/20 to-transparent pointer-events-none" />}
+                  {portal.active && <div className="absolute inset-0 bg-linear-to-tr from-white/20 to-transparent pointer-events-none" />}
                 </div>
                 <span className={cn(
                   "text-[9px] font-black tracking-widest transition-colors text-center truncate px-1",
