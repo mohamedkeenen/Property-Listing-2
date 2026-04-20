@@ -7,7 +7,7 @@ import { filterOptions } from "@/data/mockData";
 import { cn } from "@/lib/utils";
 import {
   Home, Building2, BedDouble, Bath, Car, Maximize, Tag, DollarSign, FileText, Sparkles,
-  Calendar, User, Hash, CalendarCheck, Info, CheckCircle2, AlertCircle, Paintbrush, PlusCircle, Shield
+  Calendar, User, Hash, CalendarCheck, Info, CheckCircle2, AlertCircle, Paintbrush, PlusCircle, Shield, Compass
 } from "lucide-react";
 import { ModernField } from "@/components/ui/modern-field";
 import { ModernSelect } from "@/components/ui/modern-select";
@@ -234,7 +234,7 @@ export function PropertyDetailsStep({ form }: Props) {
             />
 
             <ModernField 
-              label="Size (Total)" 
+              label="Size (Total) Sq.Ft" 
               icon={Maximize} 
               required 
               type="number" 
@@ -243,8 +243,22 @@ export function PropertyDetailsStep({ form }: Props) {
               value={watch("size")} 
             />
 
+            <ModernField 
+              label="Built Up Area Sq.Ft" 
+              icon={Maximize} 
+              type="number" 
+              {...register("builtUpArea")} 
+              value={watch("builtUpArea")} 
+            />
+
             <ModernField label="Unit No" icon={Hash} required {...register("unitNo")} error={fieldError("unitNo")} value={watch("unitNo")} />
+            <ModernField label="Land Number" icon={Hash} {...register("landNumber")} value={watch("landNumber")} />
             
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <ModernField label="Street Direction" icon={Compass} {...register("streetDirection")} value={watch("streetDirection")} placeholder="e.g. North" />
+                <ModernField label="Street Width" icon={Maximize} type="number" {...register("streetWidth")} value={watch("streetWidth")} />
+            </div>
+
             <NumberSearchSelect 
               label="Bedrooms" 
               icon={BedDouble} 
@@ -445,6 +459,7 @@ export function PropertyDetailsStep({ form }: Props) {
 
             <ModernField label="License No" icon={Hash} {...register("licenseNo")} value={watch("licenseNo")} />
             <ModernField label="Ad Issue Date" icon={Calendar} type="date" {...register("adIssueDate")} value={watch("adIssueDate")} />
+            <ModernField label="Available From" icon={CalendarCheck} type="date" {...register("availableFrom")} value={watch("availableFrom")} />
           </div>
         </section>
 
