@@ -91,7 +91,7 @@ export function AppSidebar() {
   const secondPart = nameParts.slice(1).join(' ');
 
   return (
-    <Sidebar collapsible="icon" className="group-data-[side=left]:border-r-0 md:group-data-[side=left]:border-r border-sidebar-border/10 bg-slate-900/40 backdrop-blur-xl">
+    <Sidebar collapsible="icon" className="group-data-[side=left]:border-r-0 md:group-data-[side=left]:border-r border-sidebar-border/10 bg-sidebar-background">
       <SidebarHeader className="border-b border-sidebar-border/10 bg-transparent px-0 pb-0">
         <div className={cn(
           "flex flex-col gap-6",
