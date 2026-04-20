@@ -226,7 +226,7 @@ export default function SuperAdminPage() {
                               </span>
                               <span className="lg:hidden text-[10px] font-bold text-muted-foreground uppercase">{user.name}</span>
                             </div>
-                          </div>
+                          </div> 
                         </td>
                         <td className="px-6 py-4 hidden lg:table-cell">
                           <div className="flex items-center gap-2">
