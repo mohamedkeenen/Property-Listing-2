@@ -116,7 +116,6 @@ export function AssetsAndNotesStep({ form }: Props) {
               <textarea 
                 {...register("notes")} 
                 className="w-full min-h-[160px] bg-transparent border-none focus:ring-0 text-sm font-bold text-foreground outline-none p-0 resize-none placeholder:text-muted-foreground/30 leading-relaxed relative z-10"
-                placeholder="Type your internal notes here... These are only visible to your team and won't be shared on portals."
               />
             </ModernField>
           </div>
