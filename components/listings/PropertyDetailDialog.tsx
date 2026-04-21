@@ -77,11 +77,11 @@ export function PropertyDetailDialog({ listing, open, onClose }: Props) {
           <div className="space-y-2">
             <div className="flex items-center gap-2">
               <MapPin className="h-4 w-4 text-muted-foreground" />
-              <span>{listing.community}, {listing.subCommunity}</span>
+              <span>{listing.community || listing.bayutCommunity || "—"}, {listing.subCommunity || listing.bayutSubCommunity || "—"}</span>
             </div>
             <div className="flex items-center gap-2">
               <Building2 className="h-4 w-4 text-muted-foreground" />
-              <span>{listing.building || "—"} {listing.unitNo}</span>
+              <span>{listing.building || listing.bayutBuilding || "—"} {listing.unitNo}</span>
             </div>
           </div>
           <div className="space-y-2">

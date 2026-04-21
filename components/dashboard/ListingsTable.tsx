@@ -127,7 +127,7 @@ export function ListingsTable({ listings, onViewDetails, onEdit }: Props) {
     .filter((l) => {
       if (!search) return true;
       const s = search.toLowerCase();
-      return l.title.toLowerCase().includes(s) || l.reference.toLowerCase().includes(s) || l.community.toLowerCase().includes(s);
+      return l.title.toLowerCase().includes(s) || l.reference.toLowerCase().includes(s) || (l.community || l.bayutCommunity || "").toLowerCase().includes(s);
     });
 
   const totalPages = Math.ceil(filtered.length / perPage);
@@ -408,7 +408,7 @@ export function ListingsTable({ listings, onViewDetails, onEdit }: Props) {
                       <div className="min-w-0">
                         <p className="text-sm font-medium truncate">{l.title}</p>
                         <p className="text-[10px] text-muted-foreground/60 truncate uppercase tracking-tight">
-                          {l.property_location || l.location} • {l.community} {l.building && `• ${l.building}`}
+                          {l.property_location || l.location || l.bayutLocation || "—"} • {l.community || l.bayutCommunity || "—"} {l.building || l.bayutBuilding ? `• ${l.building || l.bayutBuilding}` : ""}
                         </p>
                       </div>
                     </div>
@@ -454,7 +454,7 @@ export function ListingsTable({ listings, onViewDetails, onEdit }: Props) {
                       {l.status}
                     </Badge>
                   </TableCell>
-                   <TableCell className="text-xs">{l.community}</TableCell>
+                   <TableCell className="text-xs">{l.community || l.bayutCommunity || "—"}</TableCell>
                   <TableCell>
                     <div className="flex items-center gap-3 py-1">
                        <div className="h-8 w-8 rounded-full bg-sky-100 flex items-center justify-center overflow-hidden shrink-0 border border-sky-200/50">

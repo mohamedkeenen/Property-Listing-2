@@ -34,7 +34,10 @@ export function DashboardCharts({ listings }: { listings: PropertyListing[] }) {
   }));
 
   const communityMap: Record<string, number> = {};
-  listings.forEach((l) => { communityMap[l.community] = (communityMap[l.community] || 0) + 1; });
+  listings.forEach((l) => { 
+    const comm = l.community || l.bayutCommunity || "—";
+    communityMap[comm] = (communityMap[comm] || 0) + 1; 
+  });
   const allCommunities = Object.entries(communityMap).sort((a, b) => b[1] - a[1]);
 
   const [showAllCommunities, setShowAllCommunities] = useState(false);

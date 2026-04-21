@@ -37,8 +37,8 @@ export default function Dashboard() {
     if (!filters) return listings;
     return listings.filter((l: PropertyListing) => {
       if (filters.refId && !l.reference.toLowerCase().includes(filters.refId.toLowerCase())) return false;
-      if (filters.city && l.location !== filters.city) return false;
-      if (filters.community && l.community !== filters.community) return false;
+      if (filters.city && (l.property_location || l.location || l.bayutLocation) !== filters.city) return false;
+      if (filters.community && (l.community || l.bayutCommunity) !== filters.community) return false;
       if (filters.propertyType && l.type !== filters.propertyType) return false;
       if (filters.category && l.category !== filters.category) return false;
       if (filters.purpose && l.purpose !== filters.purpose) return false;
