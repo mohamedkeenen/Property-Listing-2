@@ -21,6 +21,11 @@ export function CustomDetailsStep({ form }: Props) {
   const customValues = watch("custom_values") || {};
   const [activeCustomFieldId, setActiveCustomFieldId] = useState<number | null>(null);
   const fileInputCustomRef = useRef<HTMLInputElement>(null);
+  
+  const textNumberFields = customFields.filter((f: any) => f.type === 'text' || f.type === 'number');
+  const imageFields = customFields.filter((f: any) => f.type === 'image');
+  const textImageFields = customFields.filter((f: any) => f.type === 'text_image');
+  const otherFields = customFields.filter((f: any) => !['text', 'number', 'image', 'text_image'].includes(f.type));
 
   const handleCustomFieldChange = (fieldId: number, value: any) => {
     setValue("custom_values", {
@@ -86,116 +91,139 @@ export function CustomDetailsStep({ form }: Props) {
              <Layers className="h-4 w-4 text-muted-foreground/30" />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-10 bg-card/30 p-10 rounded-4xl border border-border/20 shadow-sm transition-all duration-500">
-            {customFields.map((field: any) => {
-              const value = customValues[field.id];
+          <div className="flex flex-col gap-y-12 bg-card/30 p-10 rounded-4xl border border-border/20 shadow-sm transition-all duration-500">
+            {/* Text & Number Fields - 3 Columns */}
+            {textNumberFields.length > 0 && (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-10">
+                {textNumberFields.map((field: any) => {
+                  const value = customValues[field.id];
+                  return (
+                    <ModernField 
+                      key={field.id}
+                      label={field.name} 
+                      icon={field.type === 'number' ? Hash : Type} 
+                      value={value || ""}
+                      type={field.type === 'number' ? 'number' : 'text'}
+                      onChange={(e) => handleCustomFieldChange(field.id, e.target.value)}
+                      onClear={() => handleCustomFieldChange(field.id, "")}
+                      placeholder={`Enter ${field.name}...`}
+                    />
+                  );
+                })}
+              </div>
+            )}
 
-              if (field.type === 'text' || field.type === 'number') {
-                return (
-                  <ModernField 
-                    key={field.id}
-                    label={field.name} 
-                    icon={field.type === 'number' ? Hash : Type} 
-                    value={value || ""}
-                    type={field.type === 'number' ? 'number' : 'text'}
-                    onChange={(e) => handleCustomFieldChange(field.id, e.target.value)}
-                    onClear={() => handleCustomFieldChange(field.id, "")}
-                    placeholder={`Enter ${field.name}...`}
-                  />
-                );
-              }
-
-              if (field.type === 'image') {
-                 return (
-                   <div key={field.id} className="space-y-4">
-                     <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground ml-1">
-                       {field.name}
-                     </Label>
-                     <div 
-                       onClick={() => handleCustomImageClick(field.id)}
-                       className={cn(
-                         "h-48 rounded-4xl border-2 border-dashed flex flex-col items-center justify-center gap-3 cursor-pointer transition-all duration-500 overflow-hidden relative group",
-                         value ? "border-primary/30" : "border-border/50 hover:border-primary/50 hover:bg-primary/5"
-                       )}
-                     >
-                       {value ? (
-                         <>
-                           <img src={value} className="w-full h-full object-cover" />
-                           <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-all duration-500 backdrop-blur-sm">
-                             <PlusCircle className="h-10 w-10 text-white scale-90 group-hover:scale-100 transition-transform" />
-                           </div>
-                         </>
-                       ) : (
-                         <>
-                           < ImageIcon className="h-8 w-8 text-muted-foreground/20 group-hover:text-primary/40 transition-colors" />
-                           <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/50 group-hover:text-primary/60">Upload {field.name}</span>
-                         </>
-                       )}
-                     </div>
-                   </div>
-                 );
-              }
-
-              if (field.type === 'text_image') {
-                const textVal = value?.text || "";
-                const imgVal = value?.image || "";
-
-                return (
-                  <div key={field.id} className="md:col-span-2">
-                    <div className={cn(
-                      "relative flex w-full rounded-4xl border transition-all duration-500 bg-background/50 p-4 gap-6 min-h-[100px] items-center",
-                      "border-border hover:border-primary/20 focus-within:border-primary focus-within:ring-4 focus-within:ring-primary/5 shadow-sm"
-                    )}>
+            {/* Image Only Fields - Full Width */}
+            {imageFields.length > 0 && (
+              <div className="grid grid-cols-1 gap-y-10">
+                {imageFields.map((field: any) => {
+                  const value = customValues[field.id];
+                  return (
+                    <div key={field.id} className="space-y-4">
+                      <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground ml-1">
+                        {field.name}
+                      </Label>
                       <div 
                         onClick={() => handleCustomImageClick(field.id)}
                         className={cn(
-                          "h-24 w-40 rounded-2xl border-2 border-dashed flex items-center justify-center cursor-pointer transition-all duration-500 overflow-hidden relative shrink-0 group/img",
-                          imgVal ? "border-primary/30" : "border-border/50 hover:border-primary/50 hover:bg-primary/5"
+                          "h-56 rounded-4xl border-2 border-dashed flex flex-col items-center justify-center gap-3 cursor-pointer transition-all duration-500 overflow-hidden relative group",
+                          value ? "border-primary/30" : "border-border/50 hover:border-primary/50 hover:bg-primary/5"
                         )}
                       >
-                        {imgVal ? (
-                           <>
-                             <img src={imgVal} className="w-full h-full object-cover" />
-                             <div className="absolute inset-0 bg-black/20 group-hover/img:bg-black/40 flex items-center justify-center transition-all backdrop-blur-[2px]">
-                               <ImageIcon className="h-5 w-5 text-white" />
-                             </div>
-                           </>
+                        {value ? (
+                          <>
+                            <img src={value} className="w-full h-full object-cover" />
+                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-all duration-500 backdrop-blur-sm">
+                              <PlusCircle className="h-10 w-10 text-white scale-90 group-hover:scale-100 transition-transform" />
+                            </div>
+                          </>
                         ) : (
-                          <div className="flex flex-col items-center gap-2">
-                            <ImageIcon className="h-5 w-5 text-muted-foreground/20" />
-                            <span className="text-[8px] font-black uppercase tracking-[0.2em] text-muted-foreground/30 text-center">Attach Photo</span>
-                          </div>
+                          <>
+                            <ImageIcon className="h-8 w-8 text-muted-foreground/20 group-hover:text-primary/40 transition-colors" />
+                            <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/50 group-hover:text-primary/60">Upload {field.name}</span>
+                          </>
                         )}
                       </div>
-
-                      <div className="flex-1 relative h-full flex flex-col justify-center">
-                        <input 
-                          type="text"
-                          value={textVal}
-                          onChange={(e) => handleCustomFieldChange(field.id, { ...value, text: e.target.value })}
-                          className="w-full bg-transparent border-none focus:ring-0 text-sm font-bold text-foreground outline-none p-0 placeholder:text-muted-foreground/20 leading-relaxed"
-                          placeholder={`Add a description for ${field.name}...`}
-                        />
-                        <label className="absolute -top-6 left-0 text-[10px] font-black uppercase tracking-[0.2em] text-primary bg-background dark:bg-slate-900 px-2 rounded-full py-0.5 shadow-sm border border-primary/20">
-                          {field.name}
-                        </label>
-                      </div>
-
-                      {textVal && (
-                        <button 
-                          type="button" 
-                          onClick={() => handleCustomFieldChange(field.id, { ...value, text: "" })}
-                          className="shrink-0 text-muted-foreground hover:text-foreground transition-all p-2 rounded-full hover:bg-muted/50"
-                        >
-                          <X className="h-4 w-4" />
-                        </button>
-                      )}
                     </div>
-                  </div>
-                );
-              }
-              return null;
-            })}
+                  );
+                })}
+              </div>
+            )}
+
+            {/* Image + Text Fields - Full Width */}
+            {textImageFields.length > 0 && (
+              <div className="grid grid-cols-1 gap-y-10">
+                {textImageFields.map((field: any) => {
+                  const value = customValues[field.id];
+                  const textVal = value?.text || "";
+                  const imgVal = value?.image || "";
+
+                  return (
+                    <div key={field.id} className="w-full">
+                      <div className={cn(
+                        "relative flex w-full rounded-4xl border transition-all duration-500 bg-background/50 p-4 gap-6 min-h-[100px] items-center",
+                        "border-border hover:border-primary/20 focus-within:border-primary focus-within:ring-4 focus-within:ring-primary/5 shadow-sm"
+                      )}>
+                        <div 
+                          onClick={() => handleCustomImageClick(field.id)}
+                          className={cn(
+                            "h-24 w-40 rounded-2xl border-2 border-dashed flex items-center justify-center cursor-pointer transition-all duration-500 overflow-hidden relative shrink-0 group/img",
+                            imgVal ? "border-primary/30" : "border-border/50 hover:border-primary/50 hover:bg-primary/5"
+                          )}
+                        >
+                          {imgVal ? (
+                             <>
+                               <img src={imgVal} className="w-full h-full object-cover" />
+                               <div className="absolute inset-0 bg-black/20 group-hover/img:bg-black/40 flex items-center justify-center transition-all backdrop-blur-[2px]">
+                                 <ImageIcon className="h-5 w-5 text-white" />
+                               </div>
+                             </>
+                          ) : (
+                            <div className="flex flex-col items-center gap-2">
+                              <ImageIcon className="h-5 w-5 text-muted-foreground/20" />
+                              <span className="text-[8px] font-black uppercase tracking-[0.2em] text-muted-foreground/30 text-center">Attach Photo</span>
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="flex-1 relative h-full flex flex-col justify-center">
+                          <input 
+                            type="text"
+                            value={textVal}
+                            onChange={(e) => handleCustomFieldChange(field.id, { ...value, text: e.target.value })}
+                            className="w-full bg-transparent border-none focus:ring-0 text-sm font-bold text-foreground outline-none p-0 placeholder:text-muted-foreground/20 leading-relaxed"
+                            placeholder={`Add a description for ${field.name}...`}
+                          />
+                          <label className="absolute -top-6 left-0 text-[10px] font-black uppercase tracking-[0.2em] text-primary bg-background dark:bg-slate-900 px-2 rounded-full py-0.5 shadow-sm border border-primary/20">
+                            {field.name}
+                          </label>
+                        </div>
+
+                        {textVal && (
+                          <button 
+                            type="button" 
+                            onClick={() => handleCustomFieldChange(field.id, { ...value, text: "" })}
+                            className="shrink-0 text-muted-foreground hover:text-foreground transition-all p-2 rounded-full hover:bg-muted/50"
+                          >
+                            <X className="h-4 w-4" />
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* Other fields fallback */}
+            {otherFields.length > 0 && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                 {otherFields.map((field: any) => {
+                    // This is just to ensure any unexpected field types are still rendered
+                    return null; 
+                 })}
+              </div>
+            )}
           </div>
         </section>
 
