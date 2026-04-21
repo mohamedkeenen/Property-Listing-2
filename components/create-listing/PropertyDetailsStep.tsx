@@ -31,13 +31,13 @@ export function PropertyDetailsStep({ form }: Props) {
 
   const adminOptions = useMemo(() => 
     usersData?.data
-      ?.filter((u: any) => u.role === 'admin')
+      ?.filter((u: any) => u.role === 'admin' && u.is_active)
       ?.map((u: any) => ({ label: u.name, value: u.id.toString() })) || [], 
   [usersData]);
 
   const agentOptions = useMemo(() => 
     usersData?.data
-      ?.filter((u: any) => u.role === 'agent' || u.role === 'admin') // Agents are focus, but admins can be agents too
+      ?.filter((u: any) => (u.role === 'agent' || u.role === 'admin') && u.is_active) // Agents are focus, but admins can be agents too
       ?.map((u: any) => ({ label: u.name, value: u.id.toString() })) || [], 
   [usersData]);
 
