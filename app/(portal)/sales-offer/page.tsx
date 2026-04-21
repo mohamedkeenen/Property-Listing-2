@@ -283,7 +283,7 @@ export default function SalesOfferPage() {
                                   return `${baseUrl}${raw}`;
                                 }
 
-                                if (raw.includes('bitrix24.com') || raw.includes('/ajax.php')) {
+                                if (raw.includes('.bitrix24.') || raw.includes('/ajax.php')) {
                                   return `${baseUrl}/api/sales-offers/proxy-image?url=${encodeURIComponent(raw)}`;
                                 }
                                 
