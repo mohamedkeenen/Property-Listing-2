@@ -225,13 +225,13 @@ export function ListingsFilters({ onApply, agentOptions }: Props) {
             <Button 
               variant="outline" 
               onClick={reset} 
-              className="h-12 px-6 rounded-2xl border-2 border-primary/10 bg-transparent text-primary hover:bg-primary/5 hover:border-primary transition-all font-black uppercase tracking-[0.2em] text-[10px] gap-3"
+              className="h-12 px-8 rounded-2xl border-2 border-primary/30 bg-primary/5 text-primary hover:bg-primary hover:text-white hover:border-primary transition-all font-black uppercase tracking-[0.2em] text-[10px] gap-3 shadow-none"
             >
               <RotateCcw className="h-4 w-4" /> Reset All
             </Button>
             <Button 
               onClick={() => onApply(filters)} 
-              className="h-12 px-10 rounded-2xl border-2 border-primary/10 bg-transparent text-primary hover:bg-primary/5 hover:border-primary transition-all font-black uppercase tracking-[0.2em] text-[10px] shadow-none"
+              className="h-12 px-10 rounded-2xl border-2 border-primary/30 bg-primary/5 text-primary hover:bg-primary hover:text-white hover:border-primary transition-all font-black uppercase tracking-[0.2em] text-[10px] shadow-none"
             >
               <Search className="h-4 w-4 mr-1" /> Search Inventory
             </Button>
