@@ -1,9 +1,8 @@
-import { Globe, Key, Tag, FileText } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { Globe, Key, Tag, FileText, Copy } from "lucide-react";
+import { cn, copyToClipboard } from "@/lib/utils";
 import NextImage from "next/image";
 import { PropertyListing } from "@/data/mockData";
 import { useGetCompanySettingsQuery } from "@/api/redux/services/settingsApi";
-import { Copy } from "lucide-react";
 import { toast } from "react-hot-toast";
 
 interface Props {
@@ -111,7 +110,7 @@ export function StatsCards({ listings }: Props) {
                     const baseUrl = process.env.NEXT_PUBLIC_API_URL || "https://property-listing.keenenter.com/api";
                     const feedToken = companySettings?.data?.outbound_handler_token || companySettings?.data?.id;
                     const url = `${baseUrl}/properties/website/${feedToken}`;
-                    navigator.clipboard.writeText(url);
+                    copyToClipboard(url);
                     toast.success("API URL copied!");
                   }}
                   className="flex items-center gap-1 text-[9px] font-bold text-cyan-600 hover:text-cyan-700 transition-colors uppercase tracking-tight"
@@ -133,7 +132,7 @@ export function StatsCards({ listings }: Props) {
                     const baseUrl = (process.env.NEXT_PUBLIC_API_URL || "https://property-listing.keenenter.com/api").replace('/api', '');
                     const feedToken = companySettings?.data?.outbound_handler_token || companySettings?.data?.id;
                     const url = `${baseUrl}/api/feeds/${feedToken}/bayut.xml`;
-                    navigator.clipboard.writeText(url);
+                    copyToClipboard(url);
                     toast.success("Feed URL copied!");
                   }}
                   className="flex items-center gap-1 text-[9px] font-bold text-emerald-600 hover:text-emerald-700 transition-colors uppercase tracking-tight"
