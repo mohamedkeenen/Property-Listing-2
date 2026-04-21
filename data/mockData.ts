@@ -627,6 +627,17 @@ export const filterOptions = {
     "Flexi Finished ( 3/4 Finishing )"
   ],
   paymentMethods: ["Cash", "Installments"],
-  amenities: Object.keys(amenitiesMap)
+  amenities: Object.keys(amenitiesMap),
+  streetDirections: [
+    "not selected",
+    "South-West",
+    "South-East",
+    "North-West",
+    "North-East",
+    "West",
+    "East",
+    "North",
+    "South"
+  ]
 };
 

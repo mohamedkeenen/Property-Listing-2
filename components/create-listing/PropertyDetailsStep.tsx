@@ -254,10 +254,21 @@ export function PropertyDetailsStep({ form }: Props) {
             <ModernField label="Unit No" icon={Hash} required {...register("unitNo")} error={fieldError("unitNo")} value={watch("unitNo")} />
             <ModernField label="Land Number" icon={Hash} {...register("landNumber")} value={watch("landNumber")} />
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <ModernField label="Street Direction" icon={Compass} {...register("streetDirection")} value={watch("streetDirection")} placeholder="e.g. North" />
-                <ModernField label="Street Width" icon={Maximize} type="number" {...register("streetWidth")} value={watch("streetWidth")} />
-            </div>
+            <ModernSelect 
+              label="Street Direction" 
+              icon={Compass} 
+              value={watch("streetDirection")} 
+              onValueChange={(v) => setValue("streetDirection", v, { shouldValidate: true })}
+              options={filterOptions.streetDirections}
+            />
+
+            <ModernField 
+              label="Street Width" 
+              icon={Maximize} 
+              type="number" 
+              {...register("streetWidth")} 
+              value={watch("streetWidth")} 
+            />
 
             <NumberSearchSelect 
               label="Bedrooms" 
@@ -322,7 +333,6 @@ export function PropertyDetailsStep({ form }: Props) {
             <ModernField label="Minimal Rental Period" icon={CalendarCheck} type="number" {...register("minimalRentalPeriod")} value={watch("minimalRentalPeriod")} />
 
             <ModernField label="Total Land Area" icon={Maximize} type="number" {...register("landArea")} value={watch("landArea")} />
-            <ModernField label="Built-up Area" icon={Maximize} type="number" {...register("builtUpArea")} value={watch("builtUpArea")} />
             <ModernField label="Layout Type" icon={Sparkles} {...register("layoutType")} value={watch("layoutType")} />
 
             <ModernField 
