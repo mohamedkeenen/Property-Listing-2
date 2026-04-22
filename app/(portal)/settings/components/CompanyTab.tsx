@@ -5,7 +5,7 @@ import { Building2, Camera, Lock,Globe,Key,Webhook,LayoutGrid } from "lucide-rea
 import { ModernField } from "@/components/ui/modern-field";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useDispatch, useSelector } from "react-redux";
-import { selectCompanyName, selectCompanyLogo, selectSettingsLastUpdated,  selectBitrixWebhook, selectListingWebhook, selectPfApiKey, selectPfApiSecret, selectBayutApiKey, selectBayutLeadSourceWhatsapp, selectBayutLeadSourceEmail, selectBayutLeadSourcePhone, selectPfLeadSourceWhatsapp, selectPfLeadSourceEmail, selectPfLeadSourcePhone, selectSalesOfferWebhook, selectSalesOfferEntityTypeId, selectOutboundHandlerToken, selectPdfColor, selectWebsiteLink, setCompanySettings } from "@/api/redux/slices/settingsSlice";
+import { selectCompanyName, selectCompanyLogo, selectSettingsLastUpdated,  selectBitrixWebhook, selectListingWebhook, selectPfApiKey, selectPfApiSecret, selectBayutApiKey, selectBayutLeadSourceWhatsapp, selectBayutLeadSourceEmail, selectBayutLeadSourcePhone, selectPfLeadSourceWhatsapp, selectPfLeadSourceEmail, selectPfLeadSourcePhone, selectSalesOfferWebhook, selectSalesOfferEntityTypeId, selectOutboundHandlerToken, selectPdfColor, selectWebsiteLink, selectCompanyBanner, setCompanySettings } from "@/api/redux/slices/settingsSlice";
 import { useUpdateCompanySettingsMutation } from "@/api/redux/services/settingsApi";
 import { toast } from "react-hot-toast";
 import { cn } from "@/lib/utils";
@@ -35,6 +35,7 @@ export function CompanyTab({ isAdmin }: CompanyTabProps) {
   const reduxSalesOfferEntityTypeId = useSelector(selectSalesOfferEntityTypeId);
   const reduxPdfColor = useSelector(selectPdfColor);
   const reduxWebsiteLink = useSelector(selectWebsiteLink);
+  const reduxBanner = useSelector(selectCompanyBanner);
   
   const [companyName, setCompanyName] = useState(reduxCompanyName);
   const [logo, setLogo] = useState<string>(reduxLogo);
@@ -53,6 +54,7 @@ export function CompanyTab({ isAdmin }: CompanyTabProps) {
   const [salesOfferEntityTypeId, setSalesOfferEntityTypeId] = useState(reduxSalesOfferEntityTypeId);
   const [pdfColor, setPdfColor] = useState(reduxPdfColor);
   const [websiteLink, setWebsiteLink] = useState(reduxWebsiteLink);
+  const [banner, setBanner] = useState<string>(reduxBanner);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [updateSettings, { isLoading }] = useUpdateCompanySettingsMutation();
@@ -75,6 +77,7 @@ export function CompanyTab({ isAdmin }: CompanyTabProps) {
     setSalesOfferEntityTypeId(reduxSalesOfferEntityTypeId || "");
     setPdfColor(reduxPdfColor || "#3D5434");
     setWebsiteLink(reduxWebsiteLink || "");
+    setBanner(reduxBanner || "");
   }, [
     reduxCompanyName, 
     reduxLogo, 
@@ -91,7 +94,8 @@ export function CompanyTab({ isAdmin }: CompanyTabProps) {
     reduxPfLeadSourcePhone,
     reduxSalesOfferEntityTypeId,
     reduxPdfColor,
-    reduxWebsiteLink
+    reduxWebsiteLink,
+    reduxBanner
   ]);
 
   const getLogoUrl = (logoStr: string) => {
@@ -125,6 +129,7 @@ export function CompanyTab({ isAdmin }: CompanyTabProps) {
         sales_offer_entity_type_id: salesOfferEntityTypeId,
         pdf_color: pdfColor,
         website_link: websiteLink,
+        banner_image: banner,
       }).unwrap();
       
       if (result.status === 'success') {
@@ -136,17 +141,35 @@ export function CompanyTab({ isAdmin }: CompanyTabProps) {
     }
   };
 
+  const bannerInputRef = useRef<HTMLInputElement>(null);
+
   const handleLogoClick = () => {
     if (!isAdmin) return;
     fileInputRef.current?.click();
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleBannerClick = () => {
+    if (!isAdmin) return;
+    bannerInputRef.current?.click();
+  };
+
+  const handleLogoFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
         setLogo(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleBannerFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setBanner(reader.result as string);
       };
       reader.readAsDataURL(file);
     }
@@ -286,51 +309,101 @@ export function CompanyTab({ isAdmin }: CompanyTabProps) {
               </div>
               <div>
                 <CardTitle className="font-black text-xl">Branding</CardTitle>
-                <CardDescription className="font-medium">Change your company logo.</CardDescription>
+                <CardDescription className="font-medium">Manage your company branding assets.</CardDescription>
               </div>
             </div>
           </CardHeader>
-          <CardContent className="pt-8 flex flex-col items-center">
-            <div 
-              onClick={handleLogoClick}
-              className={cn(
-                "group relative w-48 h-48 rounded-2xl border-2 border-dashed border-border flex items-center justify-center transition-all overflow-hidden",
-                isAdmin ? "cursor-pointer hover:border-primary/50 hover:bg-primary/5" : "cursor-default opacity-80"
-              )}
-            >
-              {logo ? (
-                <div className="relative w-full h-full p-4">
-                  <img 
-                    src={getLogoUrl(logo)} 
-                    alt="Company Logo" 
-                    className="object-contain transition-transform group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                    <Camera className="text-white h-8 w-8" />
-                  </div>
+          <CardContent className="pt-8 space-y-8">
+            <div className="grid grid-cols-2 gap-6">
+              {/* Logo Column */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                   <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/70">Company Logo</h4>
+                   <div className="h-px flex-1 bg-border/20 ml-4" />
                 </div>
-              ) : (
-                <div className="text-center space-y-2">
-                  <Camera className="h-8 w-8 mx-auto text-muted-foreground" />
-                  <p className="text-xs font-bold text-muted-foreground">{isAdmin ? "Upload Logo" : "No Logo"}</p>
+                <div 
+                  onClick={handleLogoClick}
+                  className={cn(
+                    "group relative w-full h-40 rounded-2xl border-2 border-dashed border-border flex items-center justify-center transition-all overflow-hidden",
+                    isAdmin ? "cursor-pointer hover:border-primary/50 hover:bg-primary/5" : "cursor-default opacity-80"
+                  )}
+                >
+                  {logo ? (
+                    <div className="relative w-full h-full p-4">
+                      <img 
+                        src={getLogoUrl(logo)} 
+                        alt="Company Logo" 
+                        className="w-full h-full object-contain transition-transform group-hover:scale-105"
+                      />
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <Camera className="text-white h-8 w-8" />
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-center space-y-2">
+                      <Camera className="h-8 w-8 mx-auto text-muted-foreground" />
+                      <p className="text-xs font-bold text-muted-foreground">{isAdmin ? "Upload Logo" : "No Logo"}</p>
+                    </div>
+                  )}
                 </div>
-              )}
+                <input 
+                  type="file" 
+                  ref={fileInputRef} 
+                  onChange={handleLogoFileChange} 
+                  className="hidden" 
+                  accept="image/*"
+                />
+              </div>
+
+              {/* Banner Column */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                   <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/70">Offer Banner</h4>
+                   <div className="h-px flex-1 bg-border/20 ml-4" />
+                </div>
+                <div 
+                  onClick={handleBannerClick}
+                  className={cn(
+                    "group relative w-full h-40 rounded-2xl border-2 border-dashed border-border flex items-center justify-center transition-all overflow-hidden",
+                    isAdmin ? "cursor-pointer hover:border-primary/50 hover:bg-primary/5" : "cursor-default opacity-80"
+                  )}
+                >
+                  {banner ? (
+                    <div className="relative w-full h-full">
+                      <img 
+                        src={getLogoUrl(banner)} 
+                        alt="Banner Image" 
+                        className="w-full h-full object-cover transition-transform group-hover:scale-105"
+                      />
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <Camera className="text-white h-8 w-8" />
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-center space-y-2">
+                      <Camera className="h-6 w-6 mx-auto text-muted-foreground" />
+                      <p className="text-xs font-bold text-muted-foreground">{isAdmin ? "Upload Banner" : "No Banner"}</p>
+                    </div>
+                  )}
+                </div>
+                <input 
+                  type="file" 
+                  ref={bannerInputRef} 
+                  onChange={handleBannerFileChange} 
+                  className="hidden" 
+                  accept="image/*"
+                />
+              </div>
             </div>
+
             {!isAdmin && (
-              <div className="mt-4 p-3 bg-destructive/5 rounded-xl border border-destructive/10 text-destructive text-center w-full max-w-[200px]">
+              <div className="p-3 bg-destructive/5 rounded-xl border border-destructive/10 text-destructive text-center w-full">
                 <p className="text-[10px] font-black uppercase tracking-tighter">Access Denied</p>
                 <p className="text-[10px] font-medium leading-tight mt-1">Only admins can change branding assets.</p>
               </div>
             )}
-            <input 
-              type="file" 
-              ref={fileInputRef} 
-              onChange={handleFileChange} 
-              className="hidden" 
-              accept="image/*"
-            />
 
-            <div className="mt-8 w-full space-y-4">
+            <div className="w-full space-y-4">
               <div className="flex items-center justify-between">
                  <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/70">Website Connection</h4>
                  <div className="h-px flex-1 bg-border/20 ml-4" />
