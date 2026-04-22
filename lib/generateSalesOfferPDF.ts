@@ -43,10 +43,29 @@ export const generateSalesOfferPDF = async (formData: any, images: any) => {
   };
 
   const addImage = (img: string, x: number, y: number, w: number, h: number) => {
-    const isPng = img.toLowerCase().includes("png") || img.startsWith("data:image/png");
-    const isWebp = img.toLowerCase().includes("webp") || img.startsWith("data:image/webp");
-    const format = isPng ? "PNG" : (isWebp ? "WEBP" : "JPEG");
-    doc.addImage(img, format, x, y, w, h, undefined, 'MEDIUM');
+    let format = "JPEG";
+    
+    if (img.startsWith("data:image/")) {
+      const detected = img.split(";")[0].split("/")[1]?.toUpperCase();
+      if (detected === "PNG") format = "PNG";
+      else if (detected === "WEBP") format = "WEBP";
+    } else {
+      // Clean URL from query params for extension check
+      const cleanUrl = img.split("?")[0].toLowerCase();
+      if (cleanUrl.endsWith(".png")) format = "PNG";
+      else if (cleanUrl.endsWith(".webp")) format = "WEBP";
+    }
+
+    try {
+      doc.addImage(img, format, x, y, w, h, undefined, 'MEDIUM');
+    } catch (e) {
+      console.warn(`Failed to add image with format ${format}, retrying as JPEG...`, e);
+      try {
+        doc.addImage(img, "JPEG", x, y, w, h, undefined, 'MEDIUM');
+      } catch (err) {
+        console.error("Image addition failed completely:", err);
+      }
+    }
   };
 
   const getCircularImage = async (imgUrl: string) => {
