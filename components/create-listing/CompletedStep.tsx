@@ -272,19 +272,22 @@ export function CompletedStep({ form }: Props) {
          <Button 
            onClick={handleFinalSubmit}
            disabled={isLoading}
-           className="h-16 rounded-2xl font-black text-[11px] uppercase tracking-[0.3em] px-16 shadow-2xl shadow-primary/40 hover:shadow-primary/60 hover:-translate-y-1 transition-all bg-primary gap-4"
+           className="h-16 rounded-2xl md:rounded-[1.25rem] font-black text-[11px] uppercase tracking-[0.3em] px-16 shadow-2xl shadow-primary/40 hover:shadow-primary/60 hover:-translate-y-1 transition-all duration-300 bg-linear-to-br from-primary via-primary to-indigo-600 border-none relative overflow-hidden group/btn gap-4"
          >
-           {isLoading ? (
-             <>
-               <Loader2 className="h-4 w-4 animate-spin" />
-               Processing...
-             </>
-           ) : (
-             <>
-               Complete & Save Listing
-               <ArrowRight className="h-4 w-4" />
-             </>
-           )}
+           <div className="absolute inset-0 bg-white/10 -translate-x-full group-hover/btn:translate-x-full transition-transform duration-1000 skew-x-[-20deg]" />
+           <span className="relative z-10 flex items-center gap-4">
+             {isLoading ? (
+               <>
+                 <Loader2 className="h-4 w-4 animate-spin" />
+                 Processing...
+               </>
+             ) : (
+               <>
+                 Complete & Save Listing
+                 <ArrowRight className="h-4 w-4 transition-transform group-hover/btn:translate-x-1" />
+               </>
+             )}
+           </span>
          </Button>
          <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest text-center max-w-sm leading-loose">
            By clicking publish, your listing will be immediately broadcast to the selected distribution channels.

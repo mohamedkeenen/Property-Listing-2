@@ -179,10 +179,13 @@ export default function UsersPage() {
             </Button>
             <Button 
                 onClick={handleCreate}
-                className="h-14 rounded-2xl px-10 bg-primary hover:bg-primary/90 text-white font-black shadow-2xl shadow-primary/30 border-b-4 border-primary/40 transition-all active:scale-95 active:border-b-0 translate-y-0 active:translate-y-1 gap-3"
+                className="h-14 rounded-2xl md:rounded-[1.25rem] px-10 bg-linear-to-br from-primary via-primary to-indigo-600 text-white font-black shadow-2xl shadow-primary/30 border-none transition-all duration-300 hover:shadow-primary/40 active:scale-95 relative overflow-hidden group/btn gap-3"
             >
-                Register Member
-                <Plus className="h-5 w-5" />
+                <div className="absolute inset-0 bg-white/10 -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700 skew-x-[-20deg]" />
+                <span className="relative z-10 flex items-center gap-3">
+                    Register Member
+                    <Plus className="h-5 w-5" />
+                </span>
             </Button>
         </div>
       </div>

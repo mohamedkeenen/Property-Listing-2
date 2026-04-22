@@ -151,6 +151,17 @@ body {
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
 }
 
+button, 
+[role="button"],
+a,
+input[type="button"],
+input[type="submit"],
+input[type="image"],
+label[for],
+select {
+  cursor: pointer !important;
+}
+
 @layer utilities {
   .animate-infinite-scroll {
     animation: infinite-scroll 40s linear infinite;

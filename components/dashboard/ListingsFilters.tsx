@@ -227,7 +227,7 @@ export function ListingsFilters({ onApply, agentOptions }: Props) {
               onClick={reset} 
               className="h-12 px-8 rounded-2xl border-2 border-primary/30 bg-primary/5 text-primary hover:bg-primary hover:text-white hover:border-primary transition-all font-black uppercase tracking-[0.2em] text-[10px] gap-3 shadow-none"
             >
-              <RotateCcw className="h-4 w-4" /> Reset All
+                <RotateCcw className="h-4 w-4" /> Reset All
             </Button>
             <Button 
               onClick={() => onApply(filters)} 

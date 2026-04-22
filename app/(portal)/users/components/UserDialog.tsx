@@ -288,16 +288,19 @@ export function UserDialog({ open, onOpenChange, user, onSubmit, isLoading }: Us
             <Button
               type="submit"
               disabled={isLoading || !isValid}
-              className="rounded-xl h-12 px-10 bg-primary hover:bg-primary/90 text-white font-bold shadow-lg shadow-primary/20 disabled:opacity-30 disabled:cursor-not-allowed transition-all active:scale-95 text-xs uppercase tracking-widest"
+              className="rounded-2xl md:rounded-[1.25rem] h-12 md:h-14 px-10 bg-linear-to-br from-primary via-primary to-indigo-600 text-white font-black shadow-lg shadow-primary/20 disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-300 hover:shadow-primary/40 active:scale-95 text-xs uppercase tracking-widest relative overflow-hidden group/btn"
             >
-              {isLoading ? (
-                <Loader2 className="h-5 w-5 animate-spin" />
-              ) : (
-                <div className="flex items-center gap-2">
-                  {isEdit ? "Update User" : "Create User"}
-                  {isEdit ? <CheckCircle2 className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
-                </div>
-              )}
+              <div className="absolute inset-0 bg-white/10 -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700 skew-x-[-20deg]" />
+              <span className="relative z-10 flex items-center justify-center gap-2">
+                {isLoading ? (
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                ) : (
+                  <>
+                    {isEdit ? "Update User" : "Create User"}
+                    {isEdit ? <CheckCircle2 className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
+                  </>
+                )}
+              </span>
             </Button>
           </DialogFooter>
         </form>

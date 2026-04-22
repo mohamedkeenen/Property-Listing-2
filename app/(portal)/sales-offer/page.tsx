@@ -333,16 +333,19 @@ export default function SalesOfferPage() {
                         <Button
                           onClick={() => handleDownload(offer.id)}
                           disabled={downloadingIds.includes(offer.id)}
-                          className="rounded-xl h-10 px-5 font-black bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/10 transition-all active:scale-95 group"
+                          className="rounded-xl md:rounded-2xl h-10 px-5 font-black bg-linear-to-br from-primary via-primary to-indigo-600 text-white shadow-lg shadow-primary/10 transition-all duration-300 hover:shadow-primary/30 active:scale-95 relative overflow-hidden group/btn"
                         >
-                          {downloadingIds.includes(offer.id) ? (
-                            <Loader2 className="h-4 w-4 animate-spin" />
-                          ) : (
-                            <>
-                              <Download className="mr-2 h-4 w-4 group-hover:-translate-y-0.5 transition-transform" />
-                              Download
-                            </>
-                          )}
+                          <div className="absolute inset-0 bg-white/10 -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700 skew-x-[-20deg]" />
+                          <span className="relative z-10 flex items-center justify-center">
+                            {downloadingIds.includes(offer.id) ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                              <>
+                                <Download className="mr-2 h-4 w-4 group-hover/btn:-translate-y-0.5 transition-transform" />
+                                Download
+                              </>
+                            )}
+                          </span>
                         </Button>
                       </TableCell>
                     </TableRow>

@@ -88,8 +88,8 @@ export default function Dashboard() {
             disabled={isLoading}
             className="flex-1 sm:flex-none rounded-2xl font-black text-[10px] uppercase tracking-widest h-12 px-6 gap-3 border-2 border-primary/30 bg-primary/5 text-primary hover:border-primary hover:bg-primary hover:text-white transition-all active:scale-95 shadow-sm hover:shadow-primary/20"
           >
-            <RefreshCcw className={cn("h-4 w-4", isLoading && "animate-spin")} />
-            <span className="hidden xs:inline">Refresh</span>
+              <RefreshCcw className={cn("h-4 w-4", isLoading && "animate-spin")} />
+              <span className="hidden xs:inline">Refresh</span>
           </Button>
 
           <Button 
@@ -99,8 +99,8 @@ export default function Dashboard() {
             disabled={isSyncing}
             className="flex-1 sm:flex-none rounded-2xl font-black text-[10px] uppercase tracking-widest h-12 px-8 gap-3 border-2 border-primary/30 bg-primary/5 text-primary hover:border-primary hover:bg-primary hover:text-white transition-all active:scale-95 shadow-sm hover:shadow-primary/20"
           >
-            <Database className={cn("h-4 w-4", isSyncing && "animate-spin")} />
-            Sync <span className="hidden xs:inline">Bitrix</span>
+              <Database className={cn("h-4 w-4", isSyncing && "animate-spin")} />
+              Sync <span className="hidden xs:inline">Bitrix</span>
           </Button>
         </div>
       </div>
