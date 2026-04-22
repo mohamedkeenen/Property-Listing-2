@@ -5,7 +5,7 @@ import { Building2, Camera, Lock,Globe,Key,Webhook,LayoutGrid } from "lucide-rea
 import { ModernField } from "@/components/ui/modern-field";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useDispatch, useSelector } from "react-redux";
-import { selectCompanyName, selectCompanyLogo, selectSettingsLastUpdated,  selectBitrixWebhook, selectListingWebhook, selectPfApiKey, selectPfApiSecret, selectBayutApiKey, selectBayutLeadSourceWhatsapp, selectBayutLeadSourceEmail, selectBayutLeadSourcePhone, selectPfLeadSourceWhatsapp, selectPfLeadSourceEmail, selectPfLeadSourcePhone, selectSalesOfferWebhook, selectSalesOfferEntityTypeId, selectOutboundHandlerToken, selectPdfColor, setCompanySettings } from "@/api/redux/slices/settingsSlice";
+import { selectCompanyName, selectCompanyLogo, selectSettingsLastUpdated,  selectBitrixWebhook, selectListingWebhook, selectPfApiKey, selectPfApiSecret, selectBayutApiKey, selectBayutLeadSourceWhatsapp, selectBayutLeadSourceEmail, selectBayutLeadSourcePhone, selectPfLeadSourceWhatsapp, selectPfLeadSourceEmail, selectPfLeadSourcePhone, selectSalesOfferWebhook, selectSalesOfferEntityTypeId, selectOutboundHandlerToken, selectPdfColor, selectWebsiteLink, setCompanySettings } from "@/api/redux/slices/settingsSlice";
 import { useUpdateCompanySettingsMutation } from "@/api/redux/services/settingsApi";
 import { toast } from "react-hot-toast";
 import { cn } from "@/lib/utils";
@@ -34,6 +34,7 @@ export function CompanyTab({ isAdmin }: CompanyTabProps) {
   const reduxSalesOfferWebhook = useSelector(selectSalesOfferWebhook);
   const reduxSalesOfferEntityTypeId = useSelector(selectSalesOfferEntityTypeId);
   const reduxPdfColor = useSelector(selectPdfColor);
+  const reduxWebsiteLink = useSelector(selectWebsiteLink);
   
   const [companyName, setCompanyName] = useState(reduxCompanyName);
   const [logo, setLogo] = useState<string>(reduxLogo);
@@ -51,6 +52,7 @@ export function CompanyTab({ isAdmin }: CompanyTabProps) {
   const [salesOfferWebhook, setSalesOfferWebhook] = useState(reduxSalesOfferWebhook);
   const [salesOfferEntityTypeId, setSalesOfferEntityTypeId] = useState(reduxSalesOfferEntityTypeId);
   const [pdfColor, setPdfColor] = useState(reduxPdfColor);
+  const [websiteLink, setWebsiteLink] = useState(reduxWebsiteLink);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [updateSettings, { isLoading }] = useUpdateCompanySettingsMutation();
@@ -72,6 +74,7 @@ export function CompanyTab({ isAdmin }: CompanyTabProps) {
     setSalesOfferWebhook(reduxSalesOfferWebhook || "");
     setSalesOfferEntityTypeId(reduxSalesOfferEntityTypeId || "");
     setPdfColor(reduxPdfColor || "#3D5434");
+    setWebsiteLink(reduxWebsiteLink || "");
   }, [
     reduxCompanyName, 
     reduxLogo, 
@@ -86,9 +89,9 @@ export function CompanyTab({ isAdmin }: CompanyTabProps) {
     reduxPfLeadSourceWhatsapp,
     reduxPfLeadSourceEmail,
     reduxPfLeadSourcePhone,
-    reduxSalesOfferWebhook,
     reduxSalesOfferEntityTypeId,
-    reduxPdfColor
+    reduxPdfColor,
+    reduxWebsiteLink
   ]);
 
   const getLogoUrl = (logoStr: string) => {
@@ -121,6 +124,7 @@ export function CompanyTab({ isAdmin }: CompanyTabProps) {
         sales_offer_webhook: salesOfferWebhook,
         sales_offer_entity_type_id: salesOfferEntityTypeId,
         pdf_color: pdfColor,
+        website_link: websiteLink,
       }).unwrap();
       
       if (result.status === 'success') {
@@ -327,6 +331,19 @@ export function CompanyTab({ isAdmin }: CompanyTabProps) {
             />
 
             <div className="mt-8 w-full space-y-4">
+              <div className="flex items-center justify-between">
+                 <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/70">Website Connection</h4>
+                 <div className="h-px flex-1 bg-border/20 ml-4" />
+              </div>
+              <ModernField 
+                label="Website Link" 
+                placeholder="https://exampla.com" 
+                icon={Globe} 
+                value={websiteLink}
+                onChange={(e) => setWebsiteLink(e.target.value)}
+                readOnly={!isAdmin}
+              />
+
               <div className="flex items-center justify-between">
                  <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/70">PDF Theme Color</h4>
                  <div className="h-px flex-1 bg-border/20 ml-4" />

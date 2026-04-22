@@ -22,6 +22,7 @@ interface SettingsState {
   projectNames: string[];
   outbound_handler_token: string;
   pdf_color: string;
+  website_link: string;
 }
 
 const initialState: SettingsState = {
@@ -45,6 +46,7 @@ const initialState: SettingsState = {
   projectNames: [],
   outbound_handler_token: '',
   pdf_color: '#3D5434',
+  website_link: '',
 };
 
 const settingsSlice = createSlice({
@@ -71,6 +73,7 @@ const settingsSlice = createSlice({
       state.projectNames = action.payload.projectNames || action.payload.project_names || [];
       state.outbound_handler_token = action.payload.outbound_handler_token || '';
       state.pdf_color = action.payload.pdf_color || '#3D5434';
+      state.website_link = action.payload.website_link || '';
       state.lastUpdated = Date.now();
     },
     updateDevelopers: (state, action: PayloadAction<string[]>) => {
@@ -108,3 +111,4 @@ export const selectDevelopers = (state: RootState) => state.settings.developers;
 export const selectProjectNames = (state: RootState) => state.settings.projectNames;
 export const selectOutboundHandlerToken = (state: RootState) => state.settings.outbound_handler_token;
 export const selectPdfColor = (state: RootState) => state.settings.pdf_color;
+export const selectWebsiteLink = (state: RootState) => state.settings.website_link;
