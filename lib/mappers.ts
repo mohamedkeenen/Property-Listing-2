@@ -86,7 +86,8 @@ export const mapBackendPropertyToFrontend = (p: any): PropertyListing => {
     permitNumber: p.permit_number || "",
     availableFrom: p.available_date || "",
     parking: p.parking || 0,
-    furnished: p.furnished || "Unfurnished",
+    furnished: p.furnishing_type || "unfurnished",
+    finishingType: p.finishing_type || "",
     notes: typeof p.notes === 'string' 
       ? [{ id: Math.random(), content: p.notes, user: "System Admin", date: p.updated_at }]
       : (p.notes || []).map((n: any) => ({

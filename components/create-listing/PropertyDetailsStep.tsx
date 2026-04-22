@@ -305,13 +305,9 @@ export function PropertyDetailsStep({ form }: Props) {
               value={watch("furnishingType")} 
               onValueChange={(v) => setValue("furnishingType", v, { shouldValidate: true })}
               options={[
-                { label: "Unfinished", value: "unfinished" },
-                { 
-                  label: "Semi-finished", 
-                  value: "semi-finished",
-                  badge: "Bayut: No"
-                },
-                { label: "Fully Finished", value: "fully-finished" }
+                { label: "Unfurnished", value: "unfurnished" },
+                { label: "Semi-furnished", value: "semi-furnished", badge: "Bayut: No" },
+                { label: "Furnished", value: "furnished" },
               ]}
             />
 
@@ -392,7 +388,10 @@ export function PropertyDetailsStep({ form }: Props) {
               onValueChange={(v) => setValue("finishingType", v, { shouldValidate: true })}
               options={[
                 { label: "Unfinished", value: "unfinished" },
-                { label: "Semi Finished", value: "semi-finished" },
+                { 
+                  label: "Semi-finished", 
+                  value: "semi-finished",
+                },
                 { label: "Fully Finished", value: "fully-finished" }
               ]}
             />

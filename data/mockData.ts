@@ -622,7 +622,7 @@ export const filterOptions = {
   currencies: ["Dirham", "Egypt Pound", "US Dollar", "EURO"],
   finishingTypes: [
     "Unfinished",
-    "Semi Finished",
+    "Semi-finished",
     "Fully Finished"
   ],
   paymentMethods: ["Cash", "Installments"],
