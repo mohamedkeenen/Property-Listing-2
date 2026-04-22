@@ -53,10 +53,16 @@ export default function SalesOfferPage() {
 
       const getImg = (f: any) => {
         if (!f) return null;
-        return f.showUrl || f.url || f.downloadUrl || (typeof f === 'string' ? f : null);
+        const raw = f.showUrl || f.url || f.downloadUrl || (typeof f === 'string' ? f : null);
+        if (!raw) return null;
+        if (raw.startsWith('data:')) return raw;
+        
+        // Use our proxy for all external/cross-origin images to avoid CORS issues in PDF generation
+        const baseUrl = (process.env.NEXT_PUBLIC_API_URL || 'https://property-listing.keenenter.com').replace(/\/api$/, '').replace(/\/$/, '');
+        return `${baseUrl}/api/sales-offers/proxy-image?url=${encodeURIComponent(raw)}`;
       };
       
-      const mappedData = {
+      const mappedData = { 
         title: mapped['Title'] || "Sales Offer",
         titleArabic: "",
         projectName: cleanVal(mapped['Project Name']) || "N/A",
