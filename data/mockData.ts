@@ -563,7 +563,7 @@ export const filterOptions = {
   purposes: ["Rent", "Sale"],
   statuses: ["Live", "Draft", "Pending", "Archived", "Pocket"],
   agents: ["Ahmed Hassan", "Sara Khan", "Omar Farouk"],
-  furnished: ["Unfurnished", "Partly furnished", "Furnished"],
+  furnished: ["Unfinished", "Semi Finished", "Fully Finished"],
   projectNames: ["Burj Khalifa", "Burj Al Arab"],
   developers: [
     "Oro24",
@@ -621,10 +621,9 @@ export const filterOptions = {
   areaUnit: "SQ. FT",
   currencies: ["Dirham", "Egypt Pound", "US Dollar", "EURO"],
   finishingTypes: [
-    "Fully Finished",
+    "Unfinished",
     "Semi Finished",
-    "Core & Shell",
-    "Flexi Finished ( 3/4 Finishing )"
+    "Fully Finished"
   ],
   paymentMethods: ["Cash", "Installments"],
   amenities: Object.keys(amenitiesMap),

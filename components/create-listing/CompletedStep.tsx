@@ -124,6 +124,10 @@ export function CompletedStep({ form }: Props) {
       build_year: values.buildYear || null,
       ownership: values.ownership || null,
       currency: values.currency || "Dirham",
+      payment_method: values.paymentMethod || null,
+      service_charges: values.serviceCharges || null,
+      down_payment: values.downPayment || null,
+      financial_status: values.financialStatus || null,
     };
 
     try {

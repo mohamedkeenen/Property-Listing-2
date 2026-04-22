@@ -305,13 +305,13 @@ export function PropertyDetailsStep({ form }: Props) {
               value={watch("furnishingType")} 
               onValueChange={(v) => setValue("furnishingType", v, { shouldValidate: true })}
               options={[
-                { label: "Unfurnished", value: "unfurnished" },
+                { label: "Unfinished", value: "unfinished" },
                 { 
-                  label: "Semi-furnished", 
-                  value: "partly-furnished",
+                  label: "Semi-finished", 
+                  value: "semi-finished",
                   badge: "Bayut: No"
                 },
-                { label: "Furnished", value: "furnished" }
+                { label: "Fully Finished", value: "fully-finished" }
               ]}
             />
 
@@ -332,7 +332,6 @@ export function PropertyDetailsStep({ form }: Props) {
             <ModernField label="Property Age" icon={Calendar} type="number" {...register("age")} value={watch("age")} />
             <ModernField label="Minimal Rental Period" icon={CalendarCheck} type="number" {...register("minimalRentalPeriod")} value={watch("minimalRentalPeriod")} />
 
-            <ModernField label="Total Land Area" icon={Maximize} type="number" {...register("landArea")} value={watch("landArea")} />
             <ModernField label="Layout Type" icon={Sparkles} {...register("layoutType")} value={watch("layoutType")} />
 
             <ModernField 
@@ -391,7 +390,11 @@ export function PropertyDetailsStep({ form }: Props) {
               icon={Paintbrush} 
               value={watch("finishingType")} 
               onValueChange={(v) => setValue("finishingType", v, { shouldValidate: true })}
-              options={filterOptions.finishingTypes}
+              options={[
+                { label: "Unfinished", value: "unfinished" },
+                { label: "Semi Finished", value: "semi-finished" },
+                { label: "Fully Finished", value: "fully-finished" }
+              ]}
             />
             
             <ModernSelect 
@@ -468,7 +471,6 @@ export function PropertyDetailsStep({ form }: Props) {
             </div>
 
             <ModernField label="License No" icon={Hash} {...register("licenseNo")} value={watch("licenseNo")} />
-            <ModernField label="Ad Issue Date" icon={Calendar} type="date" {...register("adIssueDate")} value={watch("adIssueDate")} />
             <ModernField label="Available From" icon={CalendarCheck} type="date" {...register("availableFrom")} value={watch("availableFrom")} />
           </div>
         </section>
@@ -523,23 +525,7 @@ export function PropertyDetailsStep({ form }: Props) {
                 value={watch("downPayment")} 
               />
 
-              <ModernSelect 
-                label="Number Of cheques" 
-                icon={Hash} 
-                value={watch("cheques")} 
-                onValueChange={(v) => setValue("cheques", v, { shouldValidate: true })}
-                options={["1", "2", "4", "6", "12"]}
-              />
-
               <ModernField label="Service Charges" icon={FileText} {...register("serviceCharges")} value={watch("serviceCharges")} />
-
-              <ModernSelect 
-                label="Financial Status" 
-                icon={AlertCircle} 
-                value={watch("financialStatus")} 
-                onValueChange={(v) => setValue("financialStatus", v, { shouldValidate: true })}
-                options={["Paid", "Outstanding"]}
-              />
             </div>
           ) : (
             <>
@@ -612,14 +598,6 @@ export function PropertyDetailsStep({ form }: Props) {
                 )}
 
                 <ModernField label="Service Charges" icon={FileText} {...register("serviceCharges")} value={watch("serviceCharges")} />
-
-                <ModernSelect 
-                  label="Financial Status" 
-                  icon={AlertCircle} 
-                  value={watch("financialStatus")} 
-                  onValueChange={(v) => setValue("financialStatus", v, { shouldValidate: true })}
-                  options={["Paid", "Outstanding"]}
-                />
               </div>
             </>
           )}
