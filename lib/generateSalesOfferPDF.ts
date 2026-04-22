@@ -154,6 +154,11 @@ export const generateSalesOfferPDF = async (formData: any, images: any) => {
     addImage(croppedCover, 0, 0, pageWidth, pageHeight);
   }
 
+  // Company Logo on Cover
+  if (images.logo) {
+    addImage(images.logo, 15, 15, 30, 30);
+  }
+
   // Cinematic Dark Overlay
   doc.setFillColor(0, 0, 0);
   const GState = (doc as any).GState;
@@ -213,6 +218,14 @@ export const generateSalesOfferPDF = async (formData: any, images: any) => {
   if (images.banner) {
     const croppedBanner = await getCroppedImage(images.banner, (pageWidth - 30) / 45, true);
     addImage(croppedBanner, 15, 15, pageWidth - 30, 45);
+    
+    // Logo next to banner if banner exists
+    if (images.logo) {
+        // Draw a small white circle or box behind the logo for visibility
+        doc.setFillColor(255, 255, 255);
+        doc.roundedRect(pageWidth - 45, 20, 25, 25, 2, 2, "F");
+        addImage(images.logo, pageWidth - 42.5, 22.5, 20, 20);
+    }
     
     // Banner Overlays
     doc.setTextColor(255, 255, 255);
@@ -326,6 +339,13 @@ export const generateSalesOfferPDF = async (formData: any, images: any) => {
   if (images.banner) {
     const croppedBannerPage4 = await getCroppedImage(images.banner, (pageWidth - 30) / 45, true);
     addImage(croppedBannerPage4, 15, 15, pageWidth - 30, 45);
+    
+    // Logo next to banner if banner exists
+    if (images.logo) {
+        doc.setFillColor(255, 255, 255);
+        doc.roundedRect(pageWidth - 45, 20, 25, 25, 2, 2, "F");
+        addImage(images.logo, pageWidth - 42.5, 22.5, 20, 20);
+    }
     
     // Banner Overlays
     doc.setTextColor(255, 255, 255);
@@ -449,6 +469,13 @@ export const generateSalesOfferPDF = async (formData: any, images: any) => {
   if (images.banner) {
     const croppedBannerPage5 = await getCroppedImage(images.banner, (pageWidth - 30) / 45, true);
     addImage(croppedBannerPage5, 15, 15, pageWidth - 30, 45);
+    
+    // Logo next to banner if banner exists
+    if (images.logo) {
+        doc.setFillColor(255, 255, 255);
+        doc.roundedRect(pageWidth - 45, 20, 25, 25, 2, 2, "F");
+        addImage(images.logo, pageWidth - 42.5, 22.5, 20, 20);
+    }
     
     // Banner Overlays
     doc.setTextColor(255, 255, 255);

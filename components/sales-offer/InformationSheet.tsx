@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { ModernField } from "@/components/ui/modern-field";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Layout, FileSearch, Layers, Building2, CreditCard, Sparkles, Info, Upload, Trash2, Map } from "lucide-react";
+import { Layout, FileSearch, Layers, Building2, CreditCard, Sparkles, Info, Upload, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface InformationSheetProps {

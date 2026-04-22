@@ -172,6 +172,7 @@ export default function SalesOfferPage() {
       const mappedImages = {
         cover: getImg(mapped['Upload Cover Image']),
         banner: getImg(mapped['Upload Banner Image']),
+        logo: getImg(mapped['Company Logo']),
         qrCode: null,
         unitDetail: getImg(mapped['Layout Image']),
         highlights: (Array.isArray(mapped['Project Images Only-2'] || mapped['project_images_only-2'] || mapped['Project Images']) 
