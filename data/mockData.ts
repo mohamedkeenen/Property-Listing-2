@@ -563,7 +563,7 @@ export const filterOptions = {
   purposes: ["Rent", "Sale"],
   statuses: ["Live", "Draft", "Pending", "Archived", "Pocket"],
   agents: ["Ahmed Hassan", "Sara Khan", "Omar Farouk"],
-  furnished: ["Unfinished", "Semi Finished", "Fully Finished"],
+  furnished: ["unfurnished", "semi-furnished", "furnished"],
   projectNames: ["Burj Khalifa", "Burj Al Arab"],
   developers: [
     "Oro24",
