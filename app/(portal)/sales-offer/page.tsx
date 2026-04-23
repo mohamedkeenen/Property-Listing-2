@@ -104,14 +104,14 @@ export default function SalesOfferPage() {
           dld: { 
             description: "DLD Charges", 
             date: mapped['dld_date'] || "", 
-            percentage: `${mapped['dld_percentage'] || 4}%`, 
+            percentage: `${mapped['dld_percentage'] }%`, 
             amount: cleanVal(mapped['dld_amount']) 
           },
           admin: { 
             description: "Administration Fee", 
             date: mapped['admin_date'] || "", 
             percentage: `${mapped['admin_percentage'] || 0}%`, 
-            amount: cleanVal(mapped['admin_amount']) || "5,000.00" 
+            amount: cleanVal(mapped['admin_amount']) || "" 
           },
         },
         paymentPlan: [] as any[],
