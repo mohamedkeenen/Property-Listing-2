@@ -240,8 +240,7 @@ export const generateSalesOfferPDF = async (formData: any, images: any) => {
     // Logo next to banner if banner exists
     if (images.logoPdf || images.logo) {
         const logoToUse = images.logoPdf || images.logo;
-        doc.setFillColor(255, 255, 255);
-        doc.roundedRect(pageWidth - 45, 20, 25, 25, 2, 2, "F");
+        // White box removed as requested
         addImage(logoToUse, pageWidth - 42.5, 22.5, 20, 20);
     }
     
@@ -341,8 +340,7 @@ export const generateSalesOfferPDF = async (formData: any, images: any) => {
     // Logo next to banner if banner exists
     if (images.logoPdf || images.logo) {
         const logoToUse = images.logoPdf || images.logo;
-        doc.setFillColor(255, 255, 255);
-        doc.roundedRect(pageWidth - 45, 20, 25, 25, 2, 2, "F");
+        // White box removed as requested
         addImage(logoToUse, pageWidth - 42.5, 22.5, 20, 20);
     }
     
@@ -447,8 +445,7 @@ export const generateSalesOfferPDF = async (formData: any, images: any) => {
     // Logo next to banner if banner exists
     if (images.logoPdf || images.logo) {
         const logoToUse = images.logoPdf || images.logo;
-        doc.setFillColor(255, 255, 255);
-        doc.roundedRect(pageWidth - 45, 20, 25, 25, 2, 2, "F");
+        // White box removed as requested
         addImage(logoToUse, pageWidth - 42.5, 22.5, 20, 20);
     }
     
