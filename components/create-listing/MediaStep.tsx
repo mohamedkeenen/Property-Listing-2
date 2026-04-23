@@ -21,7 +21,6 @@ export function MediaStep({ form }: Props) {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const images = watch("images") || [];
-
   const applyWatermark = (base64Image: string, logoUrl: string): Promise<string> => {
     return new Promise((resolve) => {
       const img = new Image();
@@ -40,13 +39,13 @@ export function MediaStep({ form }: Props) {
            logo.crossOrigin = "anonymous";
         }
         logo.onload = () => {
-          const logoTargetWidth = canvas.width * 0.4;
+          const logoTargetWidth = canvas.width * 0.30;
           const logoTargetHeight = (logo.height / logo.width) * logoTargetWidth;
           const x = (canvas.width - logoTargetWidth) / 2;
           const y = (canvas.height - logoTargetHeight) / 2;
           
           ctx.save();
-          ctx.globalAlpha = 0.4;
+          ctx.globalAlpha = 0.65;
           ctx.drawImage(logo, x, y, logoTargetWidth, logoTargetHeight);
           ctx.restore();
           resolve(canvas.toDataURL("image/jpeg", 0.8));
