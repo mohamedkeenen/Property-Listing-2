@@ -287,7 +287,17 @@ export const generateSalesOfferPDF = async (formData: any, images: any) => {
   drawSpecRow(sy, "No. of Bedroom:", formData.bedrooms); sy += 10;
   drawSpecRow(sy, "Level :", formData.level); sy += 10;
   drawSpecRow(sy, "Total Area (SQ.FT) :", (formData.totalArea || formData.unitArea) + " (SQ.FT)"); sy += 10;
-  drawSpecRow(sy, "Selling Price :", formData.sellingPrice + " AED");
+  drawSpecRow(sy, "Selling Price :", formData.sellingPrice + " AED"); sy += 10;
+  
+  // Separate section with a gap
+  sy += 5;
+
+  if (formData.assignedConsultant) {
+    drawSpecRow(sy, "Sales Consultant :", formData.assignedConsultant); sy += 10;
+  }
+  if (formData.approvalAuthority) {
+    drawSpecRow(sy, "Head of Sales :", formData.approvalAuthority); sy += 10;
+  }
 
   doc.text(`Subject to Terms and Conditions in the Sales and Purchasing Agreement*`, pageWidth / 2, sy + 30, { align: "center" });
 
@@ -356,7 +366,7 @@ export const generateSalesOfferPDF = async (formData: any, images: any) => {
     doc.setTextColor(...primaryColor);
     doc.setFontSize(8);
     doc.setFont("helvetica", "bold");
-    doc.text("INFORMATION SHEET", 45, 47, { align: "center" });
+    doc.text("FLOOR PLAN", 45, 47, { align: "center" });
   }
 
   // 2. Technical Data Section
@@ -371,19 +381,67 @@ export const generateSalesOfferPDF = async (formData: any, images: any) => {
   doc.setFont("helvetica", "bold");
   doc.text(String(formData.level || "-"), 85, fy);
   
+  // Conditionally show Suite Area and Terrace if they exist
+  const suiteAreaNum = parseFloat(formData.suiteArea?.replace(/,/g, '') || "0");
+  const terraceNum = parseFloat(formData.terrace?.replace(/,/g, '') || "0");
+  
+  if (suiteAreaNum > 0 || terraceNum > 0) {
+    fy += 12;
+    doc.setFontSize(12);
+    doc.setTextColor(...primaryColor);
+    
+    if (suiteAreaNum > 0) {
+      doc.text("Suite Area:", 25, fy);
+      doc.setTextColor(0, 0, 0);
+      doc.text(`${formData.suiteArea} (SQ.FT)`, 85, fy);
+      fy += 8;
+    }
+    
+    if (terraceNum > 0) {
+      doc.setTextColor(...primaryColor);
+      doc.text("Terrace:", 25, fy);
+      doc.setTextColor(0, 0, 0);
+      doc.text(`${formData.terrace} (SQ.FT)`, 85, fy);
+      fy += 8;
+    }
+    
+    // Horizontal Line
+    doc.setDrawColor(...primaryColor);
+    doc.setLineWidth(0.5);
+    doc.line(25, fy - 2, 105, fy - 2);
+    fy += 5;
+    
+    // Total Area
+    doc.setTextColor(...primaryColor);
+    doc.text("Total Area :", 25, fy);
+    doc.setTextColor(0, 0, 0);
+    doc.text(`${formData.totalArea} (SQ.FT)`, 85, fy);
+  }
+  
   fy += 15;
 
   // 3. Floor Plan Image Box
   if (images.unitDetail) {
     const imgY = fy + 5;
-    const imgH = pageHeight - imgY - 40; 
+    const imgH = pageHeight - imgY - 50; 
     
     // Aesthetic Box for Image
+    const boxX = 12;
+    const boxY = imgY - 5;
+    const boxW = pageWidth - 24;
+    const boxH = imgH + 10;
+    const padding = 12; // Increased padding inside the box to prevent overflow
+
     doc.setFillColor(255, 255, 255);
     doc.setDrawColor(220, 220, 220);
     doc.setLineWidth(0.1);
-    doc.rect(12, imgY - 5, pageWidth - 24, imgH + 10, "FD");
+    doc.rect(boxX, boxY, boxW, boxH, "FD");
     
+    const contentX = boxX + padding;
+    const contentY = boxY + padding;
+    const contentW = boxW - (padding * 2);
+    const contentH = boxH - (padding * 2);
+
     // For unit detail (floor plans), we use object-fit: contain logic to avoid losing details
     const dimensions = await new Promise<{w: number, h: number}>(r => {
       const im = new Image(); im.onload = () => r({w: im.width, h: im.height}); im.onerror=() => r({w:0,h:0}); im.src = images.unitDetail;
@@ -391,22 +449,23 @@ export const generateSalesOfferPDF = async (formData: any, images: any) => {
 
     if (dimensions.w > 0) {
       const imgRatio = dimensions.w / dimensions.h;
-      const boxRatio = (pageWidth - 20) / imgH;
+      const contentRatio = contentW / contentH;
       let renderW, renderH, renderX, renderY;
-      if (imgRatio > boxRatio) {
-        renderW = pageWidth - 20;
+      
+      if (imgRatio > contentRatio) {
+        renderW = contentW;
         renderH = renderW / imgRatio;
-        renderX = 10;
-        renderY = imgY + (imgH - renderH) / 2;
+        renderX = contentX;
+        renderY = contentY + (contentH - renderH) / 2;
       } else {
-        renderH = imgH;
-        renderW = imgH * imgRatio;
-        renderX = 10 + ((pageWidth - 20) - renderW) / 2;
-        renderY = imgY;
+        renderH = contentH;
+        renderW = renderH * imgRatio;
+        renderX = contentX + (contentW - renderW) / 2;
+        renderY = contentY;
       }
       addImage(images.unitDetail, renderX, renderY, renderW, renderH);
     } else {
-      addImage(images.unitDetail, 15, imgY, pageWidth - 30, imgH);
+      addImage(images.unitDetail, contentX, contentY, contentW, contentH);
     }
   }
 
@@ -459,7 +518,7 @@ export const generateSalesOfferPDF = async (formData: any, images: any) => {
     doc.setTextColor(...primaryColor);
     doc.setFontSize(8);
     doc.setFont("helvetica", "bold");
-    doc.text("INFORMATION SHEET", 45, 47, { align: "center" });
+    doc.text("FINANCIAL DETAILS", 45, 47, { align: "center" });
   }
 
   const drawStyledTable = (startY: number, title: string, headers: string[], rows: any[], colWidths: number[]) => {

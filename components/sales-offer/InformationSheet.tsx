@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { ModernField } from "@/components/ui/modern-field";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Layout, FileSearch, Layers, Building2, CreditCard, Sparkles, Info, Upload, Trash2 } from "lucide-react";
+import { Layout, FileSearch, Layers, Building2, CreditCard, Sparkles, Info, Upload, Trash2, UserCheck, ShieldCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface InformationSheetProps {
@@ -72,6 +72,26 @@ export function InformationSheet({
             <ModernField label="Level / Floor" icon={Building2} placeholder="example floor" value={formData.level} onChange={(e) => handleInputChange('level', e.target.value)} />
             <ModernField label="Total Area (SQ.FT)" icon={Layout} placeholder="example area" value={formData.unitArea} onChange={(e) => handleInputChange('unitArea', e.target.value)} />
             <ModernField label="Final Selling Price (AED)" icon={CreditCard} placeholder="example price" value={formData.sellingPrice} onChange={(e) => handleInputChange('sellingPrice', e.target.value)} />
+            
+            {formData.assignedConsultant && (
+              <ModernField 
+                label="Sales Consultant" 
+                icon={UserCheck} 
+                placeholder="Consultant name" 
+                value={formData.assignedConsultant} 
+                onChange={(e) => handleInputChange('assignedConsultant', e.target.value)} 
+              />
+            )}
+            
+            {formData.approvalAuthority && (
+              <ModernField 
+                label="Head of Sales" 
+                icon={ShieldCheck} 
+                placeholder="Authority name" 
+                value={formData.approvalAuthority} 
+                onChange={(e) => handleInputChange('approvalAuthority', e.target.value)} 
+              />
+            )}
           </div>
           
         </Card>

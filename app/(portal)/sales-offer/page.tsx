@@ -103,6 +103,10 @@ export default function SalesOfferPage() {
           const terrace = parseFloat(cleanVal(mapped['Terrace']).replace(/,/g, '')) || 0;
           return (suite + terrace).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 });
         })(),
+        suiteArea: cleanVal(mapped['Average Area (SQ.FT)']) || "0",
+        terrace: cleanVal(mapped['Terrace']) || "0",
+        assignedConsultant: cleanVal(mapped['Assigned Consultant']) || "",
+        approvalAuthority: cleanVal(mapped['Approval Authority']) || "",
         themeColor: mapped['Theme Color'] || "#3D5434",
         preReg: {
           dld: { 
@@ -332,7 +336,7 @@ export default function SalesOfferPage() {
                       <TableCell>
                         <div className="flex items-center gap-2 font-black text-foreground">
                           <CircleUser className="h-4 w-4 text-primary" />
-                          {offer.client_name || "N/A"}
+                          {offer.client_name || "-"}
                         </div>
                       </TableCell>
                       <TableCell>
@@ -350,7 +354,7 @@ export default function SalesOfferPage() {
                       <TableCell className="text-center">
                          <div className="flex items-center justify-center gap-2 text-muted-foreground font-semibold text-xs">
                           <Timer className="h-3 w-3" />
-                          {offer.created_at ? format(new Date(offer.created_at), 'MMM dd, yyyy | hh:mm aa') : 'N/A'}
+                          {offer.created_at ? format(new Date(offer.created_at), 'MMM dd, yyyy | hh:mm aa') : '-'}
                          </div>
                       </TableCell>
                       <TableCell className="pr-6 text-right">
