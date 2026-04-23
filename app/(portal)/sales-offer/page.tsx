@@ -72,7 +72,7 @@ export default function SalesOfferPage() {
         projectNameOfficial: cleanVal(mapped['Project Name']) || "",
         location: cleanVal(mapped['Location']),
         propertyType: cleanVal(mapped['Property Type']),
-        Reference: cleanVal(mapped['Unit Reference']),
+        unitNumber: cleanVal(mapped['Unit Reference']),
         bedrooms: cleanVal(mapped['BedRoom']),
         level: cleanVal(mapped['Level / Floor']),
         unitArea: cleanVal(mapped['Average Area (SQ.FT)']),
@@ -88,13 +88,9 @@ export default function SalesOfferPage() {
           return raw;
         })(),
         developerName: mapped['Developer Name'] || "",
-        salesConsultant: mapped['Assigned Consultant'] || "",
-        headOfSales: mapped['Approval Authority'] || "Management",
         website: mapped['WebSite Link'] || "",
         referenceToken: cleanVal(mapped['Unit Reference']) || `SO-${offerId}`,
-        suiteArea: cleanVal(mapped['Average Area (SQ.FT)']) || "0",
-        terraceArea: cleanVal(mapped['Terrace']) || "0",
-        totalArea: (() => {
+        totalArea: cleanVal(mapped['Total Area (SQ.FT)']) || (() => {
           const suite = parseFloat(cleanVal(mapped['Average Area (SQ.FT)']).replace(/,/g, '')) || 0;
           const terrace = parseFloat(cleanVal(mapped['Terrace']).replace(/,/g, '')) || 0;
           return (suite + terrace).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 });
@@ -155,23 +151,23 @@ export default function SalesOfferPage() {
           
           if (i === 0) {
             p = firstP;
-            label = "1st Instalment";
+            label = "1st Installment";
           } else if (i === duration - 1) {
             p = lastP;
-            label = mappedData.paymentPlanPeriodType.includes('month') ? "On project completion" : "Final Settlement";
+            label = "Final Installment";
           } else {
             p = middleP;
             const idx = i + 1;
             let suffix = "th";
             if (idx === 2) suffix = "nd";
             if (idx === 3) suffix = "rd";
-            label = `${idx}${suffix} Instalment`;
+            label = `${idx}${suffix} Installment`;
           }
 
           const rowPrice = (price * p) / 100;
           
           newPlan.push({
-            date: i === duration - 1 && mappedData.paymentPlanPeriodType.includes('month') ? "On project completion" : currentDate.toISOString().split('T')[0],
+            date: currentDate.toISOString().split('T')[0],
             installment: label,
             percentage: p.toFixed(2) + "%",
             price: rowPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
@@ -185,6 +181,7 @@ export default function SalesOfferPage() {
         cover: getImg(mapped['Upload Cover Image']),
         banner: getImg(mapped['Upload Banner Image']),
         logo: getImg(mapped['Company Logo']),
+        logoPdf: getImg(mapped['Logo PDF']),
         qrCode: null,
         unitDetail: getImg(mapped['Layout Image']),
         highlights: (Array.isArray(mapped['Project Images Only-2'] || mapped['project_images_only-2'] || mapped['Project Images']) 

@@ -5,7 +5,7 @@ import { Building2, Camera, Lock,Globe,Key,Webhook,LayoutGrid } from "lucide-rea
 import { ModernField } from "@/components/ui/modern-field";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useDispatch, useSelector } from "react-redux";
-import { selectCompanyName, selectCompanyLogo, selectSettingsLastUpdated,  selectBitrixWebhook, selectListingWebhook, selectPfApiKey, selectPfApiSecret, selectBayutApiKey, selectBayutLeadSourceWhatsapp, selectBayutLeadSourceEmail, selectBayutLeadSourcePhone, selectPfLeadSourceWhatsapp, selectPfLeadSourceEmail, selectPfLeadSourcePhone, selectSalesOfferWebhook, selectSalesOfferEntityTypeId, selectOutboundHandlerToken, selectPdfColor, selectWebsiteLink, selectCompanyBanner, setCompanySettings } from "@/api/redux/slices/settingsSlice";
+import { selectCompanyName, selectCompanyLogo, selectSettingsLastUpdated,  selectBitrixWebhook, selectListingWebhook, selectPfApiKey, selectPfApiSecret, selectBayutApiKey, selectBayutLeadSourceWhatsapp, selectBayutLeadSourceEmail, selectBayutLeadSourcePhone, selectPfLeadSourceWhatsapp, selectPfLeadSourceEmail, selectPfLeadSourcePhone, selectSalesOfferWebhook, selectSalesOfferEntityTypeId, selectOutboundHandlerToken, selectPdfColor, selectWebsiteLink, selectCompanyBanner, selectCompanyLogoPdf, setCompanySettings } from "@/api/redux/slices/settingsSlice";
 import { useUpdateCompanySettingsMutation } from "@/api/redux/services/settingsApi";
 import { toast } from "react-hot-toast";
 import { cn } from "@/lib/utils";
@@ -36,9 +36,11 @@ export function CompanyTab({ isAdmin }: CompanyTabProps) {
   const reduxPdfColor = useSelector(selectPdfColor);
   const reduxWebsiteLink = useSelector(selectWebsiteLink);
   const reduxBanner = useSelector(selectCompanyBanner);
+  const reduxLogoPdf = useSelector(selectCompanyLogoPdf);
   
   const [companyName, setCompanyName] = useState(reduxCompanyName);
   const [logo, setLogo] = useState<string>(reduxLogo);
+  const [logoPdf, setLogoPdf] = useState<string>(reduxLogoPdf);
   const [bitrixWebhook, setBitrixWebhook] = useState(reduxBitrixWebhook);
   const [listingWebhook, setListingWebhook] = useState(reduxListingWebhook);
   const [pfApiKey, setPfApiKey] = useState(reduxPfApiKey);
@@ -78,6 +80,7 @@ export function CompanyTab({ isAdmin }: CompanyTabProps) {
     setPdfColor(reduxPdfColor || "#3D5434");
     setWebsiteLink(reduxWebsiteLink || "");
     setBanner(reduxBanner || "");
+    setLogoPdf(reduxLogoPdf || "");
   }, [
     reduxCompanyName, 
     reduxLogo, 
@@ -95,7 +98,8 @@ export function CompanyTab({ isAdmin }: CompanyTabProps) {
     reduxSalesOfferEntityTypeId,
     reduxPdfColor,
     reduxWebsiteLink,
-    reduxBanner
+    reduxBanner,
+    reduxLogoPdf
   ]);
 
   const getLogoUrl = (logoStr: string) => {
@@ -130,6 +134,7 @@ export function CompanyTab({ isAdmin }: CompanyTabProps) {
         pdf_color: pdfColor,
         website_link: websiteLink,
         banner_image: banner,
+        logo_pdf: logoPdf,
       }).unwrap();
       
       if (result.status === 'success') {
@@ -142,6 +147,7 @@ export function CompanyTab({ isAdmin }: CompanyTabProps) {
   };
 
   const bannerInputRef = useRef<HTMLInputElement>(null);
+  const logoPdfInputRef = useRef<HTMLInputElement>(null);
 
   const handleLogoClick = () => {
     if (!isAdmin) return;
@@ -151,6 +157,11 @@ export function CompanyTab({ isAdmin }: CompanyTabProps) {
   const handleBannerClick = () => {
     if (!isAdmin) return;
     bannerInputRef.current?.click();
+  };
+
+  const handleLogoPdfClick = () => {
+    if (!isAdmin) return;
+    logoPdfInputRef.current?.click();
   };
 
   const handleLogoFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -170,6 +181,17 @@ export function CompanyTab({ isAdmin }: CompanyTabProps) {
       const reader = new FileReader();
       reader.onloadend = () => {
         setBanner(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleLogoPdfFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setLogoPdf(reader.result as string);
       };
       reader.readAsDataURL(file);
     }
@@ -314,7 +336,7 @@ export function CompanyTab({ isAdmin }: CompanyTabProps) {
             </div>
           </CardHeader>
           <CardContent className="pt-8 space-y-8">
-            <div className="grid grid-cols-2 gap-6">
+            <div className="grid grid-cols-3 gap-6">
               {/* Logo Column */}
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
@@ -390,6 +412,46 @@ export function CompanyTab({ isAdmin }: CompanyTabProps) {
                   type="file" 
                   ref={bannerInputRef} 
                   onChange={handleBannerFileChange} 
+                  className="hidden" 
+                  accept="image/*"
+                />
+              </div>
+
+              {/* Logo PDF Column */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                   <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/70">Logo PDF</h4>
+                   <div className="h-px flex-1 bg-border/20 ml-4" />
+                </div>
+                <div 
+                  onClick={handleLogoPdfClick}
+                  className={cn(
+                    "group relative w-full h-40 rounded-2xl border-2 border-dashed border-border flex items-center justify-center transition-all overflow-hidden",
+                    isAdmin ? "cursor-pointer hover:border-primary/50 hover:bg-primary/5" : "cursor-default opacity-80"
+                  )}
+                >
+                  {logoPdf ? (
+                    <div className="relative w-full h-full p-4">
+                      <img 
+                        src={getLogoUrl(logoPdf)} 
+                        alt="Logo PDF" 
+                        className="w-full h-full object-contain transition-transform group-hover:scale-105"
+                      />
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <Camera className="text-white h-8 w-8" />
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-center space-y-2">
+                      <Camera className="h-6 w-6 mx-auto text-muted-foreground" />
+                      <p className="text-xs font-bold text-muted-foreground">{isAdmin ? "Upload PDF Logo" : "No Logo"}</p>
+                    </div>
+                  )}
+                </div>
+                <input 
+                  type="file" 
+                  ref={logoPdfInputRef} 
+                  onChange={handleLogoPdfFileChange} 
                   className="hidden" 
                   accept="image/*"
                 />

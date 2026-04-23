@@ -155,8 +155,17 @@ export const generateSalesOfferPDF = async (formData: any, images: any) => {
   }
 
   // Company Logo on Cover
-  if (images.logo) {
-    addImage(images.logo, 15, 15, 30, 30);
+  if (images.logoPdf || images.logo) {
+    const logoToUse = images.logoPdf || images.logo;
+    const logoSize = 50;
+    const logoX = (pageWidth - logoSize) / 2;
+    const logoY = 85; 
+    
+    // Draw white background box (the "white square" the user mentioned)
+    doc.setFillColor(255, 255, 255);
+    doc.roundedRect(logoX - 5, logoY - 5, logoSize + 10, logoSize + 10, 8, 8, "F");
+    
+    addImage(logoToUse, logoX, logoY, logoSize, logoSize);
   }
 
   // Cinematic Dark Overlay
@@ -220,11 +229,11 @@ export const generateSalesOfferPDF = async (formData: any, images: any) => {
     addImage(croppedBanner, 15, 15, pageWidth - 30, 45);
     
     // Logo next to banner if banner exists
-    if (images.logo) {
-        // Draw a small white circle or box behind the logo for visibility
+    if (images.logoPdf || images.logo) {
+        const logoToUse = images.logoPdf || images.logo;
         doc.setFillColor(255, 255, 255);
         doc.roundedRect(pageWidth - 45, 20, 25, 25, 2, 2, "F");
-        addImage(images.logo, pageWidth - 42.5, 22.5, 20, 20);
+        addImage(logoToUse, pageWidth - 42.5, 22.5, 20, 20);
     }
     
     // Banner Overlays
@@ -266,33 +275,13 @@ export const generateSalesOfferPDF = async (formData: any, images: any) => {
   drawSpecRow(sy, "Client Name :", formData.clientName); sy += 10;
   drawSpecRow(sy, "Location :", formData.location); sy += 10;
   drawSpecRow(sy, "Property Type :", formData.propertyType); sy += 10;
-  drawSpecRow(sy, "Unit Number :", formData.unitNumber); sy += 10;
+  drawSpecRow(sy, "Reference :", formData.unitNumber); sy += 10;
   drawSpecRow(sy, "No. of Bedroom:", formData.bedrooms); sy += 10;
   drawSpecRow(sy, "Level :", formData.level); sy += 10;
-  drawSpecRow(sy, "Average Unit Area (SQ.FT) :", formData.unitArea + " (SQ.FT)"); sy += 10;
+  drawSpecRow(sy, "Total Area (SQ.FT) :", (formData.totalArea || formData.unitArea) + " (SQ.FT)"); sy += 10;
   drawSpecRow(sy, "Selling Price :", formData.sellingPrice + " AED");
 
-  // Agent Section
-  let ay = sy + 15;
-  const drawAgentRow = (y: number, label: string, value: string) => {
-    doc.setFillColor(...primaryColor);
-    doc.rect(20, y, 50, 15, "F");
-    doc.setTextColor(255, 255, 255);
-    doc.setFont("helvetica", "bold");
-    doc.text(label, 25, y + 9);
-
-    doc.setFillColor(255, 255, 255);
-    doc.rect(70, y, pageWidth - 90, 15);
-    doc.setTextColor(0, 0, 0);
-    doc.setFont("helvetica", "normal");
-    doc.text(value || "-", 75, y + 9);
-  };
-
-  drawAgentRow(ay, "Sales Consultant :", formData.salesConsultant);
-  ay += 15;
-  drawAgentRow(ay, "Head of Sales :", formData.headOfSales);
-
-  doc.text(`Subject to Terms and Conditions in the Sales and Purchasing Agreement*`, pageWidth / 2, ay + 35, { align: "center" });
+  doc.text(`Subject to Terms and Conditions in the Sales and Purchasing Agreement*`, pageWidth / 2, sy + 30, { align: "center" });
 
   // ================= PAGE 3 (HIGHLIGHTS) =================
   doc.addPage();
@@ -341,10 +330,11 @@ export const generateSalesOfferPDF = async (formData: any, images: any) => {
     addImage(croppedBannerPage4, 15, 15, pageWidth - 30, 45);
     
     // Logo next to banner if banner exists
-    if (images.logo) {
+    if (images.logoPdf || images.logo) {
+        const logoToUse = images.logoPdf || images.logo;
         doc.setFillColor(255, 255, 255);
         doc.roundedRect(pageWidth - 45, 20, 25, 25, 2, 2, "F");
-        addImage(images.logo, pageWidth - 42.5, 22.5, 20, 20);
+        addImage(logoToUse, pageWidth - 42.5, 22.5, 20, 20);
     }
     
     // Banner Overlays
@@ -376,36 +366,17 @@ export const generateSalesOfferPDF = async (formData: any, images: any) => {
   
   fy += 22;
 
-  // Areas
+  // Total Area (Moved Up)
+  doc.setTextColor(...primaryColor);
   doc.setFontSize(14);
-  doc.setTextColor(...primaryColor);
   doc.setFont("helvetica", "bold");
-  doc.text("Suite Area:", 25, fy);
-  doc.setTextColor(0, 0, 0);
-  doc.setFont("helvetica", "bold");
-  doc.text(`${formData.suiteArea || formData.unitArea || "-"} (SQ.FT)`, 75, fy);
-  
-  fy += 10;
-  doc.setTextColor(...primaryColor);
-  doc.text("Terrace:", 25, fy);
-  doc.setTextColor(0, 0, 0);
-  doc.text(`${formData.terraceArea || "0.00"} (SQ.FT)`, 75, fy);
-
-  fy += 4;
-  // Thick Separator Line
-  doc.setDrawColor(...primaryColor);
-  doc.setLineWidth(1.2);
-  doc.line(25, fy, 135, fy);
-  
-  fy += 10;
-  doc.setTextColor(...primaryColor);
   doc.text("Total Area :", 25, fy);
   doc.setTextColor(0, 0, 0);
   doc.text(`${formData.totalArea || "-"} (SQ.FT)`, 75, fy);
 
   // 3. Floor Plan Image Box
   if (images.unitDetail) {
-    const imgY = fy + 12;
+    const imgY = fy + 10;
     const imgH = pageHeight - imgY - 45; 
     
     // Aesthetic Box for Image
@@ -471,10 +442,11 @@ export const generateSalesOfferPDF = async (formData: any, images: any) => {
     addImage(croppedBannerPage5, 15, 15, pageWidth - 30, 45);
     
     // Logo next to banner if banner exists
-    if (images.logo) {
+    if (images.logoPdf || images.logo) {
+        const logoToUse = images.logoPdf || images.logo;
         doc.setFillColor(255, 255, 255);
         doc.roundedRect(pageWidth - 45, 20, 25, 25, 2, 2, "F");
-        addImage(images.logo, pageWidth - 42.5, 22.5, 20, 20);
+        addImage(logoToUse, pageWidth - 42.5, 22.5, 20, 20);
     }
     
     // Banner Overlays
@@ -591,7 +563,7 @@ export const generateSalesOfferPDF = async (formData: any, images: any) => {
 
 
   // ================= PAGE 6 (AGENT DETAILS) =================
-  if (formData.agentDetails) {
+  if (formData.agentDetails && formData.agentDetails.name && formData.agentDetails.name.trim() !== "") {
     doc.addPage();
     drawBackground();
 
@@ -637,48 +609,74 @@ export const generateSalesOfferPDF = async (formData: any, images: any) => {
     let dX = cardX + 35;
     let dY = cardY + 15;
     
-    const drawAgentDetail = (label: string, value: string, iconY: number, type?: 'phone' | 'whatsapp' | 'email') => {
-      doc.setTextColor(...primaryColor);
-      doc.setFontSize(11);
-      doc.setFont("helvetica", "bold");
-      doc.text(label, dX, iconY);
+    const drawAgentDetail = (value: string, iconY: number, type?: 'phone' | 'whatsapp' | 'email' | 'name') => {
+      const iconSize = 6;
+      const iconX = dX;
       
-      const labelW = doc.getTextWidth(label);
-      const valX = dX + labelW + 2; 
-
-      doc.setTextColor(50, 50, 50);
-      doc.setFont("helvetica", "normal");
-      doc.text(value || "-", valX, iconY);
-
-      // Subtle Underline
-      doc.setDrawColor(235, 235, 235);
-      doc.setLineWidth(0.1);
-      doc.line(dX, iconY + 2, dX + 110, iconY + 2);
-
-      if (type && value && value !== "-") {
-        let url = "";
-        if (type === 'whatsapp') {
-          const clean = value.replace(/\D/g, '');
-          url = "https://wa.me/" + (clean.startsWith('0') ? '971' + clean.slice(1) : clean);
+      if (type === 'name') {
+        doc.setTextColor(...primaryColor);
+        doc.setFontSize(14);
+        doc.setFont("helvetica", "bold");
+        doc.text(value || "-", dX, iconY);
+      } else {
+        // Draw Icons
+        if (type === 'email') {
+          doc.setDrawColor(...primaryColor);
+          doc.setLineWidth(0.4);
+          doc.rect(iconX, iconY - 4.5, iconSize, 4);
+          doc.line(iconX, iconY - 4.5, iconX + iconSize/2, iconY - 2.5);
+          doc.line(iconX + iconSize/2, iconY - 2.5, iconX + iconSize, iconY - 4.5);
         } else if (type === 'phone') {
-          url = "tel:" + value.trim();
-        } else if (type === 'email') {
-          url = "mailto:" + value.trim();
+          doc.setDrawColor(...primaryColor);
+          doc.setLineWidth(0.8);
+          // Simple handset shape
+          doc.line(iconX + 1, iconY - 1, iconX + 1, iconY - 4);
+          doc.line(iconX + 1, iconY - 4, iconX + 3, iconY - 5);
+          doc.line(iconX + 1, iconY - 1, iconX + 3, iconY);
+        } else if (type === 'whatsapp') {
+          doc.setFillColor(37, 211, 102); // WhatsApp Green
+          doc.setDrawColor(37, 211, 102);
+          doc.circle(iconX + iconSize/2, iconY - 2.5, iconSize/2, "FD");
+          doc.setDrawColor(255, 255, 255);
+          doc.setLineWidth(0.4);
+          // Tiny handset inside circle
+          doc.line(iconX + 2.5, iconY - 3.5, iconX + 2.5, iconY - 1.5);
+          doc.line(iconX + 2.5, iconY - 1.5, iconX + 3.5, iconY - 1.5);
         }
-        
-        if (url) {
-          // Make both label and value clickable
-          const valueW = doc.getTextWidth(value);
-          doc.link(dX, iconY - 5, labelW, 7, { url });
-          doc.link(valX, iconY - 5, valueW, 7, { url });
+
+        const valX = dX + iconSize + 4; 
+        doc.setTextColor(50, 50, 50);
+        doc.setFontSize(11);
+        doc.setFont("helvetica", "normal");
+        doc.text(value || "-", valX, iconY);
+
+        // Subtle Underline
+        doc.setDrawColor(235, 235, 235);
+        doc.setLineWidth(0.1);
+        doc.line(dX, iconY + 2, dX + 110, iconY + 2);
+
+        if (type && value && value !== "-") {
+          let url = "";
+          if (type === 'whatsapp') {
+            const clean = value.replace(/\D/g, '');
+            url = "https://wa.me/" + (clean.startsWith('0') ? '971' + clean.slice(1) : clean);
+          } else if (type === 'phone') {
+            url = "tel:" + value.trim();
+          } else if (type === 'email') {
+            url = "mailto:" + value.trim();
+          }
+          
+          if (url) {
+            doc.link(dX, iconY - 5, 110, 7, { url });
+          }
         }
       }
     };
 
-    drawAgentDetail("NAME:", agent.name, dY); dY += 10;
-    drawAgentDetail("EMAIL:", agent.email, dY, 'email'); dY += 10;
-    drawAgentDetail("PHONE:", agent.phone, dY, 'phone'); dY += 10;
-    drawAgentDetail("WHATSAPP:", agent.whatsapp, dY, 'whatsapp');
+    drawAgentDetail(agent.name, dY, 'name'); dY += 12;
+    drawAgentDetail(agent.email, dY, 'email'); dY += 10;
+    drawAgentDetail(agent.phone, dY, 'phone'); dY += 10;
+    drawAgentDetail(agent.whatsapp, dY, 'whatsapp');
 
     // Personal Message Section
     if (agent.notes) {

@@ -4,6 +4,7 @@ import { RootState } from '../store';
 interface SettingsState {
   companyName: string;
   logo: string;
+  logo_pdf: string;
   lastUpdated: number;
   bitrix_webhook: string;
   listing_webhook: string;
@@ -29,6 +30,7 @@ interface SettingsState {
 const initialState: SettingsState = {
   companyName: '',
   logo: '',
+  logo_pdf: '',
   lastUpdated: Date.now(),
   bitrix_webhook: '',
   listing_webhook: '',
@@ -57,7 +59,8 @@ const settingsSlice = createSlice({
   reducers: {
     setCompanySettings: (state, action: PayloadAction<any>) => {
       state.companyName = action.payload.company_name || action.payload.companyName;
-      state.logo = action.payload.logo;
+      state.logo = action.payload.logo || '';
+      state.logo_pdf = action.payload.logo_pdf || '';
       state.bitrix_webhook = action.payload.bitrix_webhook || action.payload.bitrix_webhook || '';
       state.listing_webhook = action.payload.listing_webhook || '';
       state.sales_offer_webhook = action.payload.sales_offer_webhook || '';
@@ -116,3 +119,4 @@ export const selectOutboundHandlerToken = (state: RootState) => state.settings.o
 export const selectPdfColor = (state: RootState) => state.settings.pdf_color;
 export const selectWebsiteLink = (state: RootState) => state.settings.website_link;
 export const selectCompanyBanner = (state: RootState) => state.settings.banner_image;
+export const selectCompanyLogoPdf = (state: RootState) => state.settings.logo_pdf;

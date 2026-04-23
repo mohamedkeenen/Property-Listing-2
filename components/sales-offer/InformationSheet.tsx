@@ -67,19 +67,13 @@ export function InformationSheet({
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10">
             <ModernField label="Property Type" icon={Layout} placeholder="example property type" value={formData.propertyType} onChange={(e) => handleInputChange('propertyType', e.target.value)} />
-            <ModernField label="Unit Reference" icon={FileSearch} placeholder="example unit reference" value={formData.unitNumber} onChange={(e) => handleInputChange('unitNumber', e.target.value)} />
+            <ModernField label="Reference" icon={FileSearch} placeholder="example unit reference" value={formData.unitNumber} onChange={(e) => handleInputChange('unitNumber', e.target.value)} />
             <ModernField label="Bedroom Configuration" icon={Layers} placeholder="example bedrooms" value={formData.bedrooms} onChange={(e) => handleInputChange('bedrooms', e.target.value)} />
             <ModernField label="Level / Floor" icon={Building2} placeholder="example floor" value={formData.level} onChange={(e) => handleInputChange('level', e.target.value)} />
-            <ModernField label="Average Area (SQ.FT)" icon={Layout} placeholder="example area" value={formData.unitArea} onChange={(e) => handleInputChange('unitArea', e.target.value)} />
+            <ModernField label="Total Area (SQ.FT)" icon={Layout} placeholder="example area" value={formData.unitArea} onChange={(e) => handleInputChange('unitArea', e.target.value)} />
             <ModernField label="Final Selling Price (AED)" icon={CreditCard} placeholder="example price" value={formData.sellingPrice} onChange={(e) => handleInputChange('sellingPrice', e.target.value)} />
           </div>
           
-          <div className="h-px w-full bg-border/40 my-12" />
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10">
-            <ModernField label="Assigned Consultant" icon={Sparkles} value={formData.salesConsultant} onChange={(e) => handleInputChange('salesConsultant', e.target.value)} />
-            <ModernField label="Approval Authority" icon={Info} value={formData.headOfSales} onChange={(e) => handleInputChange('headOfSales', e.target.value)} />
-          </div>
         </Card>
       </div>
     </section>
