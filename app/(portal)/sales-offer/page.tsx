@@ -90,7 +90,15 @@ export default function SalesOfferPage() {
         developerName: mapped['Developer Name'] || "",
         website: mapped['WebSite Link'] || "",
         referenceToken: cleanVal(mapped['Unit Reference']) || `SO-${offerId}`,
-        totalArea: cleanVal(mapped['Total Area (SQ.FT)']) || (() => {
+        totalArea: (() => {
+          const raw = cleanVal(mapped['Total Area (SQ.FT)']);
+          if (raw) {
+            const num = parseFloat(raw.replace(/,/g, ''));
+            if (!isNaN(num)) {
+              return num.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+            }
+            return raw;
+          }
           const suite = parseFloat(cleanVal(mapped['Average Area (SQ.FT)']).replace(/,/g, '')) || 0;
           const terrace = parseFloat(cleanVal(mapped['Terrace']).replace(/,/g, '')) || 0;
           return (suite + terrace).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 });

@@ -42,7 +42,20 @@ export const generateSalesOfferPDF = async (formData: any, images: any) => {
     doc.text(ref, pageWidth - 15, pageHeight - 5, { align: "right" });
   };
 
-  const addImage = (img: string, x: number, y: number, w: number, h: number) => {
+  const icons = {
+    phone: "https://res.cloudinary.com/devht0mp5/image/upload/v1776932727/phone-svgrepo-com_ndhprg.svg",
+    email: "https://res.cloudinary.com/devht0mp5/image/upload/v1776932727/email-svgrepo-com_zmrkau.svg",
+    whatsapp: "https://res.cloudinary.com/devht0mp5/image/upload/v1776932727/whatsapp-whats-app-svgrepo-com_qokrsd.svg"
+  };
+
+  const [phoneIcon, emailIcon, whatsappIcon] = await Promise.all([
+    new Promise<string | null>(r => { const im = new Image(); im.crossOrigin="anonymous"; im.onload = () => { const canvas = document.createElement('canvas'); canvas.width = im.width; canvas.height = im.height; canvas.getContext('2d')?.drawImage(im, 0, 0); r(canvas.toDataURL("image/png")); }; im.onerror = () => r(null); im.src = icons.phone; }),
+    new Promise<string | null>(r => { const im = new Image(); im.crossOrigin="anonymous"; im.onload = () => { const canvas = document.createElement('canvas'); canvas.width = im.width; canvas.height = im.height; canvas.getContext('2d')?.drawImage(im, 0, 0); r(canvas.toDataURL("image/png")); }; im.onerror = () => r(null); im.src = icons.email; }),
+    new Promise<string | null>(r => { const im = new Image(); im.crossOrigin="anonymous"; im.onload = () => { const canvas = document.createElement('canvas'); canvas.width = im.width; canvas.height = im.height; canvas.getContext('2d')?.drawImage(im, 0, 0); r(canvas.toDataURL("image/png")); }; im.onerror = () => r(null); im.src = icons.whatsapp; })
+  ]);
+
+  const addImage = (img: string | null, x: number, y: number, w: number, h: number) => {
+    if (!img) return;
     let format = "JPEG";
     
     if (img.startsWith("data:image/")) {
@@ -157,13 +170,9 @@ export const generateSalesOfferPDF = async (formData: any, images: any) => {
   // Company Logo on Cover
   if (images.logoPdf || images.logo) {
     const logoToUse = images.logoPdf || images.logo;
-    const logoSize = 50;
+    const logoSize = 65; // Slightly larger since the box is gone
     const logoX = (pageWidth - logoSize) / 2;
-    const logoY = 85; 
-    
-    // Draw white background box (the "white square" the user mentioned)
-    doc.setFillColor(255, 255, 255);
-    doc.roundedRect(logoX - 5, logoY - 5, logoSize + 10, logoSize + 10, 8, 8, "F");
+    const logoY = 80; 
     
     addImage(logoToUse, logoX, logoY, logoSize, logoSize);
   }
@@ -366,13 +375,7 @@ export const generateSalesOfferPDF = async (formData: any, images: any) => {
   
   fy += 22;
 
-  // Total Area (Moved Up)
-  doc.setTextColor(...primaryColor);
-  doc.setFontSize(14);
-  doc.setFont("helvetica", "bold");
-  doc.text("Total Area :", 25, fy);
-  doc.setTextColor(0, 0, 0);
-  doc.text(`${formData.totalArea || "-"} (SQ.FT)`, 75, fy);
+  fy += 10;
 
   // 3. Floor Plan Image Box
   if (images.unitDetail) {
@@ -610,38 +613,23 @@ export const generateSalesOfferPDF = async (formData: any, images: any) => {
     let dY = cardY + 15;
     
     const drawAgentDetail = (value: string, iconY: number, type?: 'phone' | 'whatsapp' | 'email' | 'name') => {
-      const iconSize = 6;
+      const iconSize = 5;
       const iconX = dX;
       
       if (type === 'name') {
         doc.setTextColor(...primaryColor);
         doc.setFontSize(14);
         doc.setFont("helvetica", "bold");
-        doc.text(value || "-", dX, iconY);
+        doc.text("NAME: " + (value || "-").toUpperCase(), dX, iconY);
       } else {
-        // Draw Icons
-        if (type === 'email') {
-          doc.setDrawColor(...primaryColor);
-          doc.setLineWidth(0.4);
-          doc.rect(iconX, iconY - 4.5, iconSize, 4);
-          doc.line(iconX, iconY - 4.5, iconX + iconSize/2, iconY - 2.5);
-          doc.line(iconX + iconSize/2, iconY - 2.5, iconX + iconSize, iconY - 4.5);
-        } else if (type === 'phone') {
-          doc.setDrawColor(...primaryColor);
-          doc.setLineWidth(0.8);
-          // Simple handset shape
-          doc.line(iconX + 1, iconY - 1, iconX + 1, iconY - 4);
-          doc.line(iconX + 1, iconY - 4, iconX + 3, iconY - 5);
-          doc.line(iconX + 1, iconY - 1, iconX + 3, iconY);
-        } else if (type === 'whatsapp') {
-          doc.setFillColor(37, 211, 102); // WhatsApp Green
-          doc.setDrawColor(37, 211, 102);
-          doc.circle(iconX + iconSize/2, iconY - 2.5, iconSize/2, "FD");
-          doc.setDrawColor(255, 255, 255);
-          doc.setLineWidth(0.4);
-          // Tiny handset inside circle
-          doc.line(iconX + 2.5, iconY - 3.5, iconX + 2.5, iconY - 1.5);
-          doc.line(iconX + 2.5, iconY - 1.5, iconX + 3.5, iconY - 1.5);
+        // Draw Icons from Cloudinary Assets
+        let iconToDraw = null;
+        if (type === 'email') iconToDraw = emailIcon;
+        else if (type === 'phone') iconToDraw = phoneIcon;
+        else if (type === 'whatsapp') iconToDraw = whatsappIcon;
+
+        if (iconToDraw) {
+            addImage(iconToDraw, iconX, iconY - 4.5, iconSize, iconSize);
         }
 
         const valX = dX + iconSize + 4; 
