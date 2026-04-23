@@ -360,7 +360,7 @@ export const generateSalesOfferPDF = async (formData: any, images: any) => {
   }
 
   // 2. Technical Data Section
-  let fy = 82;
+  let fy = 72;
   
   // Floor Number (Prominent)
   doc.setTextColor(...primaryColor);
@@ -371,20 +371,18 @@ export const generateSalesOfferPDF = async (formData: any, images: any) => {
   doc.setFont("helvetica", "bold");
   doc.text(String(formData.level || "-"), 85, fy);
   
-  fy += 22;
-
-  fy += 10;
+  fy += 15;
 
   // 3. Floor Plan Image Box
   if (images.unitDetail) {
-    const imgY = fy + 10;
-    const imgH = pageHeight - imgY - 45; 
+    const imgY = fy + 5;
+    const imgH = pageHeight - imgY - 40; 
     
     // Aesthetic Box for Image
     doc.setFillColor(255, 255, 255);
     doc.setDrawColor(220, 220, 220);
     doc.setLineWidth(0.1);
-    doc.rect(15, imgY - 5, pageWidth - 30, imgH + 10, "FD");
+    doc.rect(12, imgY - 5, pageWidth - 24, imgH + 10, "FD");
     
     // For unit detail (floor plans), we use object-fit: contain logic to avoid losing details
     const dimensions = await new Promise<{w: number, h: number}>(r => {
@@ -393,22 +391,22 @@ export const generateSalesOfferPDF = async (formData: any, images: any) => {
 
     if (dimensions.w > 0) {
       const imgRatio = dimensions.w / dimensions.h;
-      const boxRatio = (pageWidth - 40) / imgH;
+      const boxRatio = (pageWidth - 20) / imgH;
       let renderW, renderH, renderX, renderY;
       if (imgRatio > boxRatio) {
-        renderW = pageWidth - 40;
+        renderW = pageWidth - 20;
         renderH = renderW / imgRatio;
-        renderX = 20;
+        renderX = 10;
         renderY = imgY + (imgH - renderH) / 2;
       } else {
         renderH = imgH;
         renderW = imgH * imgRatio;
-        renderX = 20 + ((pageWidth - 40) - renderW) / 2;
+        renderX = 10 + ((pageWidth - 20) - renderW) / 2;
         renderY = imgY;
       }
       addImage(images.unitDetail, renderX, renderY, renderW, renderH);
     } else {
-      addImage(images.unitDetail, 20, imgY, pageWidth - 40, imgH);
+      addImage(images.unitDetail, 15, imgY, pageWidth - 30, imgH);
     }
   }
 
