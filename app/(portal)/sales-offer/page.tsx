@@ -53,7 +53,9 @@ export default function SalesOfferPage() {
 
       const getImg = (f: any) => {
         if (!f) return null;
-        const raw = f.showUrl || f.url || f.downloadUrl || (typeof f === 'string' ? f : null);
+        const item = Array.isArray(f) ? f[0] : f;
+        if (!item) return null;
+        const raw = item.showUrl || item.url || item.downloadUrl || (typeof item === 'string' ? item : null);
         if (!raw) return null;
         if (raw.startsWith('data:')) return raw;
         
@@ -65,16 +67,26 @@ export default function SalesOfferPage() {
       const mappedData = { 
         title: mapped['Title'] || "Sales Offer",
         titleArabic: "",
-        projectName: cleanVal(mapped['Project Name']) || "N/A",
-        clientName: cleanVal(mapped['Client Name']) || "N/A",
-        projectNameOfficial: cleanVal(mapped['Project Name']) || "N/A",
+        projectName: cleanVal(mapped['Project Name']) || "",
+        clientName: cleanVal(mapped['Client Name']) || "",
+        projectNameOfficial: cleanVal(mapped['Project Name']) || "",
         location: cleanVal(mapped['Location']),
         propertyType: cleanVal(mapped['Property Type']),
-        unitNumber: cleanVal(mapped['Unit Reference']),
+        Reference: cleanVal(mapped['Unit Reference']),
         bedrooms: cleanVal(mapped['BedRoom']),
         level: cleanVal(mapped['Level / Floor']),
         unitArea: cleanVal(mapped['Average Area (SQ.FT)']),
-        sellingPrice: cleanVal(mapped['Price']),
+        sellingPrice: (() => {
+          const raw = cleanVal(mapped['Price']);
+          if (!raw) return "";
+          const num = parseFloat(raw.replace(/,/g, ''));
+          if (!isNaN(num)) {
+            // Keep original precision if it's a valid number
+            const decimals = raw.includes('.') ? raw.split('.')[1].length : 0;
+            return num.toLocaleString(undefined, { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+          }
+          return raw;
+        })(),
         developerName: mapped['Developer Name'] || "",
         salesConsultant: mapped['Assigned Consultant'] || "",
         headOfSales: mapped['Approval Authority'] || "Management",
