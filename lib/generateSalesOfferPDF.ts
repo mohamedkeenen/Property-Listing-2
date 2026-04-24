@@ -751,5 +751,6 @@ export const generateSalesOfferPDF = async (formData: any, images: any) => {
     addFooter(i);
   }
 
-  doc.save(`${projRaw.replace(/\s+/g, '-')}-Sales-Offer.pdf`);
+  const fileName = `${projRaw.replace(/\s+/g, '-')}-${(formData.unitNumber || "Sales-Offer").replace(/\s+/g, '-')}.pdf`;
+  doc.save(fileName);
 };

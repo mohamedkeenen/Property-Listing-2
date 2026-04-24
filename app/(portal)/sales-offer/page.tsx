@@ -16,6 +16,7 @@ interface SalesOffer {
   id: string | number;
   image?: any;
   reference: string;
+  unit_number?: string;
   project_name: string;
   client_name: string;
   price: string | number;
@@ -72,7 +73,7 @@ export default function SalesOfferPage() {
         projectNameOfficial: cleanVal(mapped['Project Name']) || "",
         location: cleanVal(mapped['Location']),
         propertyType: cleanVal(mapped['Property Type']),
-        unitNumber: cleanVal(mapped['Unit Reference']),
+        unitNumber: cleanVal(mapped['Unit Number']) || cleanVal(mapped['Unit Reference']),
         bedrooms: cleanVal(mapped['BedRoom']),
         level: cleanVal(mapped['Level / Floor']),
         unitArea: cleanVal(mapped['Average Area (SQ.FT)']),
@@ -283,103 +284,109 @@ export default function SalesOfferPage() {
                 <p className="font-bold">No sales offers found.</p>
               </div>
             ) : (
-              <Table>
-                <TableHeader className="bg-muted/30">
-                  <TableRow className="hover:bg-transparent">
-                    <TableHead className="w-[100px] h-14 font-black text-xs uppercase tracking-wider text-muted-foreground">Image</TableHead>
-                    <TableHead className="h-14 font-black text-xs uppercase tracking-wider text-muted-foreground">Reference</TableHead>
-                    <TableHead className="h-14 pl-6 font-black text-xs uppercase tracking-wider text-muted-foreground">Client Name</TableHead>
-                    <TableHead className="h-14 font-black text-xs uppercase tracking-wider text-muted-foreground">Project Name</TableHead>
-                    <TableHead className="h-14 font-black text-xs uppercase tracking-wider text-muted-foreground text-center">Price</TableHead>
-                    <TableHead className="h-14 font-black text-xs uppercase tracking-wider text-muted-foreground text-center">Created At</TableHead>
-                    <TableHead className="h-14 pr-6 text-right font-black text-xs uppercase tracking-wider text-muted-foreground">Action</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredOffers.map((offer: SalesOffer) => (
-                    <TableRow key={offer.id} className="hover:bg-muted/20 transition-colors border-border/20 group">
-                      <TableCell className="pl-6 py-4">
-                        <div className="w-14 h-14 rounded-xl border border-border/30 bg-muted/50 overflow-hidden shadow-inner group-hover:shadow-md transition-all">
-                          {offer.image ? (
-                            <img 
-                              src={(() => {
-                                const raw = offer.image?.downloadUrl || offer.image;
-                                if (!raw) return "";
-                                const baseUrl = (process.env.NEXT_PUBLIC_API_URL || 'https://property-listing.keenenter.com').replace(/\/api$/, '').replace(/\/$/, '');
-                                
-                                if (raw.startsWith('/api/')) {
-                                  return `${baseUrl}${raw}`;
-                                }
-
-                                if (raw.includes('.bitrix24.') || raw.includes('/ajax.php')) {
-                                  return `${baseUrl}/api/sales-offers/proxy-image?url=${encodeURIComponent(raw)}`;
-                                }
-                                
-                                return raw;
-                              })()} 
-                              alt="" 
-                              className="w-full h-full object-cover" 
-                            />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center">
-                              <ImageIcon className="h-5 w-5 text-muted-foreground/30" />
-                            </div>
-                          )}
-                        </div>
-                      </TableCell>
-                      <TableCell className="font-bold">
-                        <div className="flex items-center gap-2">
-                          <Hash className="h-3.5 w-3.5 text-primary/40" />
-                          {offer.reference}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2 font-black text-foreground">
-                          <CircleUser className="h-4 w-4 text-primary" />
-                          {offer.client_name || "-"}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2 font-black text-foreground/80">
-                          <Building2 className="h-4 w-4 text-primary" />
-                          {offer.project_name}
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-center">
-                        <Badge variant="secondary" className="font-black px-3 py-1 bg-green-50 text-green-700 border-green-100/50 dark:bg-green-900/20 dark:text-green-400 dark:border-green-900/50">
-                          <DollarSign className="h-3 w-3 mr-0.5" />
-                          {Number(offer.price).toLocaleString()}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-center">
-                         <div className="flex items-center justify-center gap-2 text-muted-foreground font-semibold text-xs">
-                          <Timer className="h-3 w-3" />
-                          {offer.created_at ? format(new Date(offer.created_at), 'MMM dd, yyyy | hh:mm aa') : '-'}
-                         </div>
-                      </TableCell>
-                      <TableCell className="pr-6 text-right">
-                        <Button
-                          onClick={() => handleDownload(offer.id)}
-                          disabled={downloadingIds.includes(offer.id)}
-                          className="rounded-xl md:rounded-2xl h-10 px-5 font-black bg-linear-to-br from-primary via-primary to-indigo-600 text-white shadow-lg shadow-primary/10 transition-all duration-300 hover:shadow-primary/30 active:scale-95 relative overflow-hidden group/btn"
-                        >
-                          <div className="absolute inset-0 bg-white/10 -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700 skew-x-[-20deg]" />
-                          <span className="relative z-10 flex items-center justify-center">
-                            {downloadingIds.includes(offer.id) ? (
-                              <Loader2 className="h-4 w-4 animate-spin" />
-                            ) : (
-                              <>
-                                <Download className="mr-2 h-4 w-4 group-hover/btn:-translate-y-0.5 transition-transform" />
-                                Download
-                              </>
-                            )}
-                          </span>
-                        </Button>
-                      </TableCell>
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader className="bg-muted/30">
+                    <TableRow className="hover:bg-transparent">
+                      <TableHead className="w-[100px] h-14 font-black text-xs uppercase tracking-wider text-muted-foreground">Image</TableHead>
+                      <TableHead className="h-14 font-black text-xs uppercase tracking-wider text-muted-foreground">Reference</TableHead>
+                      <TableHead className="h-14 font-black text-xs uppercase tracking-wider text-muted-foreground">Unit Number</TableHead>
+                      <TableHead className="h-14 pl-6 font-black text-xs uppercase tracking-wider text-muted-foreground">Client Name</TableHead>
+                      <TableHead className="h-14 font-black text-xs uppercase tracking-wider text-muted-foreground">Project Name</TableHead>
+                      <TableHead className="h-14 font-black text-xs uppercase tracking-wider text-muted-foreground text-center">Price</TableHead>
+                      <TableHead className="h-14 font-black text-xs uppercase tracking-wider text-muted-foreground text-center">Created At</TableHead>
+                      <TableHead className="h-14 pr-6 text-right font-black text-xs uppercase tracking-wider text-muted-foreground">Action</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredOffers.map((offer: SalesOffer) => (
+                      <TableRow key={offer.id} className="hover:bg-muted/20 transition-colors border-border/20 group">
+                        <TableCell className="pl-6 py-4">
+                          <div className="w-14 h-14 rounded-xl border border-border/30 bg-muted/50 overflow-hidden shadow-inner group-hover:shadow-md transition-all">
+                            {offer.image ? (
+                              <img 
+                                src={(() => {
+                                  const raw = offer.image?.downloadUrl || offer.image;
+                                  if (!raw) return "";
+                                  const baseUrl = (process.env.NEXT_PUBLIC_API_URL || 'https://property-listing.keenenter.com').replace(/\/api$/, '').replace(/\/$/, '');
+                                  
+                                  if (raw.startsWith('/api/')) {
+                                    return `${baseUrl}${raw}`;
+                                  }
+
+                                  if (raw.includes('.bitrix24.') || raw.includes('/ajax.php')) {
+                                    return `${baseUrl}/api/sales-offers/proxy-image?url=${encodeURIComponent(raw)}`;
+                                  }
+                                  
+                                  return raw;
+                                })()} 
+                                alt="" 
+                                className="w-full h-full object-cover" 
+                              />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center">
+                                <ImageIcon className="h-5 w-5 text-muted-foreground/30" />
+                              </div>
+                            )}
+                          </div>
+                        </TableCell>
+                        <TableCell className="font-bold">
+                          <div className="flex items-center gap-2">
+                            <Hash className="h-3.5 w-3.5 text-primary/40" />
+                            {offer.reference}
+                          </div>
+                        </TableCell>
+                        <TableCell className="font-bold">
+                          {offer.unit_number || "-"}
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2 font-black text-foreground">
+                            <CircleUser className="h-4 w-4 text-primary" />
+                            {offer.client_name || "-"}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2 font-black text-foreground/80">
+                            <Building2 className="h-4 w-4 text-primary" />
+                            {offer.project_name}
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-center">
+                          <Badge variant="secondary" className="font-black px-3 py-1 bg-green-50 text-green-700 border-green-100/50 dark:bg-green-900/20 dark:text-green-400 dark:border-green-900/50">
+                            <DollarSign className="h-3 w-3 mr-0.5" />
+                            {Number(offer.price).toLocaleString()}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-center">
+                           <div className="flex items-center justify-center gap-2 text-muted-foreground font-semibold text-xs">
+                            <Timer className="h-3 w-3" />
+                            {offer.created_at ? format(new Date(offer.created_at), 'MMM dd, yyyy | hh:mm aa') : '-'}
+                           </div>
+                        </TableCell>
+                        <TableCell className="pr-6 text-right">
+                          <Button
+                            onClick={() => handleDownload(offer.id)}
+                            disabled={downloadingIds.includes(offer.id)}
+                            className="rounded-xl md:rounded-2xl h-10 px-5 font-black bg-linear-to-br from-primary via-primary to-indigo-600 text-white shadow-lg shadow-primary/10 transition-all duration-300 hover:shadow-primary/30 active:scale-95 relative overflow-hidden group/btn"
+                          >
+                            <div className="absolute inset-0 bg-white/10 -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700 skew-x-[-20deg]" />
+                            <span className="relative z-10 flex items-center justify-center">
+                              {downloadingIds.includes(offer.id) ? (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                              ) : (
+                                <>
+                                  <Download className="mr-2 h-4 w-4 group-hover/btn:-translate-y-0.5 transition-transform" />
+                                  Download
+                                </>
+                              )}
+                            </span>
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
             )}
           </div>
         </CardContent>
