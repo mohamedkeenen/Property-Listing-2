@@ -63,7 +63,8 @@ export function AppSidebar() {
     // Hide System Registry for non-super admins
     if (item.title === "System Registry") return false;
 
-    // Standard admin/agent visibility rules
+    // Standard admin/agent/supervisor visibility rules
+    // Users page is only for admins
     if (item.title === "Users" && user?.role !== 'admin') return false;
     
     return true;

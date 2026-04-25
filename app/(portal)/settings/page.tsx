@@ -19,7 +19,9 @@ import { Button } from "@/components/ui/button";
 export default function SettingsPage() {
   const user = useSelector(selectCurrentUser);
   const isSystemAdmin = user?.email === 'listing@keenenter.com';
-  const isAdmin = user?.role === 'admin' && !isSystemAdmin;
+  const isCompanyAdmin = user?.role === 'admin' && !isSystemAdmin;
+  const isSupervisor = user?.role === 'supervisor';
+  const canSeeCompanyTabs = (isCompanyAdmin || isSupervisor);
   const [activeTab, setActiveTab] = useState("profile");
   
   return (
@@ -35,7 +37,7 @@ export default function SettingsPage() {
             </h2>
           </div>
           <p className="text-muted-foreground font-medium pt-2">
-            Manage your personal profile{isAdmin ? ', company info, inputs and service integrations' : ''}.
+            Manage your personal profile{canSeeCompanyTabs ? ', company info, inputs and service integrations' : ''}.
           </p>
         </div>
 
@@ -51,7 +53,7 @@ export default function SettingsPage() {
               <UserIcon className="ml-2 h-4 w-4" />
             </Button>
           ) : activeTab === "company" ? (
-            isAdmin && (
+            isCompanyAdmin && (
               <Button 
                 form="settings-form"
                 type="submit" 
@@ -75,14 +77,14 @@ export default function SettingsPage() {
             <UserIcon className="h-4 w-4" />
             My Profile
           </TabsTrigger>
-          {isAdmin && (
+          {canSeeCompanyTabs && (
             <>
               <TabsTrigger 
                 value="company" 
                 className="rounded-xl h-full px-8 data-[state=active]:bg-background data-[state=active]:shadow-lg data-[state=active]:text-primary font-black transition-all gap-2"
               >
                 <Building2 className="h-4 w-4" />
-                Integrations
+                Company Settings
               </TabsTrigger>
               <TabsTrigger 
                 value="custom-fields" 
@@ -99,13 +101,13 @@ export default function SettingsPage() {
           <ProfileTab user={user} />
         </TabsContent>
 
-        {isAdmin && (
+        {canSeeCompanyTabs && (
           <>
             <TabsContent value="company" className="mt-0 focus-visible:outline-none focus-visible:ring-0">
-              <CompanyTab isAdmin={isAdmin} />
+              <CompanyTab isAdmin={isCompanyAdmin} isSupervisor={isSupervisor} />
             </TabsContent>
             <TabsContent value="custom-fields" className="mt-0 focus-visible:outline-none focus-visible:ring-0">
-              <CustomFieldsTab isAdmin={isAdmin} />
+              <CustomFieldsTab isAdmin={isCompanyAdmin} isSupervisor={isSupervisor} />
             </TabsContent>
           </>
         )}

@@ -6,6 +6,7 @@ import {
   useDeleteUserMutation
 } from "@/api/redux/services/userApi";
 import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import { 
   Users as UsersIcon, 
   Search, 
@@ -35,6 +36,7 @@ export default function SuperAdminPage() {
   const [toggleActive, { isLoading: isToggling }] = useToggleUserActiveMutation();
   const [deleteUser] = useDeleteUserMutation();
   const currentUser = useSelector(selectCurrentUser);
+  const router = useRouter();
 
   const [searchQuery, setSearchQuery] = useState("");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -293,7 +295,15 @@ export default function SuperAdminPage() {
                             <span className="hidden md:inline">{user.is_active ? 'Deactivate' : 'Activate'}</span>
                           </Button>
                         </td>
-                        <td className="px-6 py-4 text-right">
+                        <td className="px-6 py-4 text-right flex items-center justify-end gap-2">
+                           <Button 
+                               onClick={() => router.push(`/users?companyId=${user.company_id}`)}
+                               variant="outline" 
+                               className="h-9 px-3 md:h-10 md:px-4 rounded-xl border-2 border-primary/20 text-primary hover:bg-primary hover:text-white transition-all active:scale-95 text-[9px] font-black uppercase tracking-widest gap-2"
+                             >
+                               <UsersIcon className="h-3.5 w-3.5" />
+                               <span className="hidden md:inline">Manage Members</span>
+                           </Button>
                            <Button 
                               onClick={() => handleDeleteClick(user)}
                               variant="outline" 

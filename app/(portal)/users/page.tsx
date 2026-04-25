@@ -8,7 +8,8 @@ import {
 } from "@/api/redux/services/userApi";
 import { UserTable } from "@/components/users/UserTable";
 import { UserDialog } from "@/components/users/UserDialog";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { 
   Users as UsersIcon, 
   Search, 
@@ -31,7 +32,12 @@ import { selectCurrentUser } from "@/api/redux/slices/authSlice";
 import { ConfirmDeleteDialog } from "@/components/shared/ConfirmDeleteDialog";
 
 export default function UsersPage() {
-  const { data, isLoading, isError, refetch, isFetching } = useGetAgentsQuery();
+  const searchParams = useSearchParams();
+  const companyId = searchParams.get('companyId');
+
+  const { data, isLoading, isError, refetch, isFetching } = useGetAgentsQuery(
+    companyId ? { company_id: Number(companyId) } : undefined
+  );
   const [createAgent, { isLoading: isCreating }] = useCreateAgentMutation();
   const [updateAgent, { isLoading: isUpdating }] = useUpdateAgentMutation();
   const [deleteAgent] = useDeleteAgentMutation();
@@ -45,6 +51,24 @@ export default function UsersPage() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState<any>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+
+  // Authorization check
+  const isAuthorized = currentUser?.role === 'admin';
+
+  if (!isAuthorized && currentUser) {
+    return (
+      <div className="flex-1 flex flex-col items-center justify-center p-8 text-center space-y-6 animate-in fade-in zoom-in duration-500">
+        <div className="p-6 rounded-4xl bg-destructive/10 text-destructive shadow-2xl shadow-destructive/20 border border-destructive/20 ring-4 ring-destructive/5 ring-offset-4 ring-offset-background">
+          <ShieldAlert className="h-16 w-16" />
+        </div>
+        <div className="space-y-2">
+            <h2 className="text-3xl font-black tracking-tight text-foreground underline decoration-destructive/30 decoration-4 underline-offset-8">Restricted Access</h2>
+            <p className="text-muted-foreground font-black text-xs uppercase tracking-widest pt-4">You do not have administrative privileges to manage organization members.</p>
+        </div>
+        <Button onClick={() => window.location.href = "/"} variant="outline" className="rounded-2xl h-14 px-10 font-black tracking-widest uppercase border-2 border-border/80 hover:bg-muted transition-all active:scale-95">Return to Dashboard</Button>
+      </div>
+    );
+  }
 
   const users = useMemo(() => {
     const apiUsers = data?.data || [];
@@ -118,7 +142,8 @@ export default function UsersPage() {
             }
         });
       } else {
-        const res = await createAgent(formData).unwrap();
+        const payload = companyId ? { ...formData, company_id: Number(companyId) } : formData;
+        const res = await createAgent(payload).unwrap();
         toast.success(res.message || "New Member Added", {
             style: {
                 borderRadius: '1rem',

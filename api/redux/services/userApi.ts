@@ -33,8 +33,11 @@ export const userApi = createApi({
       }),
       providesTags: ['User'],
     }),
-    getAgents: builder.query<any, void>({
-      query: () => '/agents',
+    getAgents: builder.query<any, { company_id?: number } | void>({
+      query: (params) => ({
+        url: '/agents',
+        params: params || {},
+      }),
       providesTags: ['Agent'],
     }),
     createAgent: builder.mutation<any, any>({
@@ -60,6 +63,12 @@ export const userApi = createApi({
         method: 'DELETE',
       }),
       invalidatesTags: ['Agent', 'User'],
+    }),
+    resendVerification: builder.mutation<any, number>({
+      query: (id) => ({
+        url: `/agents/${id}/resend-verification`,
+        method: 'POST',
+      }),
     }),
     getSuperUsers: builder.query<any, void>({
       query: () => '/super/users',
@@ -88,6 +97,7 @@ export const {
   useCreateAgentMutation, 
   useUpdateAgentMutation, 
   useDeleteAgentMutation,
+  useResendVerificationMutation,
   useGetSuperUsersQuery,
   useToggleUserActiveMutation,
   useDeleteUserMutation

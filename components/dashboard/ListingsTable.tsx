@@ -13,6 +13,8 @@ import { toast } from "@/hooks/use-toast";
 import { generatePropertyPDF } from "@/lib/generatePDF";
 import { useDeletePropertyMutation, useTogglePortalMutation } from "@/api/redux/services/propertyApi";
 import { Loader2 } from "lucide-react";
+import { useSelector } from "react-redux";
+import { selectCurrentUser } from "@/api/redux/slices/authSlice";
 
 interface Props {
   listings: PropertyListing[];  
@@ -26,10 +28,21 @@ const PortalBadge = ({ initialStatus, portal, propertyId, pfStatus }: {
   propertyId: string;
   pfStatus?: string | null;
 }) => {
+  const user = useSelector(selectCurrentUser);
+  const isAgent = user?.role === 'agent';
   const [togglePortal, { isLoading }] = useTogglePortalMutation();
   const [active, setActive] = useState(initialStatus);
 
   const handleToggle = async () => {
+    if (isAgent) {
+      toast({
+        title: "Permission Denied",
+        description: "Agents cannot push listings to portals. Please contact your supervisor or admin.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     try {
       const newStatus = !active;
       await togglePortal({ id: propertyId, portal, status: newStatus }).unwrap();
@@ -76,11 +89,12 @@ const PortalBadge = ({ initialStatus, portal, propertyId, pfStatus }: {
       variant="outline" 
       onClick={(e) => { e.stopPropagation(); handleToggle(); }}
       className={cn(
-        "text-[10px] px-1.5 py-0 cursor-pointer transition-all duration-200 active:scale-90 select-none h-5 min-w-[28px] flex items-center justify-center font-bold",
+        "text-[10px] px-1.5 py-0 transition-all duration-200 select-none h-5 min-w-[28px] flex items-center justify-center font-bold",
+        isAgent ? "cursor-not-allowed grayscale opacity-60" : "cursor-pointer active:scale-90",
         color,
         isLoading && "opacity-50 pointer-events-none"
       )}
-      title={pfStatus === 'Failed' ? 'Sync Failed' : portal.toUpperCase()}
+      title={isAgent ? "Agents cannot manage portals" : (pfStatus === 'Failed' ? 'Sync Failed' : portal.toUpperCase())}
     >
       {isLoading ? <Loader2 className="h-2 w-2 animate-spin" /> : portalNames[portal]}
       {portal === 'pf' && pfStatus === 'Synced' && active && <span className="ml-1">✅</span>}

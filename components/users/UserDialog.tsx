@@ -239,6 +239,7 @@ export function UserDialog({ open, onOpenChange, user, onSubmit, isLoading }: Us
                 </SelectTrigger>
                 <SelectContent className="rounded-2xl border-border/10 shadow-2xl bg-popover/95 backdrop-blur-2xl">
                   <SelectItem value="admin" className="rounded-lg cursor-pointer">Administrator</SelectItem>
+                  <SelectItem value="supervisor" className="rounded-lg cursor-pointer">Supervisor</SelectItem>
                   <SelectItem value="agent" className="rounded-lg cursor-pointer">Organization Agent</SelectItem>
                 </SelectContent>
               </Select>

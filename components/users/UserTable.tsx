@@ -22,13 +22,17 @@ import {
   Eye, 
   User as UserIcon,
   ShieldCheck,
-  UserCheck
+  UserCheck,
+  Mail as MailIcon, 
+  Loader2
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 
 import { format } from "date-fns";
+import { useResendVerificationMutation } from "@/api/redux/services/userApi";
+import { toast } from "react-hot-toast";
 
 interface User {
   id: number;
@@ -38,6 +42,7 @@ interface User {
   photo?: string;
   phone?: string;
   created_at?: string;
+  email_verified_at?: string | null;
 }
 
 interface UserTableProps {
@@ -48,7 +53,24 @@ interface UserTableProps {
 }
 
 export function UserTable({ users, onEdit, onDelete, onView }: UserTableProps) {
+  const [resendVerification, { isLoading: isResending }] = useResendVerificationMutation();
   const baseUrl = 'https://property-listing.keenenter.com';
+
+  const handleResend = async (id: number) => {
+    try {
+      await resendVerification(id).unwrap();
+      toast.success("Verification email sent", {
+        style: {
+          borderRadius: '1rem',
+          background: '#0f172a',
+          color: '#fff',
+          fontWeight: 'bold',
+        }
+      });
+    } catch (err: any) {
+      toast.error(err.data?.message || "Failed to send email");
+    }
+  };
 
   const getPhotoUrl = (photo: string) => {
     if (!photo) return "";
@@ -61,6 +83,7 @@ export function UserTable({ users, onEdit, onDelete, onView }: UserTableProps) {
   const getRoleIcon = (role: string) => {
     switch (role.toLowerCase()) {
       case 'admin': return <ShieldCheck className="h-3 w-3 mr-1" />;
+      case 'supervisor': return <ShieldCheck className="h-3 w-3 mr-1" />;
       case 'agent': return <UserCheck className="h-3 w-3 mr-1" />;
       default: return <UserIcon className="h-3 w-3 mr-1" />;
     }
@@ -69,6 +92,7 @@ export function UserTable({ users, onEdit, onDelete, onView }: UserTableProps) {
   const getRoleBadgeColor = (role: string) => {
     switch (role.toLowerCase()) {
       case 'admin': return "bg-primary/20 text-primary border-primary/20 hover:bg-primary/30";
+      case 'supervisor': return "bg-blue-500/20 text-blue-500 border-blue-500/20 hover:bg-blue-500/30";
       case 'agent': return "bg-purple-500/20 text-purple-500 border-purple-500/20 hover:bg-purple-500/30";
       default: return "bg-muted text-muted-foreground border-border";
     }
@@ -116,7 +140,14 @@ export function UserTable({ users, onEdit, onDelete, onView }: UserTableProps) {
                   </TableCell>
                   <TableCell className="py-4">
                     <div className="flex flex-col">
-                      <span className="font-black text-foreground tracking-tight transition-colors">{user.name}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="font-black text-foreground tracking-tight transition-colors">{user.name}</span>
+                        {!user.email_verified_at && (
+                          <Badge variant="outline" className="text-[8px] h-4 px-1.5 font-black uppercase tracking-tighter bg-orange-500/10 text-orange-500 border-orange-500/20">
+                            Pending
+                          </Badge>
+                        )}
+                      </div>
                       <span className="text-xs text-muted-foreground font-medium truncate max-w-[150px] sm:max-w-none">{user.email}</span>
                       <div className="lg:hidden flex flex-col gap-0.5 mt-1">
                         <span className="text-[9px] font-black uppercase tracking-widest text-primary/60">{user.role}</span>
@@ -143,28 +174,48 @@ export function UserTable({ users, onEdit, onDelete, onView }: UserTableProps) {
                     </Badge>
                   </TableCell>
                   <TableCell className="py-4 text-right px-6">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl hover:bg-primary/10 hover:text-primary transition-all active:scale-95">
-                          <MoreVertical className="h-4 w-4" />
+                    <div className="flex items-center justify-end gap-2">
+                      {!user.email_verified_at && (
+                        <Button 
+                          onClick={() => handleResend(user.id)}
+                          disabled={isResending}
+                          variant="outline" 
+                          size="sm" 
+                          className="hidden sm:flex h-8 rounded-lg border-orange-500/30 text-orange-500 hover:bg-orange-500/10 hover:text-orange-600 font-black text-[10px] uppercase gap-2"
+                        >
+                          {isResending ? <Loader2 className="h-3 w-3 animate-spin" /> : <MailIcon className="h-3 w-3" />}
+                          Resend
                         </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-[180px] p-2 rounded-2xl border-border/10 shadow-2xl backdrop-blur-2xl bg-background/95">
-                        <DropdownMenuItem onClick={() => onView(user)} className="rounded-xl px-3 py-2 cursor-pointer focus:bg-primary/10 focus:text-primary font-black text-xs gap-3">
-                          <Eye className="h-4 w-4" />
-                          View Details
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => onEdit(user)} className="rounded-xl px-3 py-2 cursor-pointer focus:bg-primary/10 focus:text-primary font-black text-xs gap-3">
-                          <Edit2 className="h-4 w-4" />
-                          Edit User
-                        </DropdownMenuItem>
-                        <div className="h-px bg-border/40 my-1 mx-2" />
-                        <DropdownMenuItem onClick={() => onDelete(user)} className="rounded-xl px-3 py-2 cursor-pointer text-destructive focus:bg-destructive/10 focus:text-destructive font-black text-xs gap-3">
-                          <Trash2 className="h-4 w-4" />
-                          Delete User
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                      )}
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl hover:bg-primary/10 hover:text-primary transition-all active:scale-95">
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-[180px] p-2 rounded-2xl border-border/10 shadow-2xl backdrop-blur-2xl bg-background/95">
+                          <DropdownMenuItem onClick={() => onView(user)} className="rounded-xl px-3 py-2 cursor-pointer focus:bg-primary/10 focus:text-primary font-black text-xs gap-3">
+                            <Eye className="h-4 w-4" />
+                            View Details
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => onEdit(user)} className="rounded-xl px-3 py-2 cursor-pointer focus:bg-primary/10 focus:text-primary font-black text-xs gap-3">
+                            <Edit2 className="h-4 w-4" />
+                            Edit User
+                          </DropdownMenuItem>
+                          {!user.email_verified_at && (
+                            <DropdownMenuItem onClick={() => handleResend(user.id)} className="sm:hidden rounded-xl px-3 py-2 cursor-pointer focus:bg-orange-500/10 focus:text-orange-500 font-black text-xs gap-3">
+                              <MailIcon className="h-4 w-4" />
+                              Resend Verification
+                            </DropdownMenuItem>
+                          )}
+                          <div className="h-px bg-border/40 my-1 mx-2" />
+                          <DropdownMenuItem onClick={() => onDelete(user)} className="rounded-xl px-3 py-2 cursor-pointer text-destructive focus:bg-destructive/10 focus:text-destructive font-black text-xs gap-3">
+                            <Trash2 className="h-4 w-4" />
+                            Delete User
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))

@@ -7,7 +7,7 @@ import { filterOptions } from "@/data/mockData";
 import { cn } from "@/lib/utils";
 import {
   Home, Building2, BedDouble, Bath, Car, Maximize, Tag, DollarSign, FileText, Sparkles,
-  Calendar, User, Hash, CalendarCheck, Info, CheckCircle2, AlertCircle, Paintbrush, PlusCircle, Shield, Compass
+  Calendar, User, Hash, CalendarCheck, Info, CheckCircle2, Paintbrush, PlusCircle, Shield, Compass
 } from "lucide-react";
 import { ModernField } from "@/components/ui/modern-field";
 import { ModernSelect } from "@/components/ui/modern-select";
@@ -31,13 +31,13 @@ export function PropertyDetailsStep({ form }: Props) {
 
   const adminOptions = useMemo(() => 
     usersData?.data
-      ?.filter((u: any) => u.role === 'admin' && u.is_active)
+      ?.filter((u: any) => (u.role === 'admin' || u.role === 'supervisor') && u.is_active)
       ?.map((u: any) => ({ label: u.name, value: u.id.toString() })) || [], 
   [usersData]);
 
   const agentOptions = useMemo(() => 
     usersData?.data
-      ?.filter((u: any) => (u.role === 'agent' || u.role === 'admin') && u.is_active) // Agents are focus, but admins can be agents too
+      ?.filter((u: any) => u.is_active) // All active users (Admin, Supervisor, Agent) can be agents
       ?.map((u: any) => ({ label: u.name, value: u.id.toString() })) || [], 
   [usersData]);
 

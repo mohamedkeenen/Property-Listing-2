@@ -12,9 +12,10 @@ import { BrandingSection } from "./company-tab-sections/BrandingSection";
 
 interface CompanyTabProps {
   isAdmin: boolean;
+  isSupervisor?: boolean;
 }
 
-export function CompanyTab({ isAdmin }: CompanyTabProps) {
+export function CompanyTab({ isAdmin, isSupervisor }: CompanyTabProps) {
   const dispatch = useDispatch();
   const reduxCompanyName = useSelector(selectCompanyName);
   const reduxLogo = useSelector(selectCompanyLogo);
@@ -215,21 +216,23 @@ export function CompanyTab({ isAdmin }: CompanyTabProps) {
           setCompanyName={setCompanyName}
         />
 
-        <IntegrationSection 
-          isAdmin={isAdmin}
-          listingWebhook={listingWebhook}
-          setListingWebhook={setListingWebhook}
-          salesOfferWebhook={salesOfferWebhook}
-          setSalesOfferWebhook={setSalesOfferWebhook}
-          salesOfferEntityTypeId={salesOfferEntityTypeId}
-          setSalesOfferEntityTypeId={setSalesOfferEntityTypeId}
-          pfApiKey={pfApiKey}
-          setPfApiKey={setPfApiKey}
-          pfApiSecret={pfApiSecret}
-          setPfApiSecret={setPfApiSecret}
-          bayutApiKey={bayutApiKey}
-          setBayutApiKey={setBayutApiKey}
-        />
+        {!isSupervisor && (
+          <IntegrationSection 
+            isAdmin={isAdmin}
+            listingWebhook={listingWebhook}
+            setListingWebhook={setListingWebhook}
+            salesOfferWebhook={salesOfferWebhook}
+            setSalesOfferWebhook={setSalesOfferWebhook}
+            salesOfferEntityTypeId={salesOfferEntityTypeId}
+            setSalesOfferEntityTypeId={setSalesOfferEntityTypeId}
+            pfApiKey={pfApiKey}
+            setPfApiKey={setPfApiKey}
+            pfApiSecret={pfApiSecret}
+            setPfApiSecret={setPfApiSecret}
+            bayutApiKey={bayutApiKey}
+            setBayutApiKey={setBayutApiKey}
+          />
+        )}
       </div>
 
       <div className="col-span-3">

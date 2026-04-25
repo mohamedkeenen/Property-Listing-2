@@ -11,9 +11,10 @@ import { Button } from "@/components/ui/button";
 
 interface CustomFieldsTabProps {
   isAdmin: boolean;
+  isSupervisor?: boolean;
 }
 
-export function CustomFieldsTab({ isAdmin }: CustomFieldsTabProps) {
+export function CustomFieldsTab({ isAdmin, isSupervisor }: CustomFieldsTabProps) {
   const { data: fieldsData, isLoading } = useGetCustomFieldsQuery();
   const [addField, { isLoading: isAdding }] = useAddCustomFieldMutation();
   const [deleteField] = useDeleteCustomFieldMutation();
