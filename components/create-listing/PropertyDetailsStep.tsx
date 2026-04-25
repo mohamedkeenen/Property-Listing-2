@@ -407,7 +407,7 @@ export function PropertyDetailsStep({ form }: Props) {
             />
 
             <ModernSelect 
-              label="Listing Agent" 
+              label="Listing Agent (Portal)" 
               icon={User} 
               required
               value={watch("listingAgent")} 

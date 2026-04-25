@@ -11,9 +11,9 @@ import {
 import { useSelector } from "react-redux";
 import { selectCurrentUser } from "@/api/redux/slices/authSlice";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ProfileTab } from "./components/ProfileTab";
-import { CompanyTab } from "./components/CompanyTab";
-import { CustomFieldsTab } from "./components/CustomFieldsTab";
+import { ProfileTab } from "@/components/settings/ProfileTab";
+import { CompanyTab } from "@/components/settings/CompanyTab";
+import { CustomFieldsTab } from "@/components/settings/CustomFieldsTab";
 import { Button } from "@/components/ui/button";
 
 export default function SettingsPage() {

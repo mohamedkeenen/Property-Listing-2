@@ -6,8 +6,8 @@ import {
   useUpdateAgentMutation, 
   useDeleteAgentMutation 
 } from "@/api/redux/services/userApi";
-import { UserTable } from "./components/UserTable";
-import { UserDialog } from "./components/UserDialog";
+import { UserTable } from "@/components/users/UserTable";
+import { UserDialog } from "@/components/users/UserDialog";
 import { useMemo, useState } from "react";
 import { 
   Users as UsersIcon, 

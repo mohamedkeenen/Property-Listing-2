@@ -76,7 +76,8 @@ export function AppSidebar() {
       console.error("Logout failed:", error);
     } finally {
       dispatch(logout());
-      router.push("/login");
+      localStorage.clear();
+      window.location.href = "/login";
     }
   };
 

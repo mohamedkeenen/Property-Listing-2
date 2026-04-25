@@ -33,7 +33,7 @@ export const listingSchema = z.object({
   developers: z.string().optional(),
   listingFinished: z.string().optional(),
   currency: z.string().optional(),
-  listingAgent: z.string().min(1, "Listing Agent is required"),
+  listingAgent: z.string().min(1, "Listing Agent (Portal) is required"),
   listingOwner: z.string().min(1, "Listing Owner is required"),
   landlord: z.string().optional(),
   availabilityStatus: z.string().optional(),

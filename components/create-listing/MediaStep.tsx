@@ -9,6 +9,7 @@ import {
 import { ModernField } from "@/components/ui/modern-field";
 import { useSelector } from "react-redux";
 import { selectToken } from "@/api/redux/slices/authSlice";
+import { selectWatermarkSize, selectWatermarkOpacity } from "@/api/redux/slices/settingsSlice";
 
 interface Props {
   form: UseFormReturn<any>;
@@ -17,11 +18,13 @@ interface Props {
 export function MediaStep({ form }: Props) {
   const { register, setValue, watch, formState: { errors } } = form;
   const token = useSelector(selectToken);
+  const watermarkSizeSetting = useSelector(selectWatermarkSize);
+  const watermarkOpacitySetting = useSelector(selectWatermarkOpacity);
   const [activePreviewIndex, setActivePreviewIndex] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const images = watch("images") || [];
-  const applyWatermark = (base64Image: string, logoUrl: string): Promise<string> => {
+  const applyWatermark = (base64Image: string, logoUrl: string, size: number = 5, opacity: number = 5): Promise<string> => {
     return new Promise((resolve) => {
       const img = new Image();
       img.crossOrigin = "anonymous";
@@ -39,13 +42,16 @@ export function MediaStep({ form }: Props) {
            logo.crossOrigin = "anonymous";
         }
         logo.onload = () => {
-          const logoTargetWidth = canvas.width * 0.30;
+          // Size range 1-10 mapped to 10%-50% of canvas width (10% + size*4%)
+          const sizeFactor = 0.10 + (size / 10) * 0.40;
+          const logoTargetWidth = canvas.width * sizeFactor;
           const logoTargetHeight = (logo.height / logo.width) * logoTargetWidth;
           const x = (canvas.width - logoTargetWidth) / 2;
           const y = (canvas.height - logoTargetHeight) / 2;
           
           ctx.save();
-          ctx.globalAlpha = 0.65;
+          // Opacity range 1-10 mapped to 0.1-1.0
+          ctx.globalAlpha = opacity / 10;
           ctx.drawImage(logo, x, y, logoTargetWidth, logoTargetHeight);
           ctx.restore();
           resolve(canvas.toDataURL("image/jpeg", 0.8));
@@ -97,7 +103,7 @@ export function MediaStep({ form }: Props) {
       });
 
       const processed = watermarkedLogoUrl 
-        ? await applyWatermark(base64FromFile, watermarkedLogoUrl) 
+        ? await applyWatermark(base64FromFile, watermarkedLogoUrl, watermarkSizeSetting, watermarkOpacitySetting) 
         : base64FromFile;
       
       newProcessedImages.push(processed);

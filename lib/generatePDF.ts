@@ -149,7 +149,7 @@ export async function generatePropertyPDF(listing: PropertyListing) {
   y += 8;
   pdf.setFontSize(10);
   pdf.setTextColor(30, 41, 59);
-  pdf.text("Listing Agent", margin + 5, y);
+  pdf.text("Listing Agent (Portal)", margin + 5, y);
   pdf.text("Admin", margin + contentW / 2, y);
   y += 6;
   pdf.setFontSize(9);
