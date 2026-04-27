@@ -8,8 +8,9 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { toast } from "react-hot-toast";
 import { CheckCircle2, XCircle, Loader2 } from "lucide-react";
+import { Suspense } from "react";
 
-export function VerifyEmailForm() {
+function VerifyEmailContent() {
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
   const [verifyEmail] = useVerifyEmailMutation();
@@ -76,5 +77,18 @@ export function VerifyEmailForm() {
         </CardFooter>
       </Card>
     </div>
+  );
+}
+
+export default function VerifyEmailPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex flex-col items-center justify-center min-h-[400px]">
+        <Loader2 className="h-12 w-12 text-blue-500 animate-spin" />
+        <p className="mt-4 text-blue-700 font-medium">Loading verification...</p>
+      </div>
+    }>
+      <VerifyEmailContent />
+    </Suspense>
   );
 }

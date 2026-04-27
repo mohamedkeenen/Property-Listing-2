@@ -1,36 +1,34 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-export async function proxy(request: NextRequest) {
-  // Only process POST requests with form data
+export async function middleware(request: NextRequest) {
+  // Check if it's a POST request (likely from Bitrix24 initial load)
   if (request.method === 'POST') {
     try {
       const contentType = request.headers.get('content-type') || '';
       
       if (contentType.includes('application/x-www-form-urlencoded')) {
-        // Clone the request so we can read the body without consuming it for downstream handlers
-        const clone = request.clone();
-        const formData = await clone.formData();
+        const formData = await request.formData();
         const params = new URLSearchParams();
         
+        // Extract all Bitrix24 parameters from POST body
         formData.forEach((value, key) => {
           if (typeof value === 'string') {
             params.set(key, value);
           }
         });
 
-        // Check if this looks like a Bitrix24 authentication request
-        const isBitrix = params.has('DOMAIN') && (params.has('AUTH_ID') || params.has('member_id'));
-
-        if (isBitrix) {
+        // If we found Bitrix parameters, redirect to GET with those parameters
+        if (params.has('DOMAIN') || params.has('AUTH_ID')) {
           const url = request.nextUrl.clone();
           url.search = params.toString();
           
-          // Use 303 (See Other) to force the browser to perform a GET request
+          // Return a 303 redirect to the same URL but with GET method
           return NextResponse.redirect(url, 303);
         }
       }
     } catch (error) {
+      console.error('Middleware POST processing error:', error);
     }
   }
 
@@ -39,7 +37,13 @@ export async function proxy(request: NextRequest) {
 
 export const config = {
   matcher: [
-    '/',
+    /*
+     * Match all request paths except for the ones starting with:
+     * - api (API routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     */
     '/((?!api|_next/static|_next/image|favicon.ico).*)',
   ],
 };
