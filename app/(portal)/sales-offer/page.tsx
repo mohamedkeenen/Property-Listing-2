@@ -343,23 +343,9 @@ export default function SalesOfferPage() {
                         <TableRow key={offer.id} className="hover:bg-muted/20 transition-colors border-border/20 group">
                         <TableCell className="pl-6 py-4">
                           <div className="w-14 h-14 rounded-xl border border-border/30 bg-muted/50 overflow-hidden shadow-inner group-hover:shadow-md transition-all">
-                            {offer.image ? (
+                            {getSettingsImageUrl(reduxCoverImage) ? (
                               <img 
-                                src={(() => {
-                                  const raw = offer.image?.downloadUrl || offer.image;
-                                  if (!raw) return "";
-                                  const baseUrl = (process.env.NEXT_PUBLIC_API_URL || 'https://property-listing.keenenter.com').replace(/\/api$/, '').replace(/\/$/, '');
-                                  
-                                  if (raw.startsWith('/api/')) {
-                                    return `${baseUrl}${raw}`;
-                                  }
-
-                                  if (raw.includes('.bitrix24.') || raw.includes('/ajax.php')) {
-                                    return `${baseUrl}/api/sales-offers/proxy-image?url=${encodeURIComponent(raw)}`;
-                                  }
-                                  
-                                  return raw;
-                                })()} 
+                                src={getSettingsImageUrl(reduxCoverImage)!} 
                                 alt="" 
                                 className="w-full h-full object-cover" 
                               />
