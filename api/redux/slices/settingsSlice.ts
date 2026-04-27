@@ -27,6 +27,9 @@ interface SettingsState {
   banner_image: string;
   watermark_size: number;
   watermark_opacity: number;
+  cover_image: string;
+  project_image_1: string;
+  project_image_2: string;
 }
 
 const initialState: SettingsState = {
@@ -55,6 +58,9 @@ const initialState: SettingsState = {
   banner_image: '',
   watermark_size: 5,
   watermark_opacity: 5,
+  cover_image: '',
+  project_image_1: '',
+  project_image_2: '',
 };
 
 const settingsSlice = createSlice({
@@ -86,6 +92,9 @@ const settingsSlice = createSlice({
       state.banner_image = action.payload.banner_image || '';
       state.watermark_size = action.payload.watermark_size || 5;
       state.watermark_opacity = action.payload.watermark_opacity || 5;
+      state.cover_image = action.payload.cover_image || '';
+      state.project_image_1 = action.payload.project_image_1 || '';
+      state.project_image_2 = action.payload.project_image_2 || '';
       state.lastUpdated = Date.now();
     },
     updateDevelopers: (state, action: PayloadAction<string[]>) => {
@@ -128,3 +137,6 @@ export const selectCompanyBanner = (state: RootState) => state.settings.banner_i
 export const selectCompanyLogoPdf = (state: RootState) => state.settings.logo_pdf;
 export const selectWatermarkSize = (state: RootState) => state.settings.watermark_size;
 export const selectWatermarkOpacity = (state: RootState) => state.settings.watermark_opacity;
+export const selectCoverImage = (state: RootState) => state.settings.cover_image;
+export const selectProjectImage1 = (state: RootState) => state.settings.project_image_1;
+export const selectProjectImage2 = (state: RootState) => state.settings.project_image_2;

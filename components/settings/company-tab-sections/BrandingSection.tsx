@@ -27,6 +27,18 @@ interface BrandingSectionProps {
   handleLogoFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleBannerFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleLogoPdfFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  coverImage: string;
+  projectImage1: string;
+  projectImage2: string;
+  handleCoverImageClick: () => void;
+  handleProjectImage1Click: () => void;
+  handleProjectImage2Click: () => void;
+  handleCoverImageFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleProjectImage1FileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleProjectImage2FileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  coverImageInputRef: React.RefObject<HTMLInputElement | null>;
+  projectImage1InputRef: React.RefObject<HTMLInputElement | null>;
+  projectImage2InputRef: React.RefObject<HTMLInputElement | null>;
 }
 
 export function BrandingSection({
@@ -39,7 +51,11 @@ export function BrandingSection({
   getLogoUrl,
   handleLogoClick, handleBannerClick, handleLogoPdfClick,
   fileInputRef, bannerInputRef, logoPdfInputRef,
-  handleLogoFileChange, handleBannerFileChange, handleLogoPdfFileChange
+  handleLogoFileChange, handleBannerFileChange, handleLogoPdfFileChange,
+  coverImage, projectImage1, projectImage2,
+  handleCoverImageClick, handleProjectImage1Click, handleProjectImage2Click,
+  handleCoverImageFileChange, handleProjectImage1FileChange, handleProjectImage2FileChange,
+  coverImageInputRef, projectImage1InputRef, projectImage2InputRef
 }: BrandingSectionProps) {
   return (
     <Card className="rounded-2xl border-border/50 shadow-xl overflow-hidden backdrop-blur-sm bg-card/50 sticky top-8">
@@ -171,6 +187,128 @@ export function BrandingSection({
               type="file" 
               ref={logoPdfInputRef} 
               onChange={handleLogoPdfFileChange} 
+              className="hidden" 
+              accept="image/*"
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-3 gap-6 pt-4 border-t border-border/10">
+          {/* Cover Image Column */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+               <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/70">Cover Image</h4>
+               <div className="h-px flex-1 bg-border/20 ml-4" />
+            </div>
+            <div 
+              onClick={handleCoverImageClick}
+              className={cn(
+                "group relative w-full h-40 rounded-2xl border-2 border-dashed border-border flex items-center justify-center transition-all overflow-hidden",
+                isAdmin ? "cursor-pointer hover:border-primary/50 hover:bg-primary/5" : "cursor-default opacity-80"
+              )}
+            >
+              {coverImage ? (
+                <div className="relative w-full h-full p-4">
+                  <img 
+                    src={getLogoUrl(coverImage)} 
+                    alt="Cover Image" 
+                    className="w-full h-full object-contain transition-transform group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <Camera className="text-white h-8 w-8" />
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center space-y-2">
+                  <Camera className="h-6 w-6 mx-auto text-muted-foreground" />
+                  <p className="text-xs font-bold text-muted-foreground">{isAdmin ? "Upload Cover Image" : "No Cover Image"}</p>
+                </div>
+              )}
+            </div>
+            <input 
+              type="file" 
+              ref={coverImageInputRef} 
+              onChange={handleCoverImageFileChange} 
+              className="hidden" 
+              accept="image/*"
+            />
+          </div>
+
+          {/* Project Image 1 Column */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+               <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/70">Project Image 1</h4>
+               <div className="h-px flex-1 bg-border/20 ml-4" />
+            </div>
+            <div 
+              onClick={handleProjectImage1Click}
+              className={cn(
+                "group relative w-full h-40 rounded-2xl border-2 border-dashed border-border flex items-center justify-center transition-all overflow-hidden",
+                isAdmin ? "cursor-pointer hover:border-primary/50 hover:bg-primary/5" : "cursor-default opacity-80"
+              )}
+            >
+              {projectImage1 ? (
+                <div className="relative w-full h-full p-4">
+                  <img 
+                    src={getLogoUrl(projectImage1)} 
+                    alt="Project Image 1" 
+                    className="w-full h-full object-contain transition-transform group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <Camera className="text-white h-8 w-8" />
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center space-y-2">
+                  <Camera className="h-6 w-6 mx-auto text-muted-foreground" />
+                  <p className="text-xs font-bold text-muted-foreground">{isAdmin ? "Upload Image 1" : "No Image"}</p>
+                </div>
+              )}
+            </div>
+            <input 
+              type="file" 
+              ref={projectImage1InputRef} 
+              onChange={handleProjectImage1FileChange} 
+              className="hidden" 
+              accept="image/*"
+            />
+          </div>
+
+          {/* Project Image 2 Column */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+               <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/70">Project Image 2</h4>
+               <div className="h-px flex-1 bg-border/20 ml-4" />
+            </div>
+            <div 
+              onClick={handleProjectImage2Click}
+              className={cn(
+                "group relative w-full h-40 rounded-2xl border-2 border-dashed border-border flex items-center justify-center transition-all overflow-hidden",
+                isAdmin ? "cursor-pointer hover:border-primary/50 hover:bg-primary/5" : "cursor-default opacity-80"
+              )}
+            >
+              {projectImage2 ? (
+                <div className="relative w-full h-full p-4">
+                  <img 
+                    src={getLogoUrl(projectImage2)} 
+                    alt="Project Image 2" 
+                    className="w-full h-full object-contain transition-transform group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <Camera className="text-white h-8 w-8" />
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center space-y-2">
+                  <Camera className="h-6 w-6 mx-auto text-muted-foreground" />
+                  <p className="text-xs font-bold text-muted-foreground">{isAdmin ? "Upload Image 2" : "No Image"}</p>
+                </div>
+              )}
+            </div>
+            <input 
+              type="file" 
+              ref={projectImage2InputRef} 
+              onChange={handleProjectImage2FileChange} 
               className="hidden" 
               accept="image/*"
             />

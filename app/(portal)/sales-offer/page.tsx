@@ -20,6 +20,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { SkeletonSalesOffer } from "@/components/skeleton/SkeletonSalesOffer";
+import { useSelector } from "react-redux";
+import { selectCompanyLogo, selectCompanyBanner, selectCompanyLogoPdf, selectCoverImage, selectProjectImage1, selectProjectImage2, selectPdfColor, selectSettingsLastUpdated, selectWebsiteLink } from "@/api/redux/slices/settingsSlice";
+import { API_BASE_URL } from "@/api/redux/apiConfig";
 
 interface SalesOffer {
   id: string | number;
@@ -39,6 +42,22 @@ export default function SalesOfferPage() {
   const [downloadingIds, setDownloadingIds] = useState<(string | number)[]>([]);
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(10);
+
+  const reduxLogo = useSelector(selectCompanyLogo);
+  const reduxBanner = useSelector(selectCompanyBanner);
+  const reduxLogoPdf = useSelector(selectCompanyLogoPdf);
+  const reduxCoverImage = useSelector(selectCoverImage);
+  const reduxProjectImage1 = useSelector(selectProjectImage1);
+  const reduxProjectImage2 = useSelector(selectProjectImage2);
+  const reduxPdfColor = useSelector(selectPdfColor);
+  const reduxWebsiteLink = useSelector(selectWebsiteLink);
+  const settingsLastUpdated = useSelector(selectSettingsLastUpdated);
+
+  const getSettingsImageUrl = (imgStr: string | undefined | null) => {
+    if (!imgStr) return null;
+    if (imgStr.startsWith('http') || imgStr.startsWith('data:image')) return imgStr;
+    return `${API_BASE_URL}/storage/${imgStr}?v=${settingsLastUpdated}`;
+  };
 
   const filteredOffers: SalesOffer[] = (offers as any)?.data?.filter((offer: SalesOffer) => 
     offer.project_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -205,16 +224,25 @@ export default function SalesOfferPage() {
 
 
       const mappedImages = {
-        cover: getImg(mapped['Upload Cover Image']),
-        banner: getImg(mapped['Upload Banner Image']),
-        logo: getImg(mapped['Company Logo']),
-        logoPdf: getImg(mapped['Logo PDF']),
+        cover: getSettingsImageUrl(reduxCoverImage) || getImg(mapped['Upload Cover Image']),
+        banner: getSettingsImageUrl(reduxBanner) || getImg(mapped['Upload Banner Image']),
+        logo: getSettingsImageUrl(reduxLogo) || getImg(mapped['Company Logo']),
+        logoPdf: getSettingsImageUrl(reduxLogoPdf) || getImg(mapped['Logo PDF']),
         qrCode: null,
         unitDetail: getImg(mapped['Layout Image']),
-        highlights: (Array.isArray(mapped['Project Images Only-2'] || mapped['project_images_only-2'] || mapped['Project Images']) 
-          ? (mapped['Project Images Only-2'] || mapped['project_images_only-2'] || mapped['Project Images']).map(getImg)
-          : [getImg(mapped['Project Images Only-2'] || mapped['project_images_only-2'] || mapped['Project Images'])]).filter(Boolean).slice(0, 10),
+        highlights: [
+          getSettingsImageUrl(reduxProjectImage1),
+          getSettingsImageUrl(reduxProjectImage2)
+        ].filter(Boolean).length > 0 
+          ? [getSettingsImageUrl(reduxProjectImage1), getSettingsImageUrl(reduxProjectImage2)].filter(Boolean)
+          : (Array.isArray(mapped['Project Images Only-2'] || mapped['project_images_only-2'] || mapped['Project Images']) 
+            ? (mapped['Project Images Only-2'] || mapped['project_images_only-2'] || mapped['Project Images']).map(getImg)
+            : [getImg(mapped['Project Images Only-2'] || mapped['project_images_only-2'] || mapped['Project Images'])]).filter(Boolean).slice(0, 10),
       };
+
+      // Add website and theme color from settings
+      mappedData.website = reduxWebsiteLink;
+      mappedData.themeColor = reduxPdfColor;
 
       update({ title: "Generating PDF...", variant: "loading" });
       

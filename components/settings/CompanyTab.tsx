@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { selectCompanyName, selectCompanyLogo, selectSettingsLastUpdated,  selectBitrixWebhook, selectListingWebhook, selectPfApiKey, selectPfApiSecret, selectBayutApiKey, selectBayutLeadSourceWhatsapp, selectBayutLeadSourceEmail, selectBayutLeadSourcePhone, selectPfLeadSourceWhatsapp, selectPfLeadSourceEmail, selectPfLeadSourcePhone, selectSalesOfferWebhook, selectSalesOfferEntityTypeId, selectOutboundHandlerToken, selectPdfColor, selectWebsiteLink, selectCompanyBanner, selectCompanyLogoPdf, selectWatermarkSize, selectWatermarkOpacity, setCompanySettings } from "@/api/redux/slices/settingsSlice";
+import { selectCompanyName, selectCompanyLogo, selectSettingsLastUpdated,  selectBitrixWebhook, selectListingWebhook, selectPfApiKey, selectPfApiSecret, selectBayutApiKey, selectBayutLeadSourceWhatsapp, selectBayutLeadSourceEmail, selectBayutLeadSourcePhone, selectPfLeadSourceWhatsapp, selectPfLeadSourceEmail, selectPfLeadSourcePhone, selectSalesOfferWebhook, selectSalesOfferEntityTypeId, selectOutboundHandlerToken, selectPdfColor, selectWebsiteLink, selectCompanyBanner, selectCompanyLogoPdf, selectWatermarkSize, selectWatermarkOpacity, selectCoverImage, selectProjectImage1, selectProjectImage2, setCompanySettings } from "@/api/redux/slices/settingsSlice";
 import { useUpdateCompanySettingsMutation } from "@/api/redux/services/settingsApi";
 import { toast } from "react-hot-toast";
 import { API_BASE_URL } from "@/api/redux/apiConfig";
@@ -39,6 +39,9 @@ export function CompanyTab({ isAdmin, isSupervisor }: CompanyTabProps) {
   const reduxLogoPdf = useSelector(selectCompanyLogoPdf);
   const reduxWatermarkSize = useSelector(selectWatermarkSize);
   const reduxWatermarkOpacity = useSelector(selectWatermarkOpacity);
+  const reduxCoverImage = useSelector(selectCoverImage);
+  const reduxProjectImage1 = useSelector(selectProjectImage1);
+  const reduxProjectImage2 = useSelector(selectProjectImage2);
   
   const [companyName, setCompanyName] = useState(reduxCompanyName);
   const [logo, setLogo] = useState<string>(reduxLogo);
@@ -61,6 +64,9 @@ export function CompanyTab({ isAdmin, isSupervisor }: CompanyTabProps) {
   const [banner, setBanner] = useState<string>(reduxBanner);
   const [watermarkSize, setWatermarkSize] = useState(reduxWatermarkSize);
   const [watermarkOpacity, setWatermarkOpacity] = useState(reduxWatermarkOpacity);
+  const [coverImage, setCoverImage] = useState<string>(reduxCoverImage);
+  const [projectImage1, setProjectImage1] = useState<string>(reduxProjectImage1);
+  const [projectImage2, setProjectImage2] = useState<string>(reduxProjectImage2);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [updateSettings, { isLoading }] = useUpdateCompanySettingsMutation();
@@ -87,6 +93,9 @@ export function CompanyTab({ isAdmin, isSupervisor }: CompanyTabProps) {
     setLogoPdf(reduxLogoPdf || "");
     setWatermarkSize(reduxWatermarkSize || 5);
     setWatermarkOpacity(reduxWatermarkOpacity || 5);
+    setCoverImage(reduxCoverImage || "");
+    setProjectImage1(reduxProjectImage1 || "");
+    setProjectImage2(reduxProjectImage2 || "");
   }, [
     reduxCompanyName, 
     reduxLogo, 
@@ -107,7 +116,10 @@ export function CompanyTab({ isAdmin, isSupervisor }: CompanyTabProps) {
     reduxBanner,
     reduxLogoPdf,
     reduxWatermarkSize,
-    reduxWatermarkOpacity
+    reduxWatermarkOpacity,
+    reduxCoverImage,
+    reduxProjectImage1,
+    reduxProjectImage2
   ]);
 
   const getLogoUrl = (logoStr: string) => {
@@ -145,6 +157,9 @@ export function CompanyTab({ isAdmin, isSupervisor }: CompanyTabProps) {
         logo_pdf: logoPdf,
         watermark_size: watermarkSize,
         watermark_opacity: watermarkOpacity,
+        cover_image: coverImage,
+        project_image_1: projectImage1,
+        project_image_2: projectImage2,
       }).unwrap();
       
       if (result.status === 'success') {
@@ -158,6 +173,9 @@ export function CompanyTab({ isAdmin, isSupervisor }: CompanyTabProps) {
 
   const bannerInputRef = useRef<HTMLInputElement>(null);
   const logoPdfInputRef = useRef<HTMLInputElement>(null);
+  const coverImageInputRef = useRef<HTMLInputElement>(null);
+  const projectImage1InputRef = useRef<HTMLInputElement>(null);
+  const projectImage2InputRef = useRef<HTMLInputElement>(null);
 
   const handleLogoClick = () => {
     if (!isAdmin) return;
@@ -172,6 +190,21 @@ export function CompanyTab({ isAdmin, isSupervisor }: CompanyTabProps) {
   const handleLogoPdfClick = () => {
     if (!isAdmin) return;
     logoPdfInputRef.current?.click();
+  };
+
+  const handleCoverImageClick = () => {
+    if (!isAdmin) return;
+    coverImageInputRef.current?.click();
+  };
+
+  const handleProjectImage1Click = () => {
+    if (!isAdmin) return;
+    projectImage1InputRef.current?.click();
+  };
+
+  const handleProjectImage2Click = () => {
+    if (!isAdmin) return;
+    projectImage2InputRef.current?.click();
   };
 
   const handleLogoFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -202,6 +235,39 @@ export function CompanyTab({ isAdmin, isSupervisor }: CompanyTabProps) {
       const reader = new FileReader();
       reader.onloadend = () => {
         setLogoPdf(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleCoverImageFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setCoverImage(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleProjectImage1FileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setProjectImage1(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleProjectImage2FileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setProjectImage2(reader.result as string);
       };
       reader.readAsDataURL(file);
     }
@@ -259,6 +325,18 @@ export function CompanyTab({ isAdmin, isSupervisor }: CompanyTabProps) {
           handleLogoFileChange={handleLogoFileChange}
           handleBannerFileChange={handleBannerFileChange}
           handleLogoPdfFileChange={handleLogoPdfFileChange}
+          coverImage={coverImage}
+          projectImage1={projectImage1}
+          projectImage2={projectImage2}
+          handleCoverImageClick={handleCoverImageClick}
+          handleProjectImage1Click={handleProjectImage1Click}
+          handleProjectImage2Click={handleProjectImage2Click}
+          handleCoverImageFileChange={handleCoverImageFileChange}
+          handleProjectImage1FileChange={handleProjectImage1FileChange}
+          handleProjectImage2FileChange={handleProjectImage2FileChange}
+          coverImageInputRef={coverImageInputRef}
+          projectImage1InputRef={projectImage1InputRef}
+          projectImage2InputRef={projectImage2InputRef}
         />
       </div>
     </form>
