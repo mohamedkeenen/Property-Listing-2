@@ -31,6 +31,7 @@ interface SalesOffer {
   unit_number?: string;
   project_name: string;
   client_name: string;
+  agent_name?: string;
   price: string | number;
   created_at?: string;
 }
@@ -328,7 +329,7 @@ export default function SalesOfferPage() {
                       <TableHead className="w-[100px] h-14 font-black text-xs uppercase tracking-wider text-muted-foreground">Image</TableHead>
                       <TableHead className="h-14 font-black text-xs uppercase tracking-wider text-muted-foreground">Reference</TableHead>
                       <TableHead className="h-14 font-black text-xs uppercase tracking-wider text-muted-foreground">Unit Number</TableHead>
-                      <TableHead className="h-14 pl-6 font-black text-xs uppercase tracking-wider text-muted-foreground">Client Name</TableHead>
+                      <TableHead className="h-14 pl-6 font-black text-xs uppercase tracking-wider text-muted-foreground">Agent Name</TableHead>
                       <TableHead className="h-14 font-black text-xs uppercase tracking-wider text-muted-foreground">Project Name</TableHead>
                       <TableHead className="h-14 font-black text-xs uppercase tracking-wider text-muted-foreground text-center">Price</TableHead>
                       <TableHead className="h-14 font-black text-xs uppercase tracking-wider text-muted-foreground text-center">Created At</TableHead>
@@ -368,7 +369,7 @@ export default function SalesOfferPage() {
                         <TableCell>
                           <div className="flex items-center gap-2 font-black text-foreground">
                             <CircleUser className="h-4 w-4 text-primary" />
-                            {offer.client_name || "-"}
+                            {offer.agent_name || "-"}
                           </div>
                         </TableCell>
                         <TableCell>
