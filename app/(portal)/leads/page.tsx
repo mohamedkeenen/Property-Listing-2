@@ -76,17 +76,9 @@ export default function Leads() {
         </div>
         
         <div className="flex-1 min-h-[300px] overflow-auto">
-          {leadsLoading ? (
-            <div className="h-full w-full flex flex-col items-center justify-center gap-5 py-32">
-              <div className="relative h-16 w-16">
-                  <div className="absolute inset-0 border-4 border-primary/20 rounded-full" />
-                  <div className="absolute inset-0 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-              </div>
-              <p className="text-xs font-black text-muted-foreground/60 animate-pulse uppercase tracking-[0.3em]">Establishing secure connection to database...</p>
-            </div>
-          ) : (
             <LeadsTable 
               leads={leads} 
+              isLoading={leadsLoading}
               onPageChange={setPage}
               onLimitChange={handleLimitChange}
               totalCount={totalCount}
@@ -100,7 +92,6 @@ export default function Leads() {
               onSync={handleSync}
               isSyncing={isSyncing || isFetching}
             />
-          )}
         </div>
       </div>
     </div>

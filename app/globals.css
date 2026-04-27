@@ -166,6 +166,15 @@ select {
   .animate-infinite-scroll {
     animation: infinite-scroll 40s linear infinite;
   }
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+}
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-15px); }
+  100% { transform: translateY(0px); }
 }
 
 @keyframes infinite-scroll {

@@ -45,7 +45,7 @@ const SearchSelect = ({
   placeholder: string;
 }) => {
   const [search, setSearch] = useState("");
-  const filteredOptions = options.filter(o => o.toLowerCase().includes(search.toLowerCase()));
+  const filteredOptions = Array.from(new Set(options.filter(o => o.toLowerCase().includes(search.toLowerCase()))));
 
   return (
     <div className="space-y-1.5">

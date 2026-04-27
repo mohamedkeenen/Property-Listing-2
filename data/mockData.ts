@@ -39,6 +39,7 @@ export interface PropertyListing {
   portals: { pf: boolean; bayut: boolean; website: boolean; dubizzle: boolean; bitrix: boolean };
   pfStatus: string | null;
   updatedAt: string;
+  createdAt: string;
   description: string;
   descriptionAr: string;
   amenities: string[];

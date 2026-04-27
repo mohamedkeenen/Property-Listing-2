@@ -1,22 +1,7 @@
-"use client";
-
+import { useState } from "react";
 import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from "@/components/ui/table";
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuTrigger 
-} from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
-import { 
-  MoreVertical, 
+  ChevronLeft,
+  ChevronRight,
   Edit2, 
   Trash2, 
   Eye, 
@@ -26,35 +11,48 @@ import {
   Mail as MailIcon, 
   Loader2
 } from "lucide-react";
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { 
+  Table, 
+  TableBody, 
+  TableCell, 
+  TableHead, 
+  TableHeader, 
+  TableRow 
+} from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
-
 import { format } from "date-fns";
-import { useResendVerificationMutation } from "@/api/redux/services/userApi";
 import { toast } from "react-hot-toast";
+import { useResendVerificationMutation } from "@/api/redux/services/userApi";
 
-interface User {
-  id: number;
-  name: string;
-  email: string;
-  role: string;
-  photo?: string;
-  phone?: string;
-  created_at?: string;
-  email_verified_at?: string | null;
-}
+import { SkeletonUser } from "@/components/skeleton/SkeletonUser";
 
 interface UserTableProps {
-  users: User[];
-  onEdit: (user: User) => void;
-  onDelete: (user: User) => void;
-  onView: (user: User) => void;
+  users: any[];
+  isLoading?: boolean;
+  onEdit: (user: any) => void;
+  onDelete: (user: any) => void;
+  onView: (user: any) => void;
 }
 
-export function UserTable({ users, onEdit, onDelete, onView }: UserTableProps) {
+export function UserTable({ users, isLoading, onEdit, onDelete, onView }: UserTableProps) {
   const [resendVerification, { isLoading: isResending }] = useResendVerificationMutation();
+  const [currentPage, setCurrentPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+
   const baseUrl = 'https://property-listing.keenenter.com';
+
+  const totalPages = Math.ceil(users.length / rowsPerPage);
+  const paginatedUsers = users.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
 
   const handleResend = async (id: number) => {
     try {
@@ -99,8 +97,8 @@ export function UserTable({ users, onEdit, onDelete, onView }: UserTableProps) {
   };
 
   return (
-    <div className="relative rounded-xl border border-border/50 bg-card/30 backdrop-blur-xl overflow-hidden shadow-2xl">
-      <div className="overflow-x-auto no-scrollbar">
+    <div className="relative rounded-2xl border border-border/50 bg-card/30 backdrop-blur-xl overflow-hidden shadow-2xl flex flex-col">
+      <div className="overflow-x-auto no-scrollbar flex-1">
         <Table>
           <TableHeader className="bg-muted/50">
             <TableRow className="border-border/50 hover:bg-transparent">
@@ -113,7 +111,9 @@ export function UserTable({ users, onEdit, onDelete, onView }: UserTableProps) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {users.length === 0 ? (
+            {isLoading ? (
+              <SkeletonUser />
+            ) : users.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={6} className="h-64 text-center">
                   <div className="flex flex-col items-center justify-center space-y-3 opacity-50">
@@ -123,7 +123,7 @@ export function UserTable({ users, onEdit, onDelete, onView }: UserTableProps) {
                 </TableCell>
               </TableRow>
             ) : (
-              users.map((user, index) => (
+              paginatedUsers.map((user, index) => (
                 <TableRow key={user.id} className="group border-border/40 hover:bg-primary/5 transition-colors">
                   <TableCell className="py-4 px-6">
                     <Avatar className="h-12 w-12 rounded-xl border-2 border-background ring-4 ring-primary/5 shadow-lg transition-transform duration-500">
@@ -135,7 +135,7 @@ export function UserTable({ users, onEdit, onDelete, onView }: UserTableProps) {
                   </TableCell>
                   <TableCell className="py-4 text-center hidden sm:table-cell">
                     <span className="font-mono text-xs font-black text-muted-foreground bg-muted/50 px-2 py-1 rounded-lg">
-                      #{index + 1}
+                      #{(currentPage - 1) * rowsPerPage + index + 1}
                     </span>
                   </TableCell>
                   <TableCell className="py-4">
@@ -174,47 +174,48 @@ export function UserTable({ users, onEdit, onDelete, onView }: UserTableProps) {
                     </Badge>
                   </TableCell>
                   <TableCell className="py-4 text-right px-6">
-                    <div className="flex items-center justify-end gap-2">
-                      {!user.email_verified_at && (
+                    <div className="flex items-center justify-end gap-1">
+                        {!user.email_verified_at && (
+                            <Button 
+                                onClick={() => handleResend(user.id)}
+                                disabled={isResending}
+                                variant="ghost" 
+                                size="sm"
+                                className="h-7 px-3 rounded-lg text-[9px] font-black uppercase tracking-[0.2em] bg-orange-500/10 text-orange-600 hover:bg-orange-500/30 border border-orange-500/20 transition-all hover:scale-105 active:scale-95"
+                            >
+                                {isResending ? (
+                                    <Loader2 className="h-3 w-3 animate-spin mr-1.5" />
+                                ) : null}
+                                Resend
+                            </Button>
+                        )}
                         <Button 
-                          onClick={() => handleResend(user.id)}
-                          disabled={isResending}
-                          variant="outline" 
-                          size="sm" 
-                          className="hidden sm:flex h-8 rounded-lg border-orange-500/30 text-orange-500 hover:bg-orange-500/10 hover:text-orange-600 font-black text-[10px] uppercase gap-2"
+                            onClick={() => onView(user)} 
+                            variant="ghost" 
+                            size="icon" 
+                            className="h-9 w-9 rounded-xl text-primary hover:bg-primary/20 hover:scale-110 transition-all active:scale-95"
+                            title="View Details"
                         >
-                          {isResending ? <Loader2 className="h-3 w-3 animate-spin" /> : <MailIcon className="h-3 w-3" />}
-                          Resend
-                        </Button>
-                      )}
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl hover:bg-primary/10 hover:text-primary transition-all active:scale-95">
-                            <MoreVertical className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-[180px] p-2 rounded-2xl border-border/10 shadow-2xl backdrop-blur-2xl bg-background/95">
-                          <DropdownMenuItem onClick={() => onView(user)} className="rounded-xl px-3 py-2 cursor-pointer focus:bg-primary/10 focus:text-primary font-black text-xs gap-3">
                             <Eye className="h-4 w-4" />
-                            View Details
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => onEdit(user)} className="rounded-xl px-3 py-2 cursor-pointer focus:bg-primary/10 focus:text-primary font-black text-xs gap-3">
+                        </Button>
+                        <Button 
+                            onClick={() => onEdit(user)} 
+                            variant="ghost" 
+                            size="icon" 
+                            className="h-9 w-9 rounded-xl text-amber-600 hover:bg-amber-600/20 hover:scale-110 transition-all active:scale-95"
+                            title="Edit User"
+                        >
                             <Edit2 className="h-4 w-4" />
-                            Edit User
-                          </DropdownMenuItem>
-                          {!user.email_verified_at && (
-                            <DropdownMenuItem onClick={() => handleResend(user.id)} className="sm:hidden rounded-xl px-3 py-2 cursor-pointer focus:bg-orange-500/10 focus:text-orange-500 font-black text-xs gap-3">
-                              <MailIcon className="h-4 w-4" />
-                              Resend Verification
-                            </DropdownMenuItem>
-                          )}
-                          <div className="h-px bg-border/40 my-1 mx-2" />
-                          <DropdownMenuItem onClick={() => onDelete(user)} className="rounded-xl px-3 py-2 cursor-pointer text-destructive focus:bg-destructive/10 focus:text-destructive font-black text-xs gap-3">
+                        </Button>
+                        <Button 
+                            onClick={() => onDelete(user)} 
+                            variant="ghost" 
+                            size="icon" 
+                            className="h-9 w-9 rounded-xl text-destructive hover:bg-destructive/20 hover:scale-110 transition-all active:scale-95"
+                            title="Delete User"
+                        >
                             <Trash2 className="h-4 w-4" />
-                            Delete User
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                        </Button>
                     </div>
                   </TableCell>
                 </TableRow>
@@ -222,6 +223,91 @@ export function UserTable({ users, onEdit, onDelete, onView }: UserTableProps) {
             )}
           </TableBody>
         </Table>
+      </div>
+
+      {/* Pagination Footer */}
+      <div className="border-t border-border/40 bg-muted/20 px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="flex items-center gap-4 order-2 sm:order-1">
+            <div className="flex items-center gap-2">
+                <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Rows per page:</span>
+                <Select
+                    value={rowsPerPage.toString()}
+                    onValueChange={(val) => {
+                        setRowsPerPage(Number(val));
+                        setCurrentPage(1);
+                    }}
+                >
+                    <SelectTrigger className="h-8 w-16 rounded-lg bg-background/50 border-border/40 text-[10px] font-black">
+                        <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="rounded-xl border-border/10 backdrop-blur-3xl bg-background/95">
+                        {[5, 10, 20, 50].map((num) => (
+                            <SelectItem key={num} value={num.toString()} className="text-[10px] font-black rounded-lg">
+                                {num}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+            </div>
+            <div className="h-4 w-px bg-border/40 hidden sm:block" />
+            <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">
+                Showing {(currentPage - 1) * rowsPerPage + 1} to {Math.min(currentPage * rowsPerPage, users.length)} of {users.length}
+            </span>
+        </div>
+
+        <div className="flex items-center gap-2 order-1 sm:order-2">
+            <Button
+                variant="outline"
+                size="icon"
+                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                disabled={currentPage === 1}
+                className="h-8 w-8 rounded-lg border-border/40 hover:bg-muted disabled:opacity-30 transition-all"
+            >
+                <ChevronLeft className="h-4 w-4" />
+            </Button>
+            
+            <div className="flex items-center gap-1">
+                {[...Array(totalPages)].map((_, i) => {
+                    const pageNum = i + 1;
+                    // Show only first, last, and pages around current
+                    if (
+                        pageNum === 1 || 
+                        pageNum === totalPages || 
+                        (pageNum >= currentPage - 1 && pageNum <= currentPage + 1)
+                    ) {
+                        return (
+                            <Button
+                                key={pageNum}
+                                variant={currentPage === pageNum ? "default" : "outline"}
+                                onClick={() => setCurrentPage(pageNum)}
+                                className={cn(
+                                    "h-8 min-w-[32px] rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
+                                    currentPage === pageNum ? "shadow-lg shadow-primary/20" : "border-border/40 hover:bg-muted"
+                                )}
+                            >
+                                {pageNum}
+                            </Button>
+                        );
+                    } else if (
+                        pageNum === currentPage - 2 || 
+                        pageNum === currentPage + 2
+                    ) {
+                        return <span key={pageNum} className="text-muted-foreground/40 px-1">...</span>;
+                    }
+                    return null;
+                })}
+            </div>
+
+            <Button
+                variant="outline"
+                size="icon"
+                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                disabled={currentPage === totalPages}
+                className="h-8 w-8 rounded-lg border-border/40 hover:bg-muted disabled:opacity-30 transition-all"
+            >
+                <ChevronRight className="h-4 w-4" />
+            </Button>
+        </div>
       </div>
     </div>
   );

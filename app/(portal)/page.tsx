@@ -6,7 +6,6 @@ import { StatsCards } from "@/components/dashboard/StatsCards";
 import { DashboardCharts } from "@/components/dashboard/DashboardCharts";
 import { ListingsFilters, FiltersState } from "@/components/dashboard/ListingsFilters";
 import { ListingsTable } from "@/components/dashboard/ListingsTable";
-import { PropertyDetailDialog } from "@/components/listings/PropertyDetailDialog";
 import { PropertyListing } from "@/data/mockData";
 import { useGetPropertiesQuery, useSyncBitrixMutation } from "@/api/redux/services/propertyApi";
 import { useGetAgentsQuery } from "@/api/redux/services/userApi";
@@ -19,14 +18,13 @@ import { RefreshCcw, BarChart3, Info, PieChart, List, Search, Loader2, Database 
 export default function Dashboard() {
   const router = useRouter();
   const [filters, setFilters] = useState<FiltersState | null>(null);
-  const [selectedListing, setSelectedListing] = useState<PropertyListing | null>(null);
-
   const { data: propertiesData, isLoading, refetch } = useGetPropertiesQuery({ limit: 100 });
   const [syncBitrix, { isLoading: isSyncing }] = useSyncBitrixMutation();
   const { data: agentsData } = useGetAgentsQuery();
 
-  const agentNames = useMemo(() => {
-    return agentsData?.data?.map((a: any) => a.name) || [];
+  const agentNames = useMemo<string[]>(() => {
+    const names = agentsData?.data?.map((a: any) => a.name) || [];
+    return Array.from(new Set(names));
   }, [agentsData]);
 
   const listings = useMemo(() => {
@@ -146,29 +144,15 @@ export default function Dashboard() {
         <div className="flex-1 flex flex-col min-h-0 space-y-4">
           <ListingsFilters onApply={setFilters} agentOptions={agentNames} />
           <div className="flex-1 min-h-0 relative">
-            {isLoading ? (
-              <div className="absolute inset-0 bg-background/50 backdrop-blur-sm z-50 flex items-center justify-center">
-                <div className="flex flex-col items-center gap-4">
-                  <Loader2 className="h-8 w-8 text-primary animate-spin" />
-                  <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Syncing Inventory...</p>
-                </div>
-              </div>
-            ) : (
-              <ListingsTable
-                listings={filtered}
-                onViewDetails={setSelectedListing}
-                onEdit={(l) => router.push(`/create-listing?id=${l.id}`)}
-              />
-            )}
+            <ListingsTable
+              listings={filtered}
+              isLoading={isLoading}
+              onViewDetails={(l) => router.push(`/listing/${l.id}`)}
+              onEdit={(l) => router.push(`/create-listing?id=${l.id}`)}
+            />
           </div>
         </div>
       </div>
-
-      <PropertyDetailDialog
-        listing={selectedListing}
-        open={!!selectedListing}
-        onClose={() => setSelectedListing(null)}
-      />
     </div>
   );
 }

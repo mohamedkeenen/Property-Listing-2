@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Eye, Pencil, Trash2, ChevronLeft, ChevronRight, Search, MoreHorizontal, FileDown, Bath, BedDouble, ArrowUpDown, User, Image as ImageIcon } from "lucide-react";
+import { Eye, Pencil, Trash2, ChevronLeft, ChevronRight, Search, MoreHorizontal, FileDown, Bath, BedDouble, ArrowUpDown, User, Image as ImageIcon, Edit2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -15,9 +15,14 @@ import { useDeletePropertyMutation, useTogglePortalMutation } from "@/api/redux/
 import { Loader2 } from "lucide-react";
 import { useSelector } from "react-redux";
 import { selectCurrentUser } from "@/api/redux/slices/authSlice";
+import { selectCompanyLogo, selectSettingsLastUpdated } from "@/api/redux/slices/settingsSlice";
+import { API_BASE_URL } from "@/api/redux/apiConfig";
+import { ConfirmPortalDialog } from "@/components/shared/ConfirmPortalDialog";
+import { SkeletonDashboardTable } from "@/components/skeleton/SkeletonDashboardTable";
 
 interface Props {
   listings: PropertyListing[];  
+  isLoading?: boolean;
   onViewDetails: (listing: PropertyListing) => void;
   onEdit: (listing: PropertyListing) => void;
 }
@@ -29,11 +34,15 @@ const PortalBadge = ({ initialStatus, portal, propertyId, pfStatus }: {
   pfStatus?: string | null;
 }) => {
   const user = useSelector(selectCurrentUser);
+  const companyLogo = useSelector(selectCompanyLogo);
+  const settingsLastUpdated = useSelector(selectSettingsLastUpdated);
   const isAgent = user?.role === 'agent';
   const [togglePortal, { isLoading }] = useTogglePortalMutation();
   const [active, setActive] = useState(initialStatus);
 
-  const handleToggle = async () => {
+  const [confirmOpen, setConfirmOpen] = useState(false);
+
+  const handleToggle = () => {
     if (isAgent) {
       toast({
         title: "Permission Denied",
@@ -42,7 +51,18 @@ const PortalBadge = ({ initialStatus, portal, propertyId, pfStatus }: {
       });
       return;
     }
+    setConfirmOpen(true);
+  };
 
+  const getLogoUrl = (logo: string | null) => {
+    if (!logo) return undefined;
+    if (logo.startsWith('http') || logo.startsWith('data:image')) return logo;
+    return `${API_BASE_URL}/storage/${logo}?v=${settingsLastUpdated}`;
+  };
+
+  const dialogLogoUrl = undefined;
+
+  const handleConfirmToggle = async () => {
     try {
       const newStatus = !active;
       await togglePortal({ id: propertyId, portal, status: newStatus }).unwrap();
@@ -58,6 +78,8 @@ const PortalBadge = ({ initialStatus, portal, propertyId, pfStatus }: {
         description: err.data?.message || "Internal server error occurred.",
         variant: "destructive" 
       });
+    } finally {
+      setConfirmOpen(false);
     }
   };
 
@@ -76,8 +98,8 @@ const PortalBadge = ({ initialStatus, portal, propertyId, pfStatus }: {
     bayut_active: "bg-emerald-500 text-white border-emerald-500 shadow-sm",
     dubizzle: "hover:bg-emerald-500 hover:text-white border-emerald-200 dark:border-emerald-500/30 text-emerald-600 dark:text-emerald-400 bg-emerald-500/10",
     dubizzle_active: "bg-emerald-500 text-white border-emerald-500 shadow-sm",
-    website: "hover:bg-blue-500 hover:text-white border-blue-200 dark:border-blue-500/30 text-blue-600 dark:text-blue-400 bg-blue-500/10",
-    website_active: "bg-blue-500 text-white border-blue-500 shadow-sm"
+    website: "hover:bg-cyan-500 hover:text-white border-cyan-200 dark:border-cyan-500/30 text-cyan-600 dark:text-cyan-400 bg-cyan-500/10",
+    website_active: "bg-cyan-500 text-white border-cyan-500 shadow-sm"
   };
 
   let color = portalColors[portal];
@@ -85,21 +107,33 @@ const PortalBadge = ({ initialStatus, portal, propertyId, pfStatus }: {
   if (portal === 'pf' && pfStatus === 'Failed') color = portalColors.pf_failed;
 
   return (
-    <Badge 
-      variant="outline" 
-      onClick={(e) => { e.stopPropagation(); handleToggle(); }}
-      className={cn(
-        "text-[10px] px-1.5 py-0 transition-all duration-200 select-none h-5 min-w-[28px] flex items-center justify-center font-bold",
-        isAgent ? "cursor-not-allowed grayscale opacity-60" : "cursor-pointer active:scale-90",
-        color,
-        isLoading && "opacity-50 pointer-events-none"
-      )}
-      title={isAgent ? "Agents cannot manage portals" : (pfStatus === 'Failed' ? 'Sync Failed' : portal.toUpperCase())}
-    >
-      {isLoading ? <Loader2 className="h-2 w-2 animate-spin" /> : portalNames[portal]}
-      {portal === 'pf' && pfStatus === 'Synced' && active && <span className="ml-1">✅</span>}
-      {portal === 'pf' && pfStatus === 'Failed' && active && <span className="ml-1">❌</span>}
-    </Badge>
+    <>
+      <Badge 
+        variant="outline" 
+        onClick={(e) => { e.stopPropagation(); handleToggle(); }}
+        className={cn(
+          "text-[10px] px-1.5 py-0 transition-all duration-200 select-none h-5 min-w-[28px] flex items-center justify-center font-bold",
+          isAgent ? "cursor-not-allowed grayscale opacity-60" : "cursor-pointer active:scale-90",
+          color,
+          isLoading && "opacity-50 pointer-events-none"
+        )}
+        title={isAgent ? "Agents cannot manage portals" : (pfStatus === 'Failed' ? 'Sync Failed' : portal.toUpperCase())}
+      >
+        {isLoading ? <Loader2 className="h-2 w-2 animate-spin" /> : portalNames[portal]}
+        {portal === 'pf' && pfStatus === 'Synced' && active && <span className="ml-1">✅</span>}
+        {portal === 'pf' && pfStatus === 'Failed' && active && <span className="ml-1">❌</span>}
+      </Badge>
+
+      <ConfirmPortalDialog 
+        open={confirmOpen}
+        onOpenChange={setConfirmOpen}
+        onConfirm={handleConfirmToggle}
+        portalKey={portal}
+        isActivating={!active}
+        loading={isLoading}
+        logoUrl={dialogLogoUrl}
+      />
+    </>
   );
 };
 
@@ -122,7 +156,7 @@ const statusColors: Record<string, string> = {
 
 import { ConfirmDeleteDialog } from "@/components/shared/ConfirmDeleteDialog";
 
-export function ListingsTable({ listings, onViewDetails, onEdit }: Props) {
+export function ListingsTable({ listings, isLoading, onViewDetails, onEdit }: Props) {
   const router = useRouter();
   const [deleteProperty] = useDeletePropertyMutation();
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -310,10 +344,10 @@ export function ListingsTable({ listings, onViewDetails, onEdit }: Props) {
               </TableHead>
               <TableHead>
                 <div className="flex items-center gap-2">
-                  <ArrowUpDown className="h-3 w-3" /> Updated
+                  <ArrowUpDown className="h-3 w-3" /> Created At
                 </div>
               </TableHead>
-               <TableHead>Status</TableHead>
+                <TableHead>Status</TableHead>
               <TableHead>Community</TableHead>
               <TableHead>
                 <div className="flex items-center gap-2">
@@ -333,7 +367,9 @@ export function ListingsTable({ listings, onViewDetails, onEdit }: Props) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {paginated.length === 0 ? (
+            {isLoading ? (
+              <SkeletonDashboardTable />
+            ) : paginated.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={13} className="text-center py-8 text-muted-foreground">
                   No listings found
@@ -341,43 +377,36 @@ export function ListingsTable({ listings, onViewDetails, onEdit }: Props) {
               </TableRow>
             ) : (
               paginated.map((l) => (
-                <TableRow key={l.id} className="hover:bg-muted/50 border-b-0">
-                  <TableCell>
-                    <div className="flex items-center gap-1">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="h-8 w-8">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="start" className="w-44">
-                          <DropdownMenuItem 
-                            onClick={() => router.push(`/listing/${l.id}`)}
-                            className="focus:bg-blue-600 focus:text-white cursor-pointer"
-                          >
-                            <Eye className="h-4 w-4 mr-2" /> View
-                          </DropdownMenuItem>
-                          <DropdownMenuItem 
-                            onClick={() => onEdit(l)}
-                            className="focus:bg-amber-500 focus:text-white cursor-pointer"
-                          >
-                            <Pencil className="h-4 w-4 mr-2" /> Edit
-                          </DropdownMenuItem>
-                          <DropdownMenuItem 
-                            onClick={() => handleDeleteClick(l)} 
-                            className="focus:bg-red-600 focus:text-white cursor-pointer"
-                          >
-                            <Trash2 className="h-4 w-4 mr-2" /> Delete
-                          </DropdownMenuItem>
-                          <DropdownMenuItem 
-                            onClick={() => handleDownloadPDF(l)}
-                            className="focus:bg-primary focus:text-white cursor-pointer"
-                          >
-                            <FileDown className="h-4 w-4 mr-2" /> Download PDF
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
+                <TableRow 
+                  key={l.id} 
+                  className="hover:bg-muted/50 border-b-0"
+                >
+                  <TableCell className="sticky left-0 bg-card z-10 shadow-[1px_0_0_rgba(0,0,0,0.1)] dark:shadow-[1px_0_0_rgba(255,255,255,0.1)]">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-xl bg-primary/5 text-primary/70 hover:bg-primary hover:text-white hover:shadow-md hover:shadow-primary/20 transition-all active:scale-95 group/btn">
+                          <MoreHorizontal className="h-4 w-4 transition-transform group-hover/btn:rotate-90" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="start" className="w-48 p-1.5 rounded-xl border-border shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+                        <DropdownMenuItem onClick={() => onViewDetails(l)} className="gap-2.5 py-2 rounded-lg cursor-pointer text-xs font-bold transition-all focus:bg-primary/10 focus:text-primary">
+                          <Eye className="h-4 w-4" /> View Details
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => onEdit(l)} className="gap-2.5 py-2 rounded-lg cursor-pointer text-xs font-bold transition-all focus:bg-amber-600/10 focus:text-amber-600">
+                          <Edit2 className="h-4 w-4" /> Edit Listing
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleDownloadPDF(l)} className="gap-2.5 py-2 rounded-lg cursor-pointer text-xs font-bold transition-all focus:bg-emerald-500/10 focus:text-emerald-500">
+                          <FileDown className="h-4 w-4" /> Download PDF
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator className="my-1.5 opacity-50" />
+                        <DropdownMenuItem 
+                          onClick={() => { setListingToDelete(l); setDeleteDialogOpen(true); }} 
+                          className="gap-2.5 py-2 rounded-lg cursor-pointer text-xs font-bold text-destructive transition-all focus:bg-destructive/10 focus:text-destructive"
+                        >
+                          <Trash2 className="h-4 w-4" /> Delete Listing
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </TableCell>
                   <TableCell>
                     <div className="flex gap-1.5 flex-wrap max-w-[120px]">
@@ -459,7 +488,7 @@ export function ListingsTable({ listings, onViewDetails, onEdit }: Props) {
                   <TableCell>
                     <div className="flex flex-col gap-1 py-1">
                       <span className="text-[13px] font-semibold text-foreground/80">
-                        {formatRelativeTime(l.updatedAt)}
+                        {formatRelativeTime(l.createdAt)}
                       </span>
                     </div>
                   </TableCell>
@@ -494,7 +523,7 @@ export function ListingsTable({ listings, onViewDetails, onEdit }: Props) {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <span className="text-[13px] font-semibold text-foreground/80 whitespace-nowrap">{l.office || "PRIME ZAM"}</span>
+                    <span className="text-[13px] font-semibold text-foreground/80 whitespace-nowrap">{l.office}</span>
                   </TableCell>
                 </TableRow>
               ))
@@ -503,7 +532,6 @@ export function ListingsTable({ listings, onViewDetails, onEdit }: Props) {
         </Table>
       </div>
 
-        {/* Right Scroll Indicator */}
         <button 
           onClick={(e) => { e.preventDefault(); e.stopPropagation(); scroll('right'); }}
           className="absolute right-0 top-0 bottom-0 z-20 flex items-center justify-center transition-all opacity-0 group-hover/table:opacity-100 border-none"
@@ -515,28 +543,87 @@ export function ListingsTable({ listings, onViewDetails, onEdit }: Props) {
         </button>
       </div>
 
-      {/* Pagination */}
-      <div className="flex items-center justify-between p-3 border-t border-border">
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <span>Show</span>
-          <Select value={String(perPage)} onValueChange={(v) => { setPerPage(Number(v)); setPage(1); }}>
-            <SelectTrigger className="h-8 w-16"><SelectValue /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="10">10</SelectItem>
-              <SelectItem value="25">25</SelectItem>
-              <SelectItem value="50">50</SelectItem>
-            </SelectContent>
-          </Select>
-          <span>of {filtered.length}</span>
+      {/* Pagination Footer */}
+      <div className="border-t border-border/40 bg-muted/20 px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="flex items-center gap-4 order-2 sm:order-1">
+            <div className="flex items-center gap-2">
+                <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Rows per page:</span>
+                <Select
+                    value={perPage.toString()}
+                    onValueChange={(val) => {
+                        setPerPage(Number(val));
+                        setPage(1);
+                    }}
+                >
+                    <SelectTrigger className="h-8 w-16 rounded-lg bg-background/50 border-border/40 text-[10px] font-black">
+                        <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="rounded-xl border-border/10 backdrop-blur-3xl bg-background/95">
+                        {[10, 25, 50, 100].map((num) => (
+                            <SelectItem key={num} value={num.toString()} className="text-[10px] font-black rounded-lg">
+                                {num}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+            </div>
+            <div className="h-4 w-px bg-border/40 hidden sm:block" />
+            <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">
+                Showing {(page - 1) * perPage + 1} to {Math.min(page * perPage, filtered.length)} of {filtered.length} listings
+            </span>
         </div>
-        <div className="flex items-center gap-1">
-          <Button variant="outline" size="icon" className="h-8 w-8" disabled={page <= 1} onClick={() => setPage(page - 1)}>
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
-          <span className="text-sm px-2">{page} / {Math.max(totalPages, 1)}</span>
-          <Button variant="outline" size="icon" className="h-8 w-8" disabled={page >= totalPages} onClick={() => setPage(page + 1)}>
-            <ChevronRight className="h-4 w-4" />
-          </Button>
+
+        <div className="flex items-center gap-2 order-1 sm:order-2">
+            <Button
+                variant="outline"
+                size="icon"
+                onClick={() => setPage(prev => Math.max(1, prev - 1))}
+                disabled={page === 1}
+                className="h-8 w-8 rounded-lg border-border/40 hover:bg-muted disabled:opacity-30 transition-all"
+            >
+                <ChevronLeft className="h-4 w-4" />
+            </Button>
+            
+            <div className="flex items-center gap-1">
+                {[...Array(totalPages)].map((_, i) => {
+                    const pageNum = i + 1;
+                    if (
+                        pageNum === 1 || 
+                        pageNum === totalPages || 
+                        (pageNum >= page - 1 && pageNum <= page + 1)
+                    ) {
+                        return (
+                            <Button
+                                key={pageNum}
+                                variant={page === pageNum ? "default" : "outline"}
+                                onClick={() => setPage(pageNum)}
+                                className={cn(
+                                    "h-8 min-w-[32px] rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
+                                    page === pageNum ? "shadow-lg shadow-primary/20" : "border-border/40 hover:bg-muted"
+                                )}
+                            >
+                                {pageNum}
+                            </Button>
+                        );
+                    } else if (
+                        pageNum === page - 2 || 
+                        pageNum === page + 2
+                    ) {
+                        return <span key={pageNum} className="text-muted-foreground/40 px-1">...</span>;
+                    }
+                    return null;
+                })}
+            </div>
+
+            <Button
+                variant="outline"
+                size="icon"
+                onClick={() => setPage(prev => Math.min(totalPages, prev + 1))}
+                disabled={page === totalPages}
+                className="h-8 w-8 rounded-lg border-border/40 hover:bg-muted disabled:opacity-30 transition-all"
+            >
+                <ChevronRight className="h-4 w-4" />
+            </Button>
         </div>
       </div>
 

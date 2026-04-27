@@ -2,7 +2,14 @@
 
 import { useState } from "react";
 import { toast } from "@/hooks/use-toast";
-import {  Sparkles,  Download,  Search,  FileText,  Building2,  Timer, Hash, DollarSign, Image as ImageIcon, Loader2, CircleUser } from "lucide-react";
+import {  Sparkles,  Download,  Search,  FileText,  Building2,  Timer, Hash, DollarSign, Image as ImageIcon, Loader2, CircleUser, ChevronLeft, ChevronRight } from "lucide-react";
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { format } from "date-fns";
 import { generateSalesOfferPDF } from "@/lib/generateSalesOfferPDF";
 import { useGetSalesOffersQuery, useLazyGetSalesOfferDetailQuery } from "@/api/redux/services/salesOfferApi";
@@ -11,6 +18,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
+import { SkeletonSalesOffer } from "@/components/skeleton/SkeletonSalesOffer";
 
 interface SalesOffer {
   id: string | number;
@@ -28,12 +37,17 @@ export default function SalesOfferPage() {
   const [triggerFetchDetail] = useLazyGetSalesOfferDetailQuery();
   const [searchTerm, setSearchTerm] = useState("");
   const [downloadingIds, setDownloadingIds] = useState<(string | number)[]>([]);
+  const [page, setPage] = useState(1);
+  const [perPage, setPerPage] = useState(10);
 
   const filteredOffers: SalesOffer[] = (offers as any)?.data?.filter((offer: SalesOffer) => 
     offer.project_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     (offer.client_name && offer.client_name.toLowerCase().includes(searchTerm.toLowerCase())) ||
     offer.reference.toLowerCase().includes(searchTerm.toLowerCase())
   ) || [];
+
+  const totalPages = Math.ceil(filteredOffers.length / perPage);
+  const paginatedOffers = filteredOffers.slice((page - 1) * perPage, page * perPage);
 
   const handleDownload = async (offerId: string | number) => {
     setDownloadingIds(prev => [...prev, offerId]);
@@ -260,12 +274,7 @@ export default function SalesOfferPage() {
       <Card className="rounded-2xl border-border/40 shadow-xl shadow-black/5 overflow-hidden bg-card/70 backdrop-blur-md">
         <CardContent className="p-0">
           <div className="relative min-h-[400px]">
-            {isLoading ? (
-              <div className="absolute inset-0 flex flex-col items-center justify-center gap-4">
-                <Loader2 className="h-10 w-10 text-primary animate-spin" />
-                <p className="text-sm font-bold text-muted-foreground animate-pulse">Fetching records from Bitrix...</p>
-              </div>
-            ) : isError ? (
+            {isError ? (
               <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 text-destructive">
                 <div className="p-4 rounded-full bg-destructive/10">
                   <FileText className="h-8 w-8" />
@@ -276,7 +285,7 @@ export default function SalesOfferPage() {
                   <Button variant="link" onClick={() => refetch()} className="mt-2 text-primary h-auto p-0">Retry</Button>
                 </div>
               </div>
-            ) : filteredOffers.length === 0 ? (
+            ) : filteredOffers.length === 0 && !isLoading ? (
               <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 text-muted-foreground">
                 <div className="p-4 rounded-full bg-muted/50">
                   <Sparkles className="h-8 w-8 opacity-20" />
@@ -299,8 +308,11 @@ export default function SalesOfferPage() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {filteredOffers.map((offer: SalesOffer) => (
-                      <TableRow key={offer.id} className="hover:bg-muted/20 transition-colors border-border/20 group">
+                    {isLoading ? (
+                      <SkeletonSalesOffer />
+                    ) : (
+                      paginatedOffers.map((offer: SalesOffer) => (
+                        <TableRow key={offer.id} className="hover:bg-muted/20 transition-colors border-border/20 group">
                         <TableCell className="pl-6 py-4">
                           <div className="w-14 h-14 rounded-xl border border-border/30 bg-muted/50 overflow-hidden shadow-inner group-hover:shadow-md transition-all">
                             {offer.image ? (
@@ -367,7 +379,7 @@ export default function SalesOfferPage() {
                           <Button
                             onClick={() => handleDownload(offer.id)}
                             disabled={downloadingIds.includes(offer.id)}
-                            className="rounded-xl md:rounded-2xl h-10 px-5 font-black bg-linear-to-br from-primary via-primary to-indigo-600 text-white shadow-lg shadow-primary/10 transition-all duration-300 hover:shadow-primary/30 active:scale-95 relative overflow-hidden group/btn"
+                            className="rounded-xl md:rounded-2xl h-10 px-5 font-black bg-linear-to-br from-primary via-primary to-indigo-600 text-white shadow-lg shadow-primary/10 transition-all duration-300 hover:shadow-primary/30 hover:scale-105 active:scale-95 relative overflow-hidden group/btn"
                           >
                             <div className="absolute inset-0 bg-white/10 -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700 skew-x-[-20deg]" />
                             <span className="relative z-10 flex items-center justify-center">
@@ -383,12 +395,98 @@ export default function SalesOfferPage() {
                           </Button>
                         </TableCell>
                       </TableRow>
-                    ))}
+                      ))
+                    )}
                   </TableBody>
                 </Table>
               </div>
             )}
           </div>
+          
+          {!isLoading && !isError && filteredOffers.length > 0 && (
+            <div className="border-t border-border/40 bg-muted/20 px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-4 order-2 sm:order-1">
+                  <div className="flex items-center gap-2">
+                      <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Rows per page:</span>
+                      <Select
+                          value={perPage.toString()}
+                          onValueChange={(val) => {
+                              setPerPage(Number(val));
+                              setPage(1);
+                          }}
+                      >
+                          <SelectTrigger className="h-8 w-16 rounded-lg bg-background/50 border-border/40 text-[10px] font-black">
+                              <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent className="rounded-xl border-border/10 backdrop-blur-3xl bg-background/95">
+                              {[10, 20, 50, 100].map((num) => (
+                                  <SelectItem key={num} value={num.toString()} className="text-[10px] font-black rounded-lg">
+                                      {num}
+                                  </SelectItem>
+                              ))}
+                          </SelectContent>
+                      </Select>
+                  </div>
+                  <div className="h-4 w-px bg-border/40 hidden sm:block" />
+                  <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">
+                      Showing {(page - 1) * perPage + 1} to {Math.min(page * perPage, filteredOffers.length)} of {filteredOffers.length} offers
+                  </span>
+              </div>
+
+              <div className="flex items-center gap-2 order-1 sm:order-2">
+                  <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => setPage(prev => Math.max(1, prev - 1))}
+                      disabled={page === 1}
+                      className="h-8 w-8 rounded-lg border-border/40 hover:bg-muted disabled:opacity-30 transition-all"
+                  >
+                      <ChevronLeft className="h-4 w-4" />
+                  </Button>
+                  
+                  <div className="flex items-center gap-1">
+                      {[...Array(totalPages)].map((_, i) => {
+                          const pageNum = i + 1;
+                          if (
+                              pageNum === 1 || 
+                              pageNum === totalPages || 
+                              (pageNum >= page - 1 && pageNum <= page + 1)
+                          ) {
+                              return (
+                                  <Button
+                                      key={pageNum}
+                                      variant={page === pageNum ? "default" : "outline"}
+                                      onClick={() => setPage(pageNum)}
+                                      className={cn(
+                                          "h-8 min-w-[32px] rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
+                                          page === pageNum ? "shadow-lg shadow-primary/20" : "border-border/40 hover:bg-muted"
+                                      )}
+                                  >
+                                      {pageNum}
+                                  </Button>
+                              );
+                          } else if (
+                              pageNum === page - 2 || 
+                              pageNum === page + 2
+                          ) {
+                              return <span key={pageNum} className="text-muted-foreground/40 px-1">...</span>;
+                          }
+                          return null;
+                      })}
+                  </div>
+
+                  <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => setPage(prev => Math.min(totalPages, prev + 1))}
+                      disabled={page === totalPages}
+                      className="h-8 w-8 rounded-lg border-border/40 hover:bg-muted disabled:opacity-30 transition-all"
+                  >
+                      <ChevronRight className="h-4 w-4" />
+                  </Button>
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

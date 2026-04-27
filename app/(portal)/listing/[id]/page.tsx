@@ -16,6 +16,7 @@ import { VirtualTourPlayer, VirtualTourCard, FloorPlans, QRCode, DocumentsAndNot
 import { PropertyDescriptions, PremiumDetails } from "@/components/listing/PropertyDetails";
 import { LocationMap } from "@/components/listing/LocationMap";
 import { ListingSkeleton } from "@/components/listing/ListingSkeleton";
+import { NotFoundUI } from "@/components/shared/NotFoundUI";
 
 import "./listing.css";
 import { cn } from "@/lib/utils";
@@ -36,20 +37,12 @@ export default function PropertyDetail({ params }: { params: Promise<{ id: strin
 
   if (!listing) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-8 bg-slate-50">
-        <div className="text-center max-w-lg space-y-10 bg-white p-16 rounded-[3rem] shadow-2xl border border-slate-100">
-          <div className="mx-auto h-24 w-24 rounded-full bg-slate-50 flex items-center justify-center shadow-inner">
-            <ArrowLeft className="h-12 w-12 text-slate-300" />
-          </div>
-          <div className="space-y-4">
-            <h2 className="text-4xl font-black text-slate-900 tracking-tighter uppercase">Entry Not Found</h2>
-            <p className="text-slate-400 font-bold px-12 leading-relaxed">The requested property identification does not match any records in our secure database.</p>
-          </div>
-          <Button onClick={() => router.push("/")} className="h-16 px-12 rounded-full font-black text-[14px] uppercase tracking-widest bg-slate-900 text-white hover:scale-105 transition-all shadow-2xl shadow-slate-200">
-            Return to Directory
-          </Button>
-        </div>
-      </div>
+      <NotFoundUI 
+        title="Entry Not Found"
+        message="The requested property identification does not match any records in our secure database. It may have been archived or moved."
+        buttonText="Return to Directory"
+        onAction={() => router.push("/")}
+      />
     );
   }
 

@@ -20,8 +20,17 @@ import {
   ShieldAlert,
   Loader2,
   ExternalLink,
-  Calendar
+  Calendar,
+  ChevronLeft,
+  ChevronRight
 } from "lucide-react";
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "react-hot-toast";
@@ -42,6 +51,8 @@ export default function SuperAdminPage() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState<any>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [page, setPage] = useState(1);
+  const [perPage, setPerPage] = useState(10);
 
   const isAdmin = currentUser?.email === 'listing@keenenter.com';
 
@@ -56,6 +67,9 @@ export default function SuperAdminPage() {
         u.company?.company_name?.toLowerCase().includes(searchQuery.toLowerCase())
     );
   }, [users, searchQuery]);
+
+  const totalPages = Math.ceil(filteredUsers.length / perPage);
+  const paginatedUsers = filteredUsers.slice((page - 1) * perPage, page * perPage);
 
   const handleToggleActive = async (user: any) => {
     try {
@@ -205,7 +219,7 @@ export default function SuperAdminPage() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border/20">
-                    {filteredUsers.map((user: any) => (
+                    {paginatedUsers.map((user: any) => (
                       <tr 
                         key={user.id} 
                         className={cn(
@@ -285,7 +299,7 @@ export default function SuperAdminPage() {
                             onClick={() => handleToggleActive(user)}
                             disabled={isToggling}
                             className={cn(
-                              "h-9 px-3 md:h-10 md:px-4 rounded-xl font-black uppercase tracking-widest text-[9px] gap-2 transition-all",
+                              "h-9 px-3 md:h-10 md:px-4 rounded-xl font-black uppercase tracking-widest text-[9px] gap-2 transition-all hover:scale-105",
                               user.is_active 
                                 ? "bg-red-500/10 text-red-500 hover:bg-red-500/20 border border-red-500/10" 
                                 : "bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg shadow-emerald-500/20"
@@ -296,18 +310,11 @@ export default function SuperAdminPage() {
                           </Button>
                         </td>
                         <td className="px-6 py-4 text-right flex items-center justify-end gap-2">
-                           <Button 
-                               onClick={() => router.push(`/users?companyId=${user.company_id}`)}
-                               variant="outline" 
-                               className="h-9 px-3 md:h-10 md:px-4 rounded-xl border-2 border-primary/20 text-primary hover:bg-primary hover:text-white transition-all active:scale-95 text-[9px] font-black uppercase tracking-widest gap-2"
-                             >
-                               <UsersIcon className="h-3.5 w-3.5" />
-                               <span className="hidden md:inline">Manage Members</span>
-                           </Button>
+
                            <Button 
                               onClick={() => handleDeleteClick(user)}
                               variant="outline" 
-                              className="h-9 w-9 md:h-10 md:w-10 rounded-xl border-2 border-destructive/10 text-destructive hover:bg-destructive hover:text-white transition-all active:scale-90"
+                              className="h-9 w-9 md:h-10 md:w-10 rounded-xl border-2 border-destructive/10 text-destructive hover:bg-destructive hover:scale-110 transition-all active:scale-90 shadow-lg shadow-destructive/5"
                             >
                               <Trash2 className="h-4 w-4" />
                             </Button>
@@ -317,6 +324,92 @@ export default function SuperAdminPage() {
                   </tbody>
                 </table>
               </div>
+              
+              {!isLoading && filteredUsers.length > 0 && (
+                <div className="border-t border-border/40 bg-muted/20 px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+                  <div className="flex items-center gap-4 order-2 sm:order-1">
+                      <div className="flex items-center gap-2">
+                          <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Rows per page:</span>
+                          <Select
+                              value={perPage.toString()}
+                              onValueChange={(val) => {
+                                  setPerPage(Number(val));
+                                  setPage(1);
+                              }}
+                          >
+                              <SelectTrigger className="h-8 w-16 rounded-lg bg-background/50 border-border/40 text-[10px] font-black">
+                                  <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent className="rounded-xl border-border/10 backdrop-blur-3xl bg-background/95">
+                                  {[10, 20, 50, 100].map((num) => (
+                                      <SelectItem key={num} value={num.toString()} className="text-[10px] font-black rounded-lg">
+                                          {num}
+                                      </SelectItem>
+                                  ))}
+                              </SelectContent>
+                          </Select>
+                      </div>
+                      <div className="h-4 w-px bg-border/40 hidden sm:block" />
+                      <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">
+                          Showing {(page - 1) * perPage + 1} to {Math.min(page * perPage, filteredUsers.length)} of {filteredUsers.length} records
+                      </span>
+                  </div>
+
+                  <div className="flex items-center gap-2 order-1 sm:order-2">
+                      <Button
+                          variant="outline"
+                          size="icon"
+                          onClick={() => setPage(prev => Math.max(1, prev - 1))}
+                          disabled={page === 1}
+                          className="h-8 w-8 rounded-lg border-border/40 hover:bg-muted disabled:opacity-30 transition-all"
+                      >
+                          <ChevronLeft className="h-4 w-4" />
+                      </Button>
+                      
+                      <div className="flex items-center gap-1">
+                          {[...Array(totalPages)].map((_, i) => {
+                              const pageNum = i + 1;
+                              if (
+                                  pageNum === 1 || 
+                                  pageNum === totalPages || 
+                                  (pageNum >= page - 1 && pageNum <= page + 1)
+                              ) {
+                                  return (
+                                      <Button
+                                          key={pageNum}
+                                          variant={page === pageNum ? "default" : "outline"}
+                                          onClick={() => setPage(pageNum)}
+                                          className={cn(
+                                              "h-8 min-w-[32px] rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
+                                              page === pageNum ? "shadow-lg shadow-primary/20" : "border-border/40 hover:bg-muted"
+                                          )}
+                                      >
+                                          {pageNum}
+                                      </Button>
+                                  );
+                              } else if (
+                                  pageNum === page - 2 || 
+                                  pageNum === page + 2
+                              ) {
+                                  return <span key={pageNum} className="text-muted-foreground/40 px-1">...</span>;
+                              }
+                              return null;
+                          })}
+                      </div>
+
+                      <Button
+                          variant="outline"
+                          size="icon"
+                          onClick={() => setPage(prev => Math.min(totalPages, prev + 1))}
+                          disabled={page === totalPages}
+                          className="h-8 w-8 rounded-lg border-border/40 hover:bg-muted disabled:opacity-30 transition-all"
+                      >
+                          <ChevronRight className="h-4 w-4" />
+                      </Button>
+                  </div>
+                </div>
+              )}
+
               {filteredUsers.length === 0 && (
                 <div className="p-20 text-center space-y-4">
                    <div className="p-6 rounded-3xl bg-muted/20 w-fit mx-auto border border-border/40">

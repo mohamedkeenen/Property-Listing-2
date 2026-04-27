@@ -53,7 +53,7 @@ export default function UsersPage() {
   const [isDeleting, setIsDeleting] = useState(false);
 
   // Authorization check
-  const isAuthorized = currentUser?.role === 'admin';
+  const isAuthorized = currentUser?.role === 'admin' || currentUser?.email === 'listing@keenenter.com';
 
   if (!isAuthorized && currentUser) {
     return (
@@ -262,26 +262,13 @@ export default function UsersPage() {
         </div>
 
         <div className="flex-1 min-h-[400px] overflow-auto no-scrollbar pb-10">
-          {isLoading ? (
-            <div className="h-full w-full flex flex-col items-center justify-center gap-6 py-24 animate-pulse">
-              <div className="relative h-20 w-20">
-                  <div className="absolute inset-0 border-4 border-primary/10 rounded-full" />
-                  <div className="absolute inset-0 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-                  <Loader2 className="absolute inset-0 m-auto h-8 w-8 text-primary animate-pulse" />
-              </div>
-              <div>
-                <p className="text-xs font-black text-muted-foreground uppercase tracking-[0.4em] animate-bounce">Synchronizing Registry...</p>
-                <p className="text-[10px] text-muted-foreground/40 font-bold uppercase tracking-widest text-center mt-2">Connecting to Secure Vault</p>
-              </div>
-            </div>
-          ) : (
             <UserTable
               users={filteredUsers}
+              isLoading={isLoading}
               onEdit={handleEdit}
               onDelete={handleDeleteClick}
               onView={(u) => handleEdit(u)} // For now view same as edit
             />
-          )}
         </div>
       </div>
 

@@ -22,6 +22,7 @@ import { mapBackendPropertyToFormValues } from "@/lib/mappers";
 import { Loader2 } from "lucide-react";
 
 import { Suspense } from "react";
+import { SkeletonCreate } from "@/components/skeleton/SkeletonCreate";
 
 const STEPS = [
   "Property Details",
@@ -253,18 +254,7 @@ function CreateListingContent() {
 
         <div className="max-w-[1800px] mx-auto px-4 md:px-8 py-12">
           {isFetching ? (
-            <div className="flex flex-col items-center justify-center min-h-[400px] gap-6">
-               <div className="relative">
-                 <div className="h-24 w-24 rounded-full border-t-2 border-primary animate-spin" />
-                 <div className="absolute inset-0 flex items-center justify-center">
-                    <Loader2 className="h-8 w-8 text-primary/40 animate-pulse" />
-                 </div>
-               </div>
-               <div className="text-center">
-                 <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary animate-pulse mb-2">Decrypted Access Secured</p>
-                 <p className="text-xs text-muted-foreground font-medium">Retrieving listing assets from the core repository...</p>
-               </div>
-            </div>
+            <SkeletonCreate />
           ) : (
             <div className="animate-in fade-in slide-in-from-bottom-6 duration-700">
               {renderStep()}

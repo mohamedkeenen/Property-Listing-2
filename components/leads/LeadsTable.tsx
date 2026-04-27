@@ -5,6 +5,13 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -37,6 +44,7 @@ const statusTabs = ["All Statuses", "New", "Contacted", "Qualified", "Lost"];
 
 import { useGetPropertiesQuery } from "@/api/redux/services/propertyApi";
 import { mapBackendPropertyToFrontend } from "@/lib/mappers";
+import { SkeletonLead } from "@/components/skeleton/SkeletonLead";
 
 interface LeadsTableProps {
   leads?: any[];
@@ -57,6 +65,7 @@ interface LeadsTableProps {
   };
   onSync?: () => void;
   isSyncing?: boolean;
+  isLoading?: boolean;
 }
 
 export function LeadsTable({ 
@@ -72,7 +81,8 @@ export function LeadsTable({
   limit = 50,
   filters,
   onSync,
-  isSyncing
+  isSyncing,
+  isLoading
 }: LeadsTableProps) {
   const [selectedLead, setSelectedLead] = useState<any | null>(null);
   const totalPages = Math.ceil(totalCount / limit);
@@ -240,10 +250,13 @@ export function LeadsTable({
                 <TableHead className="font-black uppercase tracking-widest text-[10px]">Property</TableHead>
                 <TableHead className="font-black uppercase tracking-widest text-[10px]">Status</TableHead>
                 <TableHead className="font-black uppercase tracking-widest text-[10px] hidden sm:table-cell">Inquiry Date</TableHead>
+                <TableHead className="font-black uppercase tracking-widest text-[10px] text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {leads.length === 0 ? (
+              {isLoading ? (
+                <SkeletonLead />
+              ) : leads.length === 0 ? (
                 <TableRow className="border-b-0">
                   <TableCell colSpan={8} className="text-center py-24">
                     <div className="flex flex-col items-center gap-3">
@@ -258,18 +271,17 @@ export function LeadsTable({
                   return (
                     <TableRow key={l.id} className="hover:bg-muted/30 border-b-0 transition-colors">
                       <TableCell>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-8 w-8">
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="start" className="w-48">
-                            <DropdownMenuItem onClick={() => setSelectedLead(l)}>
-                              <Eye className="h-4 w-4 mr-2" /> Review Lead
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                        <div className="flex items-center gap-1">
+                          <Button 
+                            onClick={() => setSelectedLead(l)} 
+                            variant="ghost" 
+                            size="icon" 
+                            className="h-8 w-8 rounded-lg text-primary hover:bg-primary/10 transition-all active:scale-90"
+                            title="Review Lead"
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                        </div>
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-3">
@@ -337,6 +349,17 @@ export function LeadsTable({
                       <TableCell className="hidden sm:table-cell text-[10px] font-medium text-muted-foreground/60">
                         {l.bitrix_created_at ? new Date(l.bitrix_created_at).toLocaleDateString() : 'N/A'}
                       </TableCell>
+                      <TableCell className="text-right">
+                        <Button 
+                          onClick={() => setSelectedLead(l)} 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-9 w-9 rounded-xl text-primary hover:bg-primary/20 hover:scale-110 transition-all active:scale-95"
+                          title="View Lead"
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                      </TableCell>
                     </TableRow>
                   );
                 })
@@ -346,95 +369,70 @@ export function LeadsTable({
         </div>
 
         {/* Pagination Footer */}
-        <div className="flex items-center justify-between p-4 border-t border-border/10 bg-muted/5">
-          <div className="flex items-center gap-6 text-[10px] font-black uppercase tracking-widest text-muted-foreground/50">
-            <div className="flex items-center gap-2">
-                <span>View</span>
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="outline" size="sm" className="h-8 px-3 text-[11px] font-black border-border/20 rounded-xl bg-background hover:bg-muted/50 transition-colors shadow-sm">
-                            {limit} <ChevronDown className="ml-2 h-3.5 w-3.5 opacity-50" />
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="start" className="rounded-xl border-border/20 shadow-2xl">
-                        {[10, 30, 50, 100].map((v) => (
-                            <DropdownMenuItem key={v} onClick={() => onLimitChange?.(v)} className="text-[10px] font-bold uppercase tracking-widest py-2">
-                                {v} per page
-                            </DropdownMenuItem>
-                        ))}
-                    </DropdownMenuContent>
-                </DropdownMenu>
-            </div>
-            <span>Showing {((currentPage - 1) * limit) + 1} - {Math.min(currentPage * limit, totalCount)} of {totalCount} leads</span>
+        <div className="border-t border-border/40 bg-muted/20 px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-4 order-2 sm:order-1">
+              <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Rows per page:</span>
+                  <Select
+                      value={limit.toString()}
+                      onValueChange={(val) => {
+                          onLimitChange?.(Number(val));
+                      }}
+                  >
+                      <SelectTrigger className="h-8 w-16 rounded-lg bg-background/50 border-border/40 text-[10px] font-black">
+                          <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="rounded-xl border-border/10 backdrop-blur-3xl bg-background/95">
+                          {[10, 20, 50, 100].map((num) => (
+                              <SelectItem key={num} value={num.toString()} className="text-[10px] font-black rounded-lg">
+                                  {num}
+                              </SelectItem>
+                          ))}
+                      </SelectContent>
+                  </Select>
+              </div>
+              <div className="h-4 w-px bg-border/40 hidden sm:block" />
+              <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">
+                  Showing {((currentPage - 1) * limit) + 1} to {Math.min(currentPage * limit, totalCount)} of {totalCount} leads
+              </span>
           </div>
-          
-          <div className="flex items-center gap-3">
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="h-9 rounded-xl font-black text-[10px] uppercase gap-2 px-4 border-border/20 shadow-sm"
-              disabled={currentPage <= 1} 
-              onClick={() => onPageChange?.(currentPage - 1)}
-            >
-              <ChevronLeft className="h-4 w-4" />
-              Prev
-            </Button>
-            
-            <div className="flex items-center gap-1.5">
-                {currentPage > 3 && totalPages > 5 && (
-                    <>
-                        <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            className="h-9 w-9 rounded-xl font-black text-[10px]"
-                            onClick={() => onPageChange?.(1)}
-                        >
-                            1
-                        </Button>
-                        <span className="text-muted-foreground/30 text-[10px] font-bold px-1">...</span>
-                    </>
-                )}
-                
-                {getPageNumbers().map((p) => (
-                    <Button 
-                        key={p} 
-                        variant={currentPage === p ? "default" : "ghost"} 
-                        size="sm" 
-                        className={cn(
-                            "h-9 w-9 rounded-xl font-black text-[10px] transition-all",
-                            currentPage === p ? "shadow-lg shadow-primary/20 scale-110" : "hover:bg-muted"
-                        )}
-                        onClick={() => onPageChange?.(p)}
-                    >
-                        {p}
-                    </Button>
-                ))}
 
-                {currentPage < totalPages - 2 && totalPages > 5 && (
-                    <>
-                        <span className="text-muted-foreground/30 text-[10px] font-bold px-1">...</span>
-                        <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            className="h-9 w-9 rounded-xl font-black text-[10px]"
-                            onClick={() => onPageChange?.(totalPages)}
-                        >
-                            {totalPages}
-                        </Button>
-                    </>
-                )}
-            </div>
+          <div className="flex items-center gap-2 order-1 sm:order-2">
+              <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => onPageChange?.(Math.max(1, currentPage - 1))}
+                  disabled={currentPage === 1}
+                  className="h-8 w-8 rounded-lg border-border/40 hover:bg-muted disabled:opacity-30 transition-all"
+              >
+                  <ChevronLeft className="h-4 w-4" />
+              </Button>
+              
+              <div className="flex items-center gap-1">
+                  {getPageNumbers().map((pageNum) => (
+                      <Button
+                          key={pageNum}
+                          variant={currentPage === pageNum ? "default" : "outline"}
+                          onClick={() => onPageChange?.(pageNum)}
+                          className={cn(
+                              "h-8 min-w-[32px] rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
+                              currentPage === pageNum ? "shadow-lg shadow-primary/20" : "border-border/40 hover:bg-muted"
+                          )}
+                      >
+                          {pageNum}
+                      </Button>
+                  ))}
+              </div>
 
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="h-9 rounded-xl font-black text-[10px] uppercase gap-2 px-4 border-border/20 shadow-sm"
-              disabled={currentPage >= totalPages} 
-              onClick={() => onPageChange?.(currentPage + 1)}
-            >
-              Next
-              <ChevronRight className="h-4 w-4" />
-            </Button>
+              <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => onPageChange?.(Math.min(totalPages, currentPage + 1))}
+                  disabled={currentPage === totalPages}
+                  className="h-8 w-8 rounded-lg border-border/40 hover:bg-muted disabled:opacity-30 transition-all"
+              >
+                  <ChevronRight className="h-4 w-4" />
+              </Button>
           </div>
         </div>
       </div>
