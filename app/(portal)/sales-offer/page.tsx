@@ -92,12 +92,16 @@ export default function SalesOfferPage() {
         if (!f) return null;
         const item = Array.isArray(f) ? f[0] : f;
         if (!item) return null;
-        const raw = item.showUrl || item.url || item.downloadUrl || (typeof item === 'string' ? item : null);
+        
+        const baseUrl = (process.env.NEXT_PUBLIC_API_URL || 'https://property-listing.keenenter.com').replace(/\/api$/, '').replace(/\/$/, '');
+        
+        if (item.proxyUrl) return `${baseUrl}${item.proxyUrl}`;
+        
+        const raw = item.urlMachine || item.showUrl || item.url || item.downloadUrl || (typeof item === 'string' ? item : null);
         if (!raw) return null;
         if (raw.startsWith('data:')) return raw;
         
         // Use our proxy for all external/cross-origin images to avoid CORS issues in PDF generation
-        const baseUrl = (process.env.NEXT_PUBLIC_API_URL || 'https://property-listing.keenenter.com').replace(/\/api$/, '').replace(/\/$/, '');
         return `${baseUrl}/api/sales-offers/proxy-image?url=${encodeURIComponent(raw)}`;
       };
       
