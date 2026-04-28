@@ -53,6 +53,7 @@ export function CompletedStep({ form }: Props) {
       property_type: values.type,
       unit_number: values.unitNo,
       land_number: values.landNumber,
+      street_name: values.streetName,
       street_direction: values.streetDirection,
       street_width: values.streetWidth,
       size: values.size,

@@ -254,6 +254,14 @@ export function PropertyDetailsStep({ form }: Props) {
             <ModernField label="Unit No" icon={Hash} required {...register("unitNo")} error={fieldError("unitNo")} value={watch("unitNo")} />
             <ModernField label="Land Number" icon={Hash} {...register("landNumber")} value={watch("landNumber")} />
             
+            <ModernField 
+              label="Street Name" 
+              icon={Building2} 
+              {...register("streetName")} 
+              value={watch("streetName")} 
+              onClear={() => setValue("streetName", "", { shouldValidate: true })}
+            />
+            
             <ModernSelect 
               label="Street Direction" 
               icon={Compass} 

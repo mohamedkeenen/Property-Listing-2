@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { selectCompanyName, selectCompanyLogo, selectSettingsLastUpdated,  selectBitrixWebhook, selectListingWebhook, selectPfApiKey, selectPfApiSecret, selectBayutApiKey, selectBayutLeadSourceWhatsapp, selectBayutLeadSourceEmail, selectBayutLeadSourcePhone, selectPfLeadSourceWhatsapp, selectPfLeadSourceEmail, selectPfLeadSourcePhone, selectSalesOfferWebhook, selectSalesOfferEntityTypeId, selectOutboundHandlerToken, selectPdfColor, selectWebsiteLink, selectCompanyBanner, selectCompanyLogoPdf, selectWatermarkSize, selectWatermarkOpacity, selectCoverImage, selectProjectImage1, selectProjectImage2, setCompanySettings } from "@/api/redux/slices/settingsSlice";
+import { selectCompanyName, selectCompanyLogo, selectSettingsLastUpdated,  selectBitrixWebhook, selectListingWebhook, selectPfApiKey, selectPfApiSecret, selectBayutApiKey, selectBayutLeadSourceWhatsapp, selectBayutLeadSourceEmail, selectBayutLeadSourcePhone, selectPfLeadSourceWhatsapp, selectPfLeadSourceEmail, selectPfLeadSourcePhone, selectSalesOfferWebhook, selectSalesOfferEntityTypeId, selectOutboundHandlerToken, selectPdfColor, selectWebsiteLink, selectCompanyBanner, selectCompanyLogoPdf, selectWatermarkSize, selectWatermarkOpacity, selectCoverImage, selectProjectImage1, selectProjectImage2, selectPropQaApiKey, selectPropQaApiSecret, setCompanySettings } from "@/api/redux/slices/settingsSlice";
 import { useUpdateCompanySettingsMutation } from "@/api/redux/services/settingsApi";
 import { toast } from "react-hot-toast";
 import { API_BASE_URL } from "@/api/redux/apiConfig";
@@ -42,6 +42,8 @@ export function CompanyTab({ isAdmin, isSupervisor }: CompanyTabProps) {
   const reduxCoverImage = useSelector(selectCoverImage);
   const reduxProjectImage1 = useSelector(selectProjectImage1);
   const reduxProjectImage2 = useSelector(selectProjectImage2);
+  const reduxPropqaApiKey = useSelector(selectPropQaApiKey);
+  const reduxPropqaApiSecret = useSelector(selectPropQaApiSecret);
   
   const [companyName, setCompanyName] = useState(reduxCompanyName);
   const [logo, setLogo] = useState<string>(reduxLogo);
@@ -67,6 +69,8 @@ export function CompanyTab({ isAdmin, isSupervisor }: CompanyTabProps) {
   const [coverImage, setCoverImage] = useState<string>(reduxCoverImage);
   const [projectImage1, setProjectImage1] = useState<string>(reduxProjectImage1);
   const [projectImage2, setProjectImage2] = useState<string>(reduxProjectImage2);
+  const [propqaApiKey, setPropqaApiKey] = useState(reduxPropqaApiKey);
+  const [propqaApiSecret, setPropqaApiSecret] = useState(reduxPropqaApiSecret);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [updateSettings, { isLoading }] = useUpdateCompanySettingsMutation();
@@ -96,6 +100,8 @@ export function CompanyTab({ isAdmin, isSupervisor }: CompanyTabProps) {
     setCoverImage(reduxCoverImage || "");
     setProjectImage1(reduxProjectImage1 || "");
     setProjectImage2(reduxProjectImage2 || "");
+    setPropqaApiKey(reduxPropqaApiKey || "");
+    setPropqaApiSecret(reduxPropqaApiSecret || "");
   }, [
     reduxCompanyName, 
     reduxLogo, 
@@ -119,7 +125,9 @@ export function CompanyTab({ isAdmin, isSupervisor }: CompanyTabProps) {
     reduxWatermarkOpacity,
     reduxCoverImage,
     reduxProjectImage1,
-    reduxProjectImage2
+    reduxProjectImage2,
+    reduxPropqaApiKey,
+    reduxPropqaApiSecret
   ]);
 
   const getLogoUrl = (logoStr: string) => {
@@ -160,6 +168,8 @@ export function CompanyTab({ isAdmin, isSupervisor }: CompanyTabProps) {
         cover_image: coverImage,
         project_image_1: projectImage1,
         project_image_2: projectImage2,
+        propqa_api_key: propqaApiKey,
+        propqa_api_secret: propqaApiSecret,
       }).unwrap();
       
       if (result.status === 'success') {
@@ -297,6 +307,10 @@ export function CompanyTab({ isAdmin, isSupervisor }: CompanyTabProps) {
             setPfApiSecret={setPfApiSecret}
             bayutApiKey={bayutApiKey}
             setBayutApiKey={setBayutApiKey}
+            propqaApiKey={propqaApiKey}
+            setPropqaApiKey={setPropqaApiKey}
+            propqaApiSecret={propqaApiSecret}
+            setPropqaApiSecret={setPropqaApiSecret}
           />
         )}
       </div>

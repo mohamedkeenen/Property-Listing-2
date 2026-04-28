@@ -73,13 +73,7 @@ export function DashboardCharts({ listings }: { listings: PropertyListing[] }) {
         name: t,
         value: listings.filter(l => l.portals.website && l.type === t).length
       })).filter(i => i.value > 0)
-    },
-    { 
-      name: "Facebook", 
-      value: 0,
-      color: COLORS.purple,
-      breakdown: []
-    },
+    }
   ];
 
   const typeMap: Record<string, number> = {};
@@ -140,8 +134,6 @@ export function DashboardCharts({ listings }: { listings: PropertyListing[] }) {
   const portalLogos: Record<string, string> = {
     "Property Finder": "https://res.cloudinary.com/devht0mp5/image/upload/v1772105511/PF_ljkahc.png",
     "Bayut": "https://res.cloudinary.com/devht0mp5/image/upload/v1772105511/bayut_gy4ev2.png",
-    "Skyloov": "https://res.cloudinary.com/devht0mp5/image/upload/v1773486432/Logo-rebrand-blue_dwxrba.svg",
-    "Facebook": "https://upload.wikimedia.org/wikipedia/commons/b/b8/2021_Facebook_icon.svg",
   };
 
   const channelIcons: Record<string, any> = {

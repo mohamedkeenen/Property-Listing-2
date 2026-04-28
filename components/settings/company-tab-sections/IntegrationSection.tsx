@@ -16,6 +16,10 @@ interface IntegrationSectionProps {
   setPfApiSecret: (val: string) => void;
   bayutApiKey: string;
   setBayutApiKey: (val: string) => void;
+  propqaApiKey: string;
+  setPropqaApiKey: (val: string) => void;
+  propqaApiSecret: string;
+  setPropqaApiSecret: (val: string) => void;
 }
 
 export function IntegrationSection({
@@ -25,7 +29,9 @@ export function IntegrationSection({
   salesOfferEntityTypeId, setSalesOfferEntityTypeId,
   pfApiKey, setPfApiKey,
   pfApiSecret, setPfApiSecret,
-  bayutApiKey, setBayutApiKey
+  bayutApiKey, setBayutApiKey,
+  propqaApiKey, setPropqaApiKey,
+  propqaApiSecret, setPropqaApiSecret
 }: IntegrationSectionProps) {
   return (
     <Card className="rounded-2xl border-border/50 shadow-xl overflow-hidden backdrop-blur-sm bg-card/50">
@@ -116,6 +122,35 @@ export function IntegrationSection({
               onChange={(e) => setBayutApiKey(e.target.value)}
               readOnly={!isAdmin}
             />
+          </div>
+
+          <div className="space-y-4">
+            <h3 className="text-sm font-black uppercase tracking-widest text-primary/70 flex items-center gap-2">
+              <div className="flex items-center gap-2">
+                <img src="https://res.cloudinary.com/devht0mp5/image/upload/v1777361218/logo-header-white.QoQUc6PB_ao5mn9.svg" alt="PropQA" className="h-4 w-auto invert dark:invert-0" />
+                PropQA
+              </div>
+            </h3>
+            <div className="grid gap-4 md:grid-cols-2">
+              <ModernField 
+                label="PropQA API Key" 
+                placeholder="Enter PropQA API Key" 
+                icon={Key} 
+                type="password"
+                value={propqaApiKey}
+                onChange={(e) => setPropqaApiKey(e.target.value)}
+                readOnly={!isAdmin}
+              />
+              <ModernField 
+                label="PropQA API Secret" 
+                placeholder="Enter PropQA API Secret" 
+                icon={Lock} 
+                type="password"
+                value={propqaApiSecret}
+                onChange={(e) => setPropqaApiSecret(e.target.value)}
+                readOnly={!isAdmin}
+              />
+            </div>
           </div>
         </div>
       </CardContent>

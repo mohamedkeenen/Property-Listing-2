@@ -87,7 +87,8 @@ const PortalBadge = ({ initialStatus, portal, propertyId, pfStatus }: {
     pf: "PF",
     bayut: "BY",
     dubizzle: "DB",
-    website: "WB"
+    website: "WB",
+    propqa: "PQ"
   };
 
   const portalColors: Record<string, string> = {
@@ -99,12 +100,16 @@ const PortalBadge = ({ initialStatus, portal, propertyId, pfStatus }: {
     dubizzle: "hover:bg-emerald-500 hover:text-white border-emerald-200 dark:border-emerald-500/30 text-emerald-600 dark:text-emerald-400 bg-emerald-500/10",
     dubizzle_active: "bg-emerald-500 text-white border-emerald-500 shadow-sm",
     website: "hover:bg-cyan-500 hover:text-white border-cyan-200 dark:border-cyan-500/30 text-cyan-600 dark:text-cyan-400 bg-cyan-500/10",
-    website_active: "bg-cyan-500 text-white border-cyan-500 shadow-sm"
+    website_active: "bg-cyan-500 text-white border-cyan-500 shadow-sm",
+    propqa: "hover:bg-indigo-500 hover:text-white border-indigo-200 dark:border-indigo-500/30 text-indigo-600 dark:text-indigo-400 bg-indigo-500/10",
+    propqa_active: "bg-indigo-500 text-white border-indigo-500 shadow-sm",
+    propqa_failed: "bg-orange-500 text-white border-orange-600 shadow-sm animate-pulse"
   };
 
   let color = portalColors[portal];
   if (active) color = portalColors[`${portal}_active`];
   if (portal === 'pf' && pfStatus === 'Failed') color = portalColors.pf_failed;
+  if (portal === 'propqa' && pfStatus === 'Failed') color = portalColors.propqa_failed;
 
   return (
     <>
@@ -448,6 +453,12 @@ export function ListingsTable({ listings, isLoading, onViewDetails, onEdit }: Pr
                         portal="website" 
                         propertyId={l.id} 
                         initialStatus={l.portals.website} 
+                      />
+                      <PortalBadge 
+                        portal="propqa" 
+                        propertyId={l.id} 
+                        initialStatus={l.portals.propqa} 
+                        pfStatus={l.propqa_status}
                       />
                     </div>
                   </TableCell>

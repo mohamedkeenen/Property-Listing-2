@@ -13,6 +13,7 @@ export const listingSchema = z.object({
   furnished: z.string().optional(),
   unitNo: z.string().min(1, "Unit Number is required"),
   landNumber: z.string().optional(),
+  streetName: z.string().optional(),
   streetDirection: z.string().optional(),
   streetWidth: z.coerce.number().optional().default(0),
   buildYear: z.string().optional(),

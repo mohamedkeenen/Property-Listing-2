@@ -80,6 +80,8 @@ export default function SalesOfferPage() {
       const result = await triggerFetchDetail(offerId).unwrap();
       const item = result.data;
       const mapped = result.mapped || {};
+      
+      console.log("PDF Mapping Data:", { mapped, item });
 
       const cleanVal = (val: any) => {
         if (!val) return "";
@@ -108,9 +110,9 @@ export default function SalesOfferPage() {
         location: cleanVal(mapped['Location']),
         propertyType: cleanVal(mapped['Property Type']),
         unitNumber: cleanVal(mapped['Unit Number']) || cleanVal(mapped['Unit Reference']),
-        bedrooms: cleanVal(mapped['BedRoom']),
-        level: cleanVal(mapped['Level / Floor']),
-        unitArea: cleanVal(mapped['Average Area (SQ.FT)']),
+        bedrooms: cleanVal(mapped['No. of Bedroom']) || cleanVal(mapped['Bedrooms']) || cleanVal(mapped['BedRoom']),
+        level: cleanVal(mapped['Floor Number']) || cleanVal(mapped['Level / Floor']),
+        unitArea: cleanVal(mapped['Total (sq.ft)']) || cleanVal(mapped['Average Area (SQ.FT)']),
         sellingPrice: (() => {
           const raw = cleanVal(mapped['Price']);
           if (!raw) return "";
@@ -126,7 +128,7 @@ export default function SalesOfferPage() {
         website: mapped['WebSite Link'] || "",
         referenceToken: cleanVal(mapped['Unit Reference']) || `SO-${offerId}`,
         totalArea: (() => {
-          const raw = cleanVal(mapped['Total Area (SQ.FT)']);
+          const raw = cleanVal(mapped['Total (sq.ft)']) || cleanVal(mapped['Total Area (SQ.FT)']);
           if (raw) {
             const num = parseFloat(raw.replace(/,/g, ''));
             if (!isNaN(num)) {
@@ -134,7 +136,7 @@ export default function SalesOfferPage() {
             }
             return raw;
           }
-          const suite = parseFloat(cleanVal(mapped['Average Area (SQ.FT)']).replace(/,/g, '')) || 0;
+          const suite = parseFloat(cleanVal(mapped['Total (sq.ft)']).replace(/,/g, '')) || 0;
           const terrace = parseFloat(cleanVal(mapped['Terrace']).replace(/,/g, '')) || 0;
           return (suite + terrace).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 });
         })(),
@@ -159,10 +161,10 @@ export default function SalesOfferPage() {
         },
         paymentPlan: [] as any[],
         paymentPlanStartDate: mapped['Start Date'] || "",
-        paymentPlanDuration: mapped['Duration']?.toString() || "10",
-        paymentPlanPeriodType: mapped['Period Type']?.toLowerCase() || "month",
-        firstInstallmentPercentage: mapped['First Install']?.toString() || "20",
-        lastInstallmentPercentage: mapped['Last Install']?.toString() || "30",
+        paymentPlanDuration: mapped['Duration']?.toString() || "",
+        paymentPlanPeriodType: mapped['Period Type']?.toLowerCase() || "",
+        firstInstallmentPercentage: mapped['First Install']?.toString() || "",
+        lastInstallmentPercentage: mapped['Last Install']?.toString() || "",
         agentDetails: {
           name: mapped['Agent Name'] || "",
           email: mapped['Agent Email'] || "",
@@ -330,8 +332,6 @@ export default function SalesOfferPage() {
                       <TableHead className="h-14 font-black text-xs uppercase tracking-wider text-muted-foreground">Reference</TableHead>
                       <TableHead className="h-14 font-black text-xs uppercase tracking-wider text-muted-foreground">Unit Number</TableHead>
                       <TableHead className="h-14 pl-6 font-black text-xs uppercase tracking-wider text-muted-foreground">Agent Name</TableHead>
-                      <TableHead className="h-14 font-black text-xs uppercase tracking-wider text-muted-foreground">Project Name</TableHead>
-                      <TableHead className="h-14 font-black text-xs uppercase tracking-wider text-muted-foreground text-center">Price</TableHead>
                       <TableHead className="h-14 font-black text-xs uppercase tracking-wider text-muted-foreground text-center">Created At</TableHead>
                       <TableHead className="h-14 pr-6 text-right font-black text-xs uppercase tracking-wider text-muted-foreground">Action</TableHead>
                     </TableRow>
@@ -371,18 +371,6 @@ export default function SalesOfferPage() {
                             <CircleUser className="h-4 w-4 text-primary" />
                             {offer.agent_name || "-"}
                           </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-2 font-black text-foreground/80">
-                            <Building2 className="h-4 w-4 text-primary" />
-                            {offer.project_name}
-                          </div>
-                        </TableCell>
-                        <TableCell className="text-center">
-                          <Badge variant="secondary" className="font-black px-3 py-1 bg-green-50 text-green-700 border-green-100/50 dark:bg-green-900/20 dark:text-green-400 dark:border-green-900/50">
-                            <DollarSign className="h-3 w-3 mr-0.5" />
-                            {Number(offer.price).toLocaleString()}
-                          </Badge>
                         </TableCell>
                         <TableCell className="text-center">
                            <div className="flex items-center justify-center gap-2 text-muted-foreground font-semibold text-xs">

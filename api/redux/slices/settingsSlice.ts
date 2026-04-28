@@ -24,6 +24,8 @@ interface SettingsState {
   outbound_handler_token: string;
   pdf_color: string;
   website_link: string;
+  propqa_api_key: string;
+  propqa_api_secret: string;
   banner_image: string;
   watermark_size: number;
   watermark_opacity: number;
@@ -55,6 +57,8 @@ const initialState: SettingsState = {
   outbound_handler_token: '',
   pdf_color: '#3D5434',
   website_link: '',
+  propqa_api_key: '',
+  propqa_api_secret: '',
   banner_image: '',
   watermark_size: 5,
   watermark_opacity: 5,
@@ -89,6 +93,8 @@ const settingsSlice = createSlice({
       state.outbound_handler_token = action.payload.outbound_handler_token || '';
       state.pdf_color = action.payload.pdf_color || '#3D5434';
       state.website_link = action.payload.website_link || '';
+      state.propqa_api_key = action.payload.propqa_api_key || '';
+      state.propqa_api_secret = action.payload.propqa_api_secret || '';
       state.banner_image = action.payload.banner_image || '';
       state.watermark_size = action.payload.watermark_size || 5;
       state.watermark_opacity = action.payload.watermark_opacity || 5;
@@ -133,6 +139,8 @@ export const selectProjectNames = (state: RootState) => state.settings.projectNa
 export const selectOutboundHandlerToken = (state: RootState) => state.settings.outbound_handler_token;
 export const selectPdfColor = (state: RootState) => state.settings.pdf_color;
 export const selectWebsiteLink = (state: RootState) => state.settings.website_link;
+export const selectPropQaApiKey = (state: RootState) => state.settings.propqa_api_key;
+export const selectPropQaApiSecret = (state: RootState) => state.settings.propqa_api_secret;
 export const selectCompanyBanner = (state: RootState) => state.settings.banner_image;
 export const selectCompanyLogoPdf = (state: RootState) => state.settings.logo_pdf;
 export const selectWatermarkSize = (state: RootState) => state.settings.watermark_size;
