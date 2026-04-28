@@ -1,5 +1,49 @@
 import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 import { PropertyListing } from "@/data/mockData";
+
+async function renderTextToImage(text: string, title: string = ""): Promise<string | null> {
+    if (!text && !title) return null;
+    
+    const div = document.createElement('div');
+    div.style.position = 'absolute';
+    div.style.left = '-9999px';
+    div.style.top = '-9999px';
+    div.style.width = '350px';
+    div.style.fontFamily = 'Arial, Tahoma, sans-serif';
+    div.style.direction = 'rtl';
+    div.style.textAlign = 'right';
+    div.style.color = 'rgb(50, 50, 50)';
+    div.style.backgroundColor = 'transparent';
+    
+    if (title) {
+        const titleEl = document.createElement('div');
+        titleEl.style.fontWeight = 'bold';
+        titleEl.style.color = 'black';
+        titleEl.style.fontSize = '18px';
+        titleEl.style.marginBottom = '12px';
+        titleEl.innerText = title;
+        div.appendChild(titleEl);
+    }
+    
+    const textEl = document.createElement('div');
+    textEl.style.fontSize = '12px';
+    textEl.style.lineHeight = '1.6';
+    textEl.style.whiteSpace = 'pre-wrap';
+    textEl.innerText = text;
+    div.appendChild(textEl);
+    
+    document.body.appendChild(div);
+    
+    try {
+        const canvas = await html2canvas(div, { backgroundColor: null, scale: 2 });
+        document.body.removeChild(div);
+        return canvas.toDataURL('image/png');
+    } catch (e) {
+        document.body.removeChild(div);
+        return null;
+    }
+}
 
 async function loadImage(url: string): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -11,7 +55,7 @@ async function loadImage(url: string): Promise<string> {
       canvas.height = img.height;
       const ctx = canvas.getContext("2d");
       ctx?.drawImage(img, 0, 0);
-      resolve(canvas.toDataURL("image/jpeg", 0.9));
+      resolve(canvas.toDataURL("image/png"));
     };
     img.onerror = () => reject(new Error("Failed to load image"));
     img.src = url;
@@ -43,7 +87,7 @@ const getCircularImage = async (imgUrl: string) => {
     });
 };
 
-export async function generatePropertyPDF(listing: PropertyListing) {
+export async function generatePropertyPDF(listing: PropertyListing, settings?: any) {
   const doc = new jsPDF("p", "mm", "a4");
   const pageWidth = 210;
   const pageHeight = 297;
@@ -51,53 +95,142 @@ export async function generatePropertyPDF(listing: PropertyListing) {
   const contentWidth = pageWidth - margin * 2;
   let y = margin;
 
+  const hexToRgb = (hex: string): [number, number, number] => {
+    let r = 15, g = 23, b = 42;
+    if (hex) {
+      hex = hex.replace(/^#/, '');
+      if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
+      if (hex.length === 6) {
+        r = parseInt(hex.substring(0, 2), 16);
+        g = parseInt(hex.substring(2, 4), 16);
+        b = parseInt(hex.substring(4, 6), 16);
+      }
+    }
+    return [r, g, b];
+  };
+
   // Colors
-  const darkColor = [15, 23, 42] as [number, number, number];
+  const darkColor = settings?.themeColor ? hexToRgb(settings.themeColor) : ([15, 23, 42] as [number, number, number]);
   const mutedColor = [100, 116, 139] as [number, number, number];
   const borderColor = [226, 232, 240] as [number, number, number];
-  // const goldColor = [184, 134, 11] as [number, number, number];
+  
+  const companyName = settings?.companyName || "VOID";
+  const website = settings?.websiteLink || "voidresidences.ae";
 
-  // --- HEADER ---
-  // Logo placeholder
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(22);
-  doc.setTextColor(0, 0, 0);
-  doc.text("VOID", margin, y + 10);
-  doc.setFontSize(8);
-  doc.setFont("helvetica", "normal");
-  doc.text("RESIDENCES", margin, y + 14);
-
-  // Title & Location
-  doc.setFontSize(18);
-  doc.setFont("helvetica", "bold");
-  doc.text(listing.title.toUpperCase(), 70, y + 8);
-  doc.setFontSize(9);
-  doc.setFont("helvetica", "normal");
-  doc.setTextColor(...mutedColor);
-  doc.text(`${listing.community}, ${listing.location}, United Arab Emirates`, 70, y + 13);
-
-  // Reference & Date
-  doc.setFontSize(8);
-  doc.text(`PROPERTY ID`, pageWidth - 65, y + 6);
-  doc.text(`LISTED ON`, pageWidth - 45, y + 6);
-  doc.setFont("helvetica", "bold");
-  doc.setTextColor(0, 0, 0);
-  doc.text(listing.reference, pageWidth - 65, y + 10);
-  doc.text(new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }), pageWidth - 45, y + 10);
-
-  // Header QR
-  if (listing.qr_url) {
+  const drawBranding = async () => {
+    // Header
+    doc.setFillColor(...darkColor);
+    doc.rect(0, 0, pageWidth, 25, "F");
+    doc.setTextColor(255, 255, 255);
+    
+    // Logo (Left)
+    if (settings?.logoPdf) {
       try {
-          const qrImg = await loadImage(listing.qr_url);
-          doc.addImage(qrImg, "JPEG", pageWidth - margin - 15, y, 15, 15);
-          doc.setFontSize(6);
-          doc.setFont("helvetica", "normal");
-          doc.text("SCAN TO VIEW", pageWidth - margin - 15, y + 18);
-          doc.text("DIGITAL BROCHURE", pageWidth - margin - 15, y + 20);
-      } catch (e) { /* skip */ }
+        const logoImg = await loadImage(settings.logoPdf);
+        doc.addImage(logoImg, "PNG", margin, 5, 40, 15, undefined, "MEDIUM");
+      } catch (e) {
+        doc.setFont("helvetica", "bold"); doc.setFontSize(12); doc.text(companyName, margin, 15);
+      }
+    } else {
+      doc.setFont("helvetica", "bold"); doc.setFontSize(12); doc.text(companyName, margin, 15);
+    }
+
+    // Listing Title (Center)
+    doc.setFontSize(11);
+    doc.setFont("helvetica", "bold");
+    const headerTitle = listing.title.length > 45 ? listing.title.substring(0, 42) + "..." : listing.title;
+    doc.text(headerTitle.toUpperCase(), pageWidth / 2, 15, { align: "center" });
+
+    // QR Code in Header Right
+    if (listing.qr_url) {
+      try {
+        const qrImg = await loadImage(listing.qr_url);
+        doc.addImage(qrImg, "JPEG", pageWidth - margin - 18, 3.5, 18, 18);
+      } catch (e) {}
+    }
+
+    // Footer
+    doc.setFillColor(...darkColor);
+    doc.rect(0, pageHeight - 20, pageWidth, 20, "F");
+    doc.setTextColor(255, 255, 255);
+    
+    // Footer Logo (Left)
+    if (settings?.logoPdf) {
+      try {
+        const logoImg = await loadImage(settings.logoPdf);
+        doc.addImage(logoImg, "PNG", margin, pageHeight - 17, 30, 12, undefined, "MEDIUM");
+      } catch (e) {
+        doc.setFontSize(9); doc.text(companyName, margin, pageHeight - 10);
+      }
+    } else {
+      doc.setFontSize(9); doc.text(companyName, margin, pageHeight - 10);
+    }
+    
+    // Date in Footer Center
+    const dateStr = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+    doc.setFontSize(9);
+    doc.text(dateStr, pageWidth / 2, pageHeight - 10, { align: "center" });
+
+    // Website (Right)
+    doc.setFontSize(10);
+    doc.text(website, pageWidth - margin, pageHeight - 10, { align: "right" });
+  };
+
+  await drawBranding();
+  y = 35;
+
+  // --- LOCATION LOGIC ---
+  let displayLocation = listing.location;
+  let displayCommunity = listing.community;
+
+  // prioritize PF if set
+  if (listing.pfLocation && listing.pfLocation !== "-") {
+      const pfParts = listing.pfLocation.split(" - ");
+      if (pfParts.length >= 2) {
+          displayLocation = pfParts[0];
+          displayCommunity = pfParts[1];
+      }
+  } 
+  // fallback to Bayut/Dubizzle if set
+  else if (listing.bayutLocation && listing.bayutLocation !== "-") {
+      displayLocation = listing.bayutCity || listing.location;
+      displayCommunity = listing.bayutCommunity || listing.community;
   }
 
-  y += 25;
+  // Location (Left)
+  doc.setFontSize(10);
+  doc.setFont("helvetica", "bold");
+  doc.setTextColor(0, 0, 0);
+  doc.text(`${displayCommunity}, ${displayLocation}`, margin, y);
+  
+  doc.setFontSize(8);
+  doc.setFont("helvetica", "normal");
+  doc.setTextColor(...mutedColor);
+  doc.text(`United Arab Emirates`, margin, y + 5);
+
+  // Price (Center)
+  doc.setFontSize(13);
+  doc.setFont("helvetica", "bold");
+  doc.setTextColor(...darkColor);
+  const priceStr = `AED ${listing.price.toLocaleString()}`;
+  const periodStr = (listing.pricePeriod || listing.purpose === "Rent") ? (listing.pricePeriod ? `/${listing.pricePeriod}` : "/Year") : "";
+  doc.text(`${priceStr}${periodStr}`, pageWidth / 2, y, { align: "center" });
+
+  // Reference (Far Right)
+  doc.setFontSize(8);
+  doc.setFont("helvetica", "normal");
+  doc.setTextColor(...mutedColor);
+  const refText = `PROPERTY ID: `;
+  const refVal = listing.reference;
+  const refValWidth = doc.getTextWidth(refVal);
+  const refTextWidth = doc.getTextWidth(refText);
+  
+  doc.text(refText, pageWidth - margin - refValWidth, y, { align: "right" });
+  doc.setFont("helvetica", "bold");
+  doc.setTextColor(0, 0, 0);
+  doc.text(refVal, pageWidth - margin, y, { align: "right" });
+
+  y += 20;
 
   // --- HERO IMAGE ---
   try {
@@ -107,30 +240,42 @@ export async function generatePropertyPDF(listing: PropertyListing) {
     doc.setFillColor(240, 240, 240);
     doc.rect(margin, y, contentWidth, 75, "F");
   }
-  y += 80;
+  y += 85;
 
-  // --- BADGES ROW ---
-  const badgeWidth = (contentWidth - 9) / 4;
+  // --- BADGES GRID (2 Rows) ---
+  const badgesPerRow = 5;
+  const badgeWidth = (contentWidth - (badgesPerRow - 1) * 3) / badgesPerRow;
   const badges = [
-      { label: "Type", value: listing.type, icon: "🏠" },
-      { label: "Category", value: listing.category, icon: "🏢" },
-      { label: "Purpose", value: listing.purpose, icon: "🤝" },
-      { label: "Status", value: listing.status, icon: "🟢" }
+      { label: "Type", value: listing.type },
+      { label: "Category", value: listing.category },
+      { label: "Purpose", value: listing.purpose },
+      { label: "Status", value: listing.status },
+      { label: "Furnishing", value: listing.furnished },
+      { label: "Building", value: listing.building || "-" },
+      { label: "Unit No.", value: listing.unitNo || "-" },
+      { label: "Permit No.", value: listing.permitNumber || "-" },
+      { label: "Available", value: listing.availableFrom || "Immediate" },
+      { label: "Posted On", value: new Date(listing.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) }
   ];
 
   badges.forEach((b, i) => {
-      const bx = margin + i * (badgeWidth + 3);
+      const col = i % badgesPerRow;
+      const row = Math.floor(i / badgesPerRow);
+      const bx = margin + col * (badgeWidth + 3);
+      const by = y + row * 15;
+
       doc.setFillColor(248, 250, 252);
-      doc.roundedRect(bx, y, badgeWidth, 12, 1, 1, "F");
-      doc.setFontSize(7);
+      doc.roundedRect(bx, by, badgeWidth, 12, 1, 1, "F");
+      doc.setFontSize(6.5);
       doc.setTextColor(...mutedColor);
-      doc.text(b.label.toUpperCase(), bx + 10, y + 5);
-      doc.setFontSize(8);
+      doc.text(b.label.toUpperCase(), bx + badgeWidth / 2, by + 4, { align: "center" });
+      doc.setFontSize(7.5);
       doc.setFont("helvetica", "bold");
       doc.setTextColor(0, 0, 0);
-      doc.text(b.value, bx + 10, y + 9);
+      const val = String(b.value).length > 18 ? String(b.value).substring(0, 15) + "..." : String(b.value);
+      doc.text(val, bx + badgeWidth / 2, by + 9, { align: "center" });
   });
-  y += 18;
+  y += 32;
 
   // --- CORE SPECS ---
   const specBoxW = (contentWidth - 9) / 4;
@@ -155,63 +300,13 @@ export async function generatePropertyPDF(listing: PropertyListing) {
   });
   y += 28;
 
-  // --- PROPERTY DETAILS & PRICE ---
-  const detailsColW = contentWidth * 0.65;
-  const priceCardW = contentWidth * 0.32;
-  
-  // Left: Details Table
-  doc.setFontSize(11);
-  doc.setFont("helvetica", "bold");
-  doc.setTextColor(0, 0, 0);
-  doc.text("PROPERTY DETAILS", margin, y);
-  y += 6;
-  
-  const detailRows = [
-      ["Type", listing.type, "Category", listing.category],
-      ["Furnishing", listing.furnished, "Purpose", listing.purpose],
-      ["Bedrooms", String(listing.bedrooms), "Size", `${listing.size.toLocaleString()} Sqft`],
-      ["Bathrooms", String(listing.bathrooms), "Posted On", "April 1, 2025"],
-      ["Parking", String(listing.parking), "Permit No.", listing.permitNumber || "1234567890"],
-      ["Available From", listing.availableFrom || "Immediate", "Building", listing.building || "N/A"],
-      ["Unit No.", listing.unitNo || "N/A", "", ""]
-  ];
-
-  doc.setFontSize(8);
-  detailRows.forEach((row, i) => {
-      const ry = y + i * 5;
-      doc.setFont("helvetica", "normal");
-      doc.setTextColor(...mutedColor);
-      doc.text(row[0], margin, ry);
-      doc.text(row[2], margin + detailsColW / 2, ry);
-      
-      doc.setFont("helvetica", "bold");
-      doc.setTextColor(0, 0, 0);
-      doc.text(row[1], margin + 25, ry);
-      doc.text(row[3], margin + detailsColW / 2 + 25, ry);
-  });
-
-  // Right: Price Card
-  const py = y - 6;
-  doc.setFillColor(...darkColor);
-  doc.roundedRect(margin + detailsColW + 3, py, priceCardW, 25, 2, 2, "F");
-  doc.setTextColor(255, 255, 255);
-  doc.setFontSize(8);
-  doc.text("PRICE", margin + detailsColW + 8, py + 8);
-  doc.setFontSize(14);
-  doc.setFont("helvetica", "bold");
-  doc.text(`AED ${listing.price.toLocaleString()}`, margin + detailsColW + 8, py + 16);
-  doc.setFontSize(8);
-  doc.setFont("helvetica", "normal");
-  doc.text(listing.purpose === "Rent" ? "/Year" : "", margin + detailsColW + priceCardW - 10, py + 16, { align: "right" });
-
-  y += 40;
+  y += 5;
 
   // --- DESCRIPTION ---
   doc.setFontSize(11);
   doc.setFont("helvetica", "bold");
   doc.setTextColor(0, 0, 0);
   doc.text("DESCRIPTION", margin, y);
-  doc.text("الوصف بالعربية", pageWidth - margin, y, { align: "right" });
   y += 6;
 
   doc.setFontSize(8);
@@ -221,45 +316,72 @@ export async function generatePropertyPDF(listing: PropertyListing) {
   doc.text(descLines, margin, y);
 
   if (listing.descriptionAr) {
-      const arLines = ["(Arabic description provided in the digital portal)"];
-      doc.text(arLines, pageWidth - margin, y, { align: "right" });
+      try {
+          const arImg = await renderTextToImage(listing.descriptionAr, "الوصف بالعربية");
+          if (arImg) {
+              const imgW = (contentWidth / 2) - 5;
+              // we don't have getImageProperties easily without loading it again, 
+              // but we can just use an HTML Image element to get dims
+              const img = new Image();
+              img.src = arImg;
+              await new Promise(r => { img.onload = r; });
+              const imgH = (img.height * imgW) / img.width;
+              doc.addImage(arImg, "PNG", pageWidth - margin - imgW, y - 6, imgW, imgH);
+          }
+      } catch (e) {
+          const arLines = ["(Arabic description provided in the digital portal)"];
+          doc.text(arLines, pageWidth - margin, y, { align: "right" });
+      }
   }
-  y += Math.max(descLines.length * 4, 10) + 10;
+
+  y += Math.max(descLines.length * 4, 20) + 15;
+
+  // Force New Page for Agent/Admin and rest of details
+  doc.addPage();
+  await drawBranding();
+  y = 35;
 
   // --- AGENT & ADMIN DETAILS ---
   const cardW = (contentWidth - 5) / 2;
-  const renderPersonCard = async (px: number, py: number, title: string, name: string, phone: string, email: string, rera: string, avatar?: string) => {
+  const renderPersonCard = async (px: number, py: number, title: string, name: string, phone: string, email: string, avatar?: string) => {
       doc.setDrawColor(...borderColor);
-      doc.roundedRect(px, py, cardW, 40, 2, 2, "D");
+      doc.roundedRect(px, py, cardW, 40, 3, 3, "S");
       
+      doc.setTextColor(...darkColor);
       doc.setFontSize(10);
       doc.setFont("helvetica", "bold");
-      doc.text(title.toUpperCase(), px + 40, py + 8);
+      doc.text(title.toUpperCase(), px + 40, py + 10);
       
-      if (avatar) {
+      const avatarToUse = avatar || settings?.logoPdf;
+      if (avatarToUse) {
           try {
-              const circImg = await getCircularImage(avatar);
+              const circImg = await getCircularImage(avatarToUse);
               doc.addImage(circImg, "PNG", px + 5, py + 5, 30, 30);
           } catch (e) { /* skip */ }
       }
 
-      doc.setFontSize(9);
-      doc.text(name, px + 40, py + 15);
-      doc.setFontSize(7);
+      doc.setFontSize(11);
+      doc.setTextColor(0, 0, 0);
+      doc.text(name, px + 40, py + 18);
+      
+      doc.setFontSize(8.5);
       doc.setFont("helvetica", "normal");
-      doc.setTextColor(...mutedColor);
-      doc.text(`+ ${phone}`, px + 40, py + 22);
-      doc.text(`${email}`, px + 40, py + 27);
-      doc.text(`RERA ID: ${rera}`, px + 40, py + 32);
+      doc.setTextColor(60, 60, 60);
+      doc.text(`+ ${phone}`, px + 40, py + 26);
+      doc.text(email, px + 40, py + 33);
   };
 
-  await renderPersonCard(margin, y, "Agent Details", listing.listingAgent, listing.agentPhone || "", listing.agentEmail || "", "789012", listing.listingAgentAvatar);
-  await renderPersonCard(margin + cardW + 5, y, "Admin Details", "System Admin", "+971 4 987 6543", "admin@voidresidences.ae", "123456", "");
+  await renderPersonCard(margin, y, "Agent Details", listing.listingAgent, listing.agentPhone || "", listing.agentEmail || "", listing.listingAgentAvatar);
+  await renderPersonCard(margin + cardW + 5, y, "Admin Details", listing.owner || "System Admin", listing.ownerPhone || "Not Provided", listing.ownerEmail || "Not Provided", listing.ownerAvatar);
 
   y += 45;
 
   // --- GALLERY ---
-  if (y > 230) { doc.addPage(); y = margin; }
+  if (y > 230) { 
+    doc.addPage(); 
+    await drawBranding();
+    y = 35; 
+  }
   doc.setFontSize(11);
   doc.setFont("helvetica", "bold");
   doc.setTextColor(0, 0, 0);
@@ -276,7 +398,11 @@ export async function generatePropertyPDF(listing: PropertyListing) {
   y += thumbH + 10;
 
   // --- AMENITIES ---
-  if (y > 250) { doc.addPage(); y = margin; }
+  if (y > 250) { 
+    doc.addPage(); 
+    await drawBranding();
+    y = 35; 
+  }
   doc.setFontSize(11);
   doc.setFont("helvetica", "bold");
   doc.text("AMENITIES & FEATURES", margin, y);
@@ -294,7 +420,11 @@ export async function generatePropertyPDF(listing: PropertyListing) {
   y += 20;
 
   // --- LOCATION & FLOOR PLAN ---
-  if (y > 240) { doc.addPage(); y = margin; }
+  if (y > 240) { 
+    doc.addPage(); 
+    await drawBranding();
+    y = 35; 
+  }
   const mapWidth = (contentWidth - 5) / 2;
   doc.text("LOCATION", margin, y);
   doc.text("FLOOR PLAN", margin + mapWidth + 5, y);
@@ -310,16 +440,6 @@ export async function generatePropertyPDF(listing: PropertyListing) {
           doc.addImage(fpImg, "JPEG", margin + mapWidth + 5, y, mapWidth, 40, undefined, 'MEDIUM');
       } catch (e) { /* skip */ }
   }
-
-  // --- FOOTER ---
-  doc.setFillColor(...darkColor);
-  doc.rect(0, pageHeight - 20, pageWidth, 20, "F");
-  doc.setTextColor(255, 255, 255);
-  doc.setFontSize(10);
-  doc.text("VOID", margin, pageHeight - 12);
-  doc.setFontSize(7);
-  doc.text("Void Residences is a premium real estate brand focused on quality.", margin + 15, pageHeight - 12);
-  doc.text("Contact: +971 4 123 4567 | info@voidresidences.ae", pageWidth - margin, pageHeight - 12, { align: "right" });
 
   doc.save(`${listing.reference}.pdf`);
 }

@@ -36,6 +36,7 @@ export interface PropertyListing {
   owner: string;
   ownerAvatar: string;
   ownerPhone: string;
+  ownerEmail?: string;
   portals: { pf: boolean; bayut: boolean; website: boolean; dubizzle: boolean; bitrix: boolean };
   pfStatus: string | null;
   updatedAt: string;

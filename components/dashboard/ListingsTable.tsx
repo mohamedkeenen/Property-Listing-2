@@ -15,7 +15,7 @@ import { useDeletePropertyMutation, useTogglePortalMutation } from "@/api/redux/
 import { Loader2 } from "lucide-react";
 import { useSelector } from "react-redux";
 import { selectCurrentUser } from "@/api/redux/slices/authSlice";
-import { selectCompanyLogo, selectSettingsLastUpdated } from "@/api/redux/slices/settingsSlice";
+import { selectCompanyLogo, selectSettingsLastUpdated, selectCompanyName, selectCompanyLogoPdf, selectPdfColor, selectWebsiteLink } from "@/api/redux/slices/settingsSlice";
 import { API_BASE_URL } from "@/api/redux/apiConfig";
 import { ConfirmPortalDialog } from "@/components/shared/ConfirmPortalDialog";
 import { SkeletonDashboardTable } from "@/components/skeleton/SkeletonDashboardTable";
@@ -165,6 +165,19 @@ export function ListingsTable({ listings, isLoading, onViewDetails, onEdit }: Pr
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(10);
 
+  // Redux Settings
+  const companyName = useSelector(selectCompanyName);
+  const companyLogo = useSelector(selectCompanyLogo);
+  const pdfColor = useSelector(selectPdfColor);
+  const websiteLink = useSelector(selectWebsiteLink);
+  const settingsLastUpdated = useSelector(selectSettingsLastUpdated);
+
+  const getSettingsImageUrl = (imgStr: string | undefined | null) => {
+    if (!imgStr) return null;
+    if (imgStr.startsWith('http') || imgStr.startsWith('data:image')) return imgStr;
+    return `${API_BASE_URL}/storage/${imgStr}?v=${settingsLastUpdated}`;
+  };
+
   // Delete dialog state
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [listingToDelete, setListingToDelete] = useState<PropertyListing | null>(null);
@@ -220,7 +233,12 @@ export function ListingsTable({ listings, isLoading, onViewDetails, onEdit }: Pr
     });
 
     try {
-      await generatePropertyPDF(listing);
+      await generatePropertyPDF(listing, {
+        companyName,
+        logoPdf: getSettingsImageUrl(companyLogo),
+        themeColor: pdfColor,
+        websiteLink
+      });
       update({
         id,
         title: "PDF Downloaded",
@@ -342,19 +360,19 @@ export function ListingsTable({ listings, isLoading, onViewDetails, onEdit }: Pr
                   Price
                 </div>
               </TableHead>
-              <TableHead>
+              <TableHead className="whitespace-nowrap min-w-[120px]">
                 <div className="flex items-center gap-2">
                   <ArrowUpDown className="h-3 w-3" /> Created At
                 </div>
               </TableHead>
-                <TableHead>Status</TableHead>
-              <TableHead>Community</TableHead>
-              <TableHead>
+                <TableHead className="whitespace-nowrap">Status</TableHead>
+              <TableHead className="whitespace-nowrap">Community</TableHead>
+              <TableHead className="whitespace-nowrap min-w-[180px]">
                 <div className="flex items-center gap-2">
                   <ArrowUpDown className="h-3 w-3" /> Listing Agent (Portal)
                 </div>
               </TableHead>
-              <TableHead>
+              <TableHead className="whitespace-nowrap min-w-[150px]">
                 <div className="flex items-center gap-2">
                   <ArrowUpDown className="h-3 w-3" /> Listing Owner
                 </div>
