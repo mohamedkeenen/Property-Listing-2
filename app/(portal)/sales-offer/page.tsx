@@ -344,9 +344,9 @@ export default function SalesOfferPage() {
                         <TableRow key={offer.id} className="hover:bg-muted/20 transition-colors border-border/20 group">
                         <TableCell className="pl-6 py-4">
                           <div className="w-14 h-14 rounded-xl border border-border/30 bg-muted/50 overflow-hidden shadow-inner group-hover:shadow-md transition-all">
-                            {getSettingsImageUrl(reduxCoverImage) ? (
+                            {getSettingsImageUrl(reduxCoverImage) || offer.image ? (
                               <img 
-                                src={getSettingsImageUrl(reduxCoverImage)!} 
+                                src={getSettingsImageUrl(reduxCoverImage) || (offer.image?.startsWith('/') ? `${API_BASE_URL}${offer.image}` : offer.image)} 
                                 alt="" 
                                 className="w-full h-full object-cover" 
                               />
