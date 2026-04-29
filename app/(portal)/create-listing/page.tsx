@@ -98,6 +98,13 @@ function CreateListingContent() {
       bayutCommunity: "",
       bayutSubCommunity: "",
       bayutBuilding: "",
+      propqa_emirate: "",
+      propqa_city: "",
+      propqa_community: "",
+      propqa_sub_community: "",
+      propqa_tower: "",
+      propqa_lat: "",
+      propqa_lng: "",
       portals: {
         propertyFinder: false,
         bayutEnabled: false,

@@ -105,7 +105,7 @@ export function PropQALocationSelect({
       {open && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-          <div className="absolute top-[calc(100%+8px)] left-0 w-full bg-background border border-border/60 rounded-[1.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.1)] z-50 p-4 overflow-hidden animate-in fade-in zoom-in-95 duration-300 backdrop-blur-xl bg-background/95">
+          <div className="absolute top-[calc(100%+8px)] left-0 w-full z-50 p-4 overflow-hidden animate-in fade-in zoom-in-95 duration-300 backdrop-blur-xl bg-background/95">
             <div className="relative mb-4">
               <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
                 <Search className="h-4 w-4 text-primary/40" />
@@ -178,7 +178,7 @@ export function PropQALocationSelect({
                 </div>
               ) : (
                 <div className="py-16 text-center space-y-5 animate-in fade-in duration-500">
-                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-[2rem] bg-primary/5 text-primary/20 rotate-12 transition-transform hover:rotate-0">
+                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-4xl bg-primary/5 text-primary/20 rotate-12 transition-transform hover:rotate-0">
                     <MapPin className="h-8 w-8" />
                   </div>
                   <div className="space-y-2">

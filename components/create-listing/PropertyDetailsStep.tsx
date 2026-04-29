@@ -303,8 +303,6 @@ export function PropertyDetailsStep({ form }: Props) {
               error={fieldError("bathrooms")}
             />
 
-            <ModernField label="Location ID (PF)" icon={Hash} type="number" {...register("locationId")} value={watch("locationId")} />
-
             <ModernField label="No of parking spaces" icon={Car} type="number" {...register("parking")} value={watch("parking")} />
 
             <ModernSelect 

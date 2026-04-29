@@ -104,6 +104,13 @@ export function CompletedStep({ form }: Props) {
       location_id: values.locationId ? parseInt(values.locationId) : null,
       propqa_location_id: values.propqaLocationId ? parseInt(values.propqaLocationId) : null,
       propqa_location_name: values.propqaLocationName || null,
+      propqa_lat: values.propqa_lat || null,
+      propqa_lng: values.propqa_lng || null,
+      propqa_emirate: values.propqa_emirate || null,
+      propqa_city: values.propqa_city || null,
+      propqa_community: values.propqa_community || null,
+      propqa_sub_community: values.propqa_sub_community || null,
+      propqa_tower: values.propqa_tower || null,
       has_garden: !!values.hasGarden,
       has_kitchen: !!values.hasKitchen,
       has_parking: !!values.hasParking,
@@ -132,6 +139,8 @@ export function CompletedStep({ form }: Props) {
       service_charges: values.serviceCharges || null,
       down_payment: values.downPayment || null,
       financial_status: values.financialStatus || null,
+      latitude: values.latitude || null,
+      longitude: values.longitude || null,
     };
 
     try {

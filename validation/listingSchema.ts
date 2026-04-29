@@ -102,6 +102,11 @@ export const listingSchema = z.object({
   longitude: z.coerce.number().optional(),
   propqa_lat: z.coerce.number().optional(),
   propqa_lng: z.coerce.number().optional(),
+  propqa_emirate: z.string().optional(),
+  propqa_city: z.string().optional(),
+  propqa_community: z.string().optional(),
+  propqa_sub_community: z.string().optional(),
+  propqa_tower: z.string().optional(),
 });
 
 export type ListingFormValues = z.infer<typeof listingSchema>;

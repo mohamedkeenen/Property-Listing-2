@@ -169,7 +169,7 @@ export function PFLocationSelect({
                 </div>
               ) : (
                 <div className="py-16 text-center space-y-5 animate-in fade-in duration-500">
-                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-[2rem] bg-red-500/5 text-red-500/20 rotate-12 transition-transform hover:rotate-0">
+                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-4xl bg-red-500/5 text-red-500/20 rotate-12 transition-transform hover:rotate-0">
                     <MapPin className="h-8 w-8" />
                   </div>
                   <div className="space-y-2">

@@ -21,6 +21,15 @@ export interface PropertyListing {
   building: string;
   propqaLocationId?: number;
   propqaLocationName?: string;
+  propqa_lat?: number | null;
+  propqa_lng?: number | null;
+  propqa_emirate?: string;
+  propqa_city?: string;
+  propqa_community?: string;
+  propqa_sub_community?: string;
+  propqa_tower?: string;
+  latitude?: number | null;
+  longitude?: number | null;
   unitNo: string;
   type: string;
   category: "Residential" | "Commercial";

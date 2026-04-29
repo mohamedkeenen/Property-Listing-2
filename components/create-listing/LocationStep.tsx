@@ -50,8 +50,10 @@ export function LocationStep({ form }: Props) {
                 setValue("property_location", loc.name, { shouldValidate: true });
                 
                 if (loc.coordinates) {
-                  setValue("latitude", loc.coordinates.lat);
-                  setValue("longitude", loc.coordinates.lng);
+                  const lat = loc.coordinates.lat ?? loc.coordinates.latitude;
+                  const lng = loc.coordinates.lng ?? loc.coordinates.longitude;
+                  if (lat !== undefined) setValue("latitude", lat, { shouldValidate: true });
+                  if (lng !== undefined) setValue("longitude", lng, { shouldValidate: true });
                 }
 
                 // Clear existing
@@ -78,6 +80,7 @@ export function LocationStep({ form }: Props) {
                 label="Emirate" 
                 value={watch("uaeEmirate")}
                 onValueChange={(v) => setValue("uaeEmirate", v, { shouldValidate: true })}
+                readOnly={!!watch("locationId")}
                 options={[
                   { label: "Dubai", value: "dubai" },
                   { label: "Abu Dhabi", value: "abu-dhabi" },
@@ -90,6 +93,7 @@ export function LocationStep({ form }: Props) {
                   label="City" 
                   value={watch("city")}
                   onValueChange={(v) => setValue("city", v, { shouldValidate: true })}
+                  readOnly={!!watch("locationId")}
                   options={watch("city") ? [watch("city"), ...filterOptions.cities] : filterOptions.cities}
                   icon={Globe}
                   error={fieldError("city")}
@@ -98,6 +102,7 @@ export function LocationStep({ form }: Props) {
                   label="Community" 
                   value={watch("community")}
                   onValueChange={(v) => setValue("community", v, { shouldValidate: true })}
+                  readOnly={!!watch("locationId")}
                   options={watch("community") ? [watch("community"), ...filterOptions.communities] : filterOptions.communities}
                   icon={Navigation}
                   error={fieldError("community")}
@@ -106,6 +111,7 @@ export function LocationStep({ form }: Props) {
                   label="Sub Community" 
                   value={watch("subCommunity")}
                   onValueChange={(v) => setValue("subCommunity", v, { shouldValidate: true })}
+                  readOnly={!!watch("locationId")}
                   options={watch("subCommunity") ? [watch("subCommunity"), ...filterOptions.subCommunities] : filterOptions.subCommunities}
                   icon={MapPin}
                   error={fieldError("subCommunity")}
@@ -114,14 +120,16 @@ export function LocationStep({ form }: Props) {
                   label="Building / Tower" 
                   value={watch("building")}
                   onValueChange={(v) => setValue("building", v, { shouldValidate: true })}
+                  readOnly={!!watch("locationId")}
                   options={watch("building") ? [watch("building"), ...filterOptions.buildings] : filterOptions.buildings}
                   icon={Building2}
                   error={fieldError("building")}
                 />
+                <ModernField label="Location ID" value={watch("locationId")} readOnly />
                 <ModernField label="Lat" value={watch("latitude")} readOnly />
                 <ModernField label="Lng" value={watch("longitude")} readOnly />
               
-              <div className="relative aspect-video rounded-[1.5rem] border border-border/60 bg-muted/30 overflow-hidden mt-4">
+              <div className="relative aspect-video rounded-3xl border border-border/60 bg-muted/30 overflow-hidden mt-4">
                 {watch("latitude") && watch("longitude") ? (
                   <iframe
                     width="100%"
@@ -224,6 +232,7 @@ export function LocationStep({ form }: Props) {
               initialLabel={watch("propqaLocationName")}
               onValueChange={(loc) => {
                 setValue("propqaLocationId", loc.id, { shouldValidate: true });
+                setValue("propqa_location_id", loc.id, { shouldValidate: true });
                 setValue("propqaLocationName", loc.name, { shouldValidate: true });
                 setValue("locationId", loc.id, { shouldValidate: true });
                 
@@ -240,13 +249,13 @@ export function LocationStep({ form }: Props) {
 
                 if (loc.tree && Array.isArray(loc.tree)) {
                   loc.tree.forEach((node: any) => {
-                    const type = node.type?.toLowerCase();
+                    const type = node.type?.toLowerCase().replace(/[-_\s]/g, "");
                     const name = node.name;
-                    if (type === 'emirate') setValue("propqa_emirate", name);
-                    if (type === 'city') setValue("propqa_city", name);
-                    if (type === 'community') setValue("propqa_community", name);
-                    if (type === 'sub-community') setValue("propqa_sub_community", name);
-                    if (type === 'building' || type === 'tower') setValue("propqa_tower", name);
+                    if (type === "emirate") setValue("propqa_emirate", name, { shouldValidate: true });
+                    if (type === "city") setValue("propqa_city", name, { shouldValidate: true });
+                    if (type === "community") setValue("propqa_community", name, { shouldValidate: true });
+                    if (type === "subcommunity") setValue("propqa_sub_community", name, { shouldValidate: true });
+                    if (type === "building" || type === "tower") setValue("propqa_tower", name, { shouldValidate: true });
                   });
                 }
               }}
@@ -254,13 +263,49 @@ export function LocationStep({ form }: Props) {
             />
 
             <div className="space-y-4 pt-4 border-t border-border/40">
-              <ModernField label="Emirate" value={watch("propqa_emirate")} readOnly icon={Globe} />
-              <ModernField label="City" value={watch("propqa_city")} readOnly icon={Globe} />
-              <ModernField label="Community" value={watch("propqa_community")} readOnly icon={Navigation} />
-              <ModernField label="Sub Community" value={watch("propqa_sub_community")} readOnly icon={MapPin} />
-              <ModernField label="Building / Tower" value={watch("propqa_tower")} readOnly icon={Building2} />
-              <ModernField label="Lat" value={watch("propqa_lat")} readOnly />
-              <ModernField label="Lng" value={watch("propqa_lng")} readOnly />
+              <ModernSelect 
+                label="Emirate" 
+                value={watch("propqa_emirate")} 
+                onValueChange={(v) => setValue("propqa_emirate", v, { shouldValidate: true })} 
+                readOnly={!!watch("propqa_location_id")}
+                options={watch("propqa_emirate") ? [watch("propqa_emirate"), "Dubai", "Abu Dhabi", "Sharjah", "Ajman", "Umm Al Quwain", "Ras Al Khaimah", "Fujairah"] : ["Dubai", "Abu Dhabi", "Sharjah", "Ajman", "Umm Al Quwain", "Ras Al Khaimah", "Fujairah"]}
+                icon={Globe} 
+              />
+              <ModernSelect 
+                label="City" 
+                value={watch("propqa_city")} 
+                onValueChange={(v) => setValue("propqa_city", v, { shouldValidate: true })} 
+                readOnly={!!watch("propqa_location_id")}
+                options={watch("propqa_city") ? [watch("propqa_city"), ...filterOptions.cities] : filterOptions.cities}
+                icon={Globe} 
+              />
+              <ModernSelect 
+                label="Community" 
+                value={watch("propqa_community")} 
+                onValueChange={(v) => setValue("propqa_community", v, { shouldValidate: true })} 
+                readOnly={!!watch("propqa_location_id")}
+                options={watch("propqa_community") ? [watch("propqa_community"), ...filterOptions.communities] : filterOptions.communities}
+                icon={Navigation} 
+              />
+              <ModernSelect 
+                label="Sub Community" 
+                value={watch("propqa_sub_community")} 
+                onValueChange={(v) => setValue("propqa_sub_community", v, { shouldValidate: true })} 
+                readOnly={!!watch("propqa_location_id")}
+                options={watch("propqa_sub_community") ? [watch("propqa_sub_community"), ...filterOptions.subCommunities] : filterOptions.subCommunities}
+                icon={MapPin} 
+              />
+              <ModernSelect 
+                label="Building / Tower" 
+                value={watch("propqa_tower")} 
+                onValueChange={(v) => setValue("propqa_tower", v, { shouldValidate: true })} 
+                readOnly={!!watch("propqa_location_id")}
+                options={watch("propqa_tower") ? [watch("propqa_tower"), ...filterOptions.buildings] : filterOptions.buildings}
+                icon={Building2} 
+              />
+               <ModernField label="PropQA Location ID" value={watch("propqa_location_id")} readOnly />
+               <ModernField label="Lat" value={watch("propqa_lat")} readOnly />
+               <ModernField label="Lng" value={watch("propqa_lng")} readOnly />
               
               <div className="relative aspect-video rounded-3xl border border-border/60 bg-muted/30 overflow-hidden mt-4">
                 {watch("propqa_lat") && watch("propqa_lng") ? (
