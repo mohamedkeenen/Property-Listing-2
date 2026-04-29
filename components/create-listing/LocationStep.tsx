@@ -5,6 +5,7 @@ import { MapPin, Navigation, Building2, Globe } from "lucide-react";
 import { ModernSelect } from "@/components/ui/modern-select";
 import { ModernField } from "@/components/ui/modern-field";
 import { PropQALocationSelect } from "./PropQALocationSelect";
+import { PFLocationSelect } from "./PFLocationSelect";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Rocket } from "lucide-react";
@@ -16,8 +17,6 @@ interface Props {
 export function LocationStep({ form }: Props) {
   const { register, watch, setValue, formState: { errors } } = form;
 
-  const currentCity = watch("city");
-  const currentCommunity = watch("community");
   const currentBayutCity = watch("bayutCity");
   const currentBayutCommunity = watch("bayutCommunity");
 
@@ -41,67 +40,116 @@ export function LocationStep({ form }: Props) {
             </CardTitle>
           </CardHeader>
           <CardContent className="p-8 space-y-6">
-            <ModernSelect 
-              label="Emirate" 
-              value={watch("uaeEmirate")}
-              onValueChange={(v) => setValue("uaeEmirate", v, { shouldValidate: true })}
-              options={[
-                { label: "Dubai", value: "dubai" },
-                { label: "Abu Dhabi", value: "abu-dhabi" },
-                { label: "Northern Emirates", value: "northern-emirates" },
-              ]}
-              icon={Globe}
-              required
-              error={fieldError("uaeEmirate")}
-            />
-
-            <ModernSelect 
-              label="Property Finder Location" 
+            <PFLocationSelect 
+              label="Search PF Location" 
               value={watch("pfLocation")}
-              onValueChange={(v) => {
-                setValue("pfLocation", v, { shouldValidate: true });
-                setValue("property_location", v, { shouldValidate: true });
+              initialLabel={watch("property_location")}
+              onValueChange={(loc) => {
+                setValue("pfLocation", loc.id, { shouldValidate: true });
+                setValue("locationId", loc.id, { shouldValidate: true });
+                setValue("property_location", loc.name, { shouldValidate: true });
+                
+                if (loc.coordinates) {
+                  setValue("latitude", loc.coordinates.lat);
+                  setValue("longitude", loc.coordinates.lng);
+                }
+
+                // Clear existing
+                setValue("city", "");
+                setValue("community", "");
+                setValue("subCommunity", "");
+                setValue("building", "");
+
+                // Map PF Path Hierarchy (e.g. "Dubai > Dubai Marina > ...")
+                if (loc.path) {
+                   const parts = loc.path.split(">").map((s: string) => s.trim());
+                   if (parts.length > 0) setValue("uaeEmirate", parts[0].toLowerCase());
+                   if (parts.length > 1) setValue("city", parts[1]);
+                   if (parts.length > 2) setValue("community", parts[2]);
+                   if (parts.length > 3) setValue("subCommunity", parts[3]);
+                   if (parts.length > 4) setValue("building", parts[4]);
+                }
               }}
-              options={filterOptions.pfLocations}
-              icon={MapPin}
               error={fieldError("pfLocation")}
             />
 
-            <ModernSelect 
-              label="City" 
-              value={currentCity}
-              onValueChange={(v) => setValue("city", v, { shouldValidate: true })}
-              options={filterOptions.cities}
-              icon={Globe}
-              error={fieldError("city")}
-            />
-            
-            <ModernSelect 
-              label="Community" 
-              value={currentCommunity}
-              onValueChange={(v) => setValue("community", v, { shouldValidate: true })}
-              options={filterOptions.communities}
-              icon={Navigation}
-              error={fieldError("community")}
-            />
+            <div className="space-y-4 pt-4 border-t border-border/40">
+              <ModernSelect 
+                label="Emirate" 
+                value={watch("uaeEmirate")}
+                onValueChange={(v) => setValue("uaeEmirate", v, { shouldValidate: true })}
+                options={[
+                  { label: "Dubai", value: "dubai" },
+                  { label: "Abu Dhabi", value: "abu-dhabi" },
+                  { label: "Northern Emirates", value: "northern-emirates" },
+                ]}
+                icon={Globe}
+                readOnly
+              />
+              
+              <div className="grid grid-cols-2 gap-4">
+                <ModernSelect 
+                  label="City" 
+                  value={watch("city")}
+                  onValueChange={(v) => setValue("city", v, { shouldValidate: true })}
+                  options={watch("city") ? [{label: watch("city"), value: watch("city")}, ...filterOptions.cities] : filterOptions.cities}
+                  icon={Globe}
+                  error={fieldError("city")}
+                />
+                <ModernSelect 
+                  label="Community" 
+                  value={watch("community")}
+                  onValueChange={(v) => setValue("community", v, { shouldValidate: true })}
+                  options={watch("community") ? [{label: watch("community"), value: watch("community")}, ...filterOptions.communities] : filterOptions.communities}
+                  icon={Navigation}
+                  error={fieldError("community")}
+                />
+              </div>
 
-            <ModernSelect 
-              label="Sub Community" 
-              value={watch("subCommunity")}
-              onValueChange={(v) => setValue("subCommunity", v, { shouldValidate: true })}
-              options={filterOptions.subCommunities}
-              icon={MapPin}
-              error={fieldError("subCommunity")}
-            />
+              <div className="grid grid-cols-2 gap-4">
+                <ModernSelect 
+                  label="Sub Community" 
+                  value={watch("subCommunity")}
+                  onValueChange={(v) => setValue("subCommunity", v, { shouldValidate: true })}
+                  options={watch("subCommunity") ? [{label: watch("subCommunity"), value: watch("subCommunity")}, ...filterOptions.subCommunities] : filterOptions.subCommunities}
+                  icon={MapPin}
+                  error={fieldError("subCommunity")}
+                />
+                <ModernSelect 
+                  label="Building / Tower" 
+                  value={watch("building")}
+                  onValueChange={(v) => setValue("building", v, { shouldValidate: true })}
+                  options={watch("building") ? [{label: watch("building"), value: watch("building")}, ...filterOptions.buildings] : filterOptions.buildings}
+                  icon={Building2}
+                  error={fieldError("building")}
+                />
+              </div>
 
-            <ModernSelect 
-              label="Building / Tower" 
-              value={watch("building")}
-              onValueChange={(v) => setValue("building", v, { shouldValidate: true })}
-              options={filterOptions.buildings}
-              icon={Building2}
-              error={fieldError("building")}
-            />
+              <div className="grid grid-cols-2 gap-4">
+                <ModernField label="Lat" value={watch("latitude")} readOnly />
+                <ModernField label="Lng" value={watch("longitude")} readOnly />
+              </div>
+              
+              <div className="relative aspect-video rounded-[1.5rem] border border-border/60 bg-muted/30 overflow-hidden mt-4">
+                {watch("latitude") && watch("longitude") ? (
+                  <iframe
+                    width="100%"
+                    height="100%"
+                    frameBorder="0"
+                    style={{ border: 0 }}
+                    src={`https://maps.google.com/maps?q=${watch("latitude")},${watch("longitude")}&z=15&output=embed`}
+                    allowFullScreen
+                  ></iframe>
+                ) : (
+                  <div className="h-full flex flex-col items-center justify-center text-center p-4">
+                    <Globe className="h-6 w-6 text-red-500/20 animate-pulse mb-2" />
+                    <p className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/30">
+                      Map Preview
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
           </CardContent>
         </Card>
 
@@ -223,14 +271,14 @@ export function LocationStep({ form }: Props) {
               <ModernField label="Sub Community" value={watch("propqa_sub_community")} readOnly icon={MapPin} />
               <ModernField label="Building / Tower" value={watch("propqa_tower")} readOnly icon={Building2} />
               
-              <div className="relative aspect-video rounded-[1.5rem] border border-border/60 bg-muted/30 overflow-hidden mt-4">
+              <div className="relative aspect-video rounded-3xl border border-border/60 bg-muted/30 overflow-hidden mt-4">
                 {watch("propqa_lat") && watch("propqa_lng") ? (
                   <iframe
                     width="100%"
                     height="100%"
                     frameBorder="0"
                     style={{ border: 0 }}
-                    src={`https://www.google.com/maps/embed/v1/view?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&center=${watch("propqa_lat")},${watch("propqa_lng")}&zoom=15`}
+                    src={`https://maps.google.com/maps?q=${watch("propqa_lat")},${watch("propqa_lng")}&z=15&output=embed`}
                     allowFullScreen
                   ></iframe>
                 ) : (

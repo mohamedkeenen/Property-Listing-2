@@ -60,13 +60,13 @@ export const listingSchema = z.object({
   videoUrl: z.string().optional(),
   view360Url: z.string().optional(),
   qrUrl: z.string().optional(),
-  pfLocation: z.string().min(1, "Location (Property Finder) is required"),
+  pfLocation: z.union([z.string(), z.number()]).optional(),
   city: z.string().optional(),
   community: z.string().optional(),
   subCommunity: z.string().optional(),
   building: z.string().optional(),
   bayutCity: z.string().optional(),
-  bayutLocation: z.string().optional(),
+  bayutLocation: z.union([z.string(), z.number()]).optional(),
   bayutCommunity: z.string().optional(),
   bayutSubCommunity: z.string().optional(),
   bayutBuilding: z.string().optional(),
@@ -98,6 +98,10 @@ export const listingSchema = z.object({
   documents: z.array(z.string()).optional(),
   publishStatus: z.string().optional(),
   custom_values: z.record(z.string(), z.any()).optional(),
+  latitude: z.coerce.number().optional(),
+  longitude: z.coerce.number().optional(),
+  propqa_lat: z.coerce.number().optional(),
+  propqa_lng: z.coerce.number().optional(),
 });
 
 export type ListingFormValues = z.infer<typeof listingSchema>;

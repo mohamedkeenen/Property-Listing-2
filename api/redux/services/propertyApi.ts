@@ -80,6 +80,15 @@ export const propertyApi = createApi({
         params: { search },
       }),
     }),
+    searchPFLocations: builder.query<any, string>({
+      query: (search) => ({
+        url: '/pf/locations',
+        params: { search },
+      }),
+    }),
+    getPFSubLocations: builder.query<any, string | number>({
+      query: (id) => `/pf/locations/${id}/children`,
+    }),
   }),
 });
 
@@ -92,4 +101,6 @@ export const {
   useTogglePortalMutation,
   useSyncBitrixMutation,
   useSearchPropQALocationsQuery,
+  useSearchPFLocationsQuery,
+  useGetPFSubLocationsQuery,
 } = propertyApi;

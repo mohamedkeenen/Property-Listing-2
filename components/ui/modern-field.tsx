@@ -50,7 +50,8 @@ const ModernField = forwardRef<HTMLInputElement, ModernFieldProps>(
             "relative flex w-full rounded-xl border transition-all duration-300 overflow-visible px-4 gap-3 bg-background py-3 cursor-text",
             alignTop ? "items-start" : "items-center min-h-14 h-auto",
             isFocused ? "border-primary ring-4 ring-primary/5 shadow-sm" : "border-border hover:border-primary/20",
-            error ? "border-destructive ring-destructive/10" : ""
+            error ? "border-destructive ring-destructive/10" : "",
+            props.readOnly ? "opacity-70 cursor-default bg-muted/10 grayscale-[0.2]" : ""
           )}
         >
           {flag ? (

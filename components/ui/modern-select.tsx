@@ -20,6 +20,7 @@ interface ModernSelectProps {
   icon?: any;
   required?: boolean;
   error?: string;
+  readOnly?: boolean;
 }
 
 export function ModernSelect({ 
@@ -29,7 +30,8 @@ export function ModernSelect({
   options, 
   icon, 
   required, 
-  error 
+  error,
+  readOnly
 }: ModernSelectProps) {
   const [search, setSearch] = useState("");
 
@@ -59,7 +61,8 @@ export function ModernSelect({
       required={required} 
       error={error}
       value={value}
-      onClear={value ? () => {
+      readOnly={readOnly}
+      onClear={value && !readOnly ? () => {
         onValueChange("");
         const activeElement = document.activeElement as HTMLElement;
         if (activeElement && activeElement.tagName === 'BUTTON') {
@@ -67,9 +70,9 @@ export function ModernSelect({
         }
       } : undefined}
     >
-      <Select value={value} onValueChange={onValueChange}>
+      <Select value={value} onValueChange={onValueChange} disabled={readOnly}>
         <SelectTrigger 
-          className="border-none p-0 h-full w-full shadow-none focus:ring-0 text-sm font-bold text-foreground bg-transparent flex items-center justify-between group/trigger [&_svg]:ml-2 [&_svg]:shrink-0 [&_svg]:text-muted-foreground/50 [&_svg]:group-hover/trigger:text-primary [&_svg]:transition-colors">
+          className="border-none p-0 h-full w-full shadow-none focus:ring-0 text-sm font-bold text-foreground bg-transparent flex items-center justify-between group/trigger [&_svg]:ml-2 [&_svg]:shrink-0 [&_svg]:text-muted-foreground/50 [&_svg]:group-hover/trigger:text-primary [&_svg]:transition-colors disabled:opacity-100 cursor-default">
           <SelectValue placeholder=" " />
         </SelectTrigger>
         <SelectContent className="rounded-xl border-border shadow-xl p-2 max-h-[400px]">
