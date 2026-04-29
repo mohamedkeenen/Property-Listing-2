@@ -84,10 +84,8 @@ export function LocationStep({ form }: Props) {
                   { label: "Northern Emirates", value: "northern-emirates" },
                 ]}
                 icon={Globe}
-                readOnly
               />
               
-              <div className="grid grid-cols-2 gap-4">
                 <ModernSelect 
                   label="City" 
                   value={watch("city")}
@@ -104,9 +102,6 @@ export function LocationStep({ form }: Props) {
                   icon={Navigation}
                   error={fieldError("community")}
                 />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
                 <ModernSelect 
                   label="Sub Community" 
                   value={watch("subCommunity")}
@@ -123,12 +118,8 @@ export function LocationStep({ form }: Props) {
                   icon={Building2}
                   error={fieldError("building")}
                 />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
                 <ModernField label="Lat" value={watch("latitude")} readOnly />
                 <ModernField label="Lng" value={watch("longitude")} readOnly />
-              </div>
               
               <div className="relative aspect-video rounded-[1.5rem] border border-border/60 bg-muted/30 overflow-hidden mt-4">
                 {watch("latitude") && watch("longitude") ? (
@@ -263,13 +254,13 @@ export function LocationStep({ form }: Props) {
             />
 
             <div className="space-y-4 pt-4 border-t border-border/40">
-              <div className="grid grid-cols-2 gap-4">
-                <ModernField label="Emirate" value={watch("propqa_emirate")} readOnly icon={Globe} />
-                <ModernField label="City" value={watch("propqa_city")} readOnly icon={Globe} />
-              </div>
+              <ModernField label="Emirate" value={watch("propqa_emirate")} readOnly icon={Globe} />
+              <ModernField label="City" value={watch("propqa_city")} readOnly icon={Globe} />
               <ModernField label="Community" value={watch("propqa_community")} readOnly icon={Navigation} />
               <ModernField label="Sub Community" value={watch("propqa_sub_community")} readOnly icon={MapPin} />
               <ModernField label="Building / Tower" value={watch("propqa_tower")} readOnly icon={Building2} />
+              <ModernField label="Lat" value={watch("propqa_lat")} readOnly />
+              <ModernField label="Lng" value={watch("propqa_lng")} readOnly />
               
               <div className="relative aspect-video rounded-3xl border border-border/60 bg-muted/30 overflow-hidden mt-4">
                 {watch("propqa_lat") && watch("propqa_lng") ? (
