@@ -92,7 +92,7 @@ export function LocationStep({ form }: Props) {
                   label="City" 
                   value={watch("city")}
                   onValueChange={(v) => setValue("city", v, { shouldValidate: true })}
-                  options={watch("city") ? [{label: watch("city"), value: watch("city")}, ...filterOptions.cities] : filterOptions.cities}
+                  options={watch("city") ? [watch("city"), ...filterOptions.cities] : filterOptions.cities}
                   icon={Globe}
                   error={fieldError("city")}
                 />
@@ -100,7 +100,7 @@ export function LocationStep({ form }: Props) {
                   label="Community" 
                   value={watch("community")}
                   onValueChange={(v) => setValue("community", v, { shouldValidate: true })}
-                  options={watch("community") ? [{label: watch("community"), value: watch("community")}, ...filterOptions.communities] : filterOptions.communities}
+                  options={watch("community") ? [watch("community"), ...filterOptions.communities] : filterOptions.communities}
                   icon={Navigation}
                   error={fieldError("community")}
                 />
@@ -111,7 +111,7 @@ export function LocationStep({ form }: Props) {
                   label="Sub Community" 
                   value={watch("subCommunity")}
                   onValueChange={(v) => setValue("subCommunity", v, { shouldValidate: true })}
-                  options={watch("subCommunity") ? [{label: watch("subCommunity"), value: watch("subCommunity")}, ...filterOptions.subCommunities] : filterOptions.subCommunities}
+                  options={watch("subCommunity") ? [watch("subCommunity"), ...filterOptions.subCommunities] : filterOptions.subCommunities}
                   icon={MapPin}
                   error={fieldError("subCommunity")}
                 />
@@ -119,7 +119,7 @@ export function LocationStep({ form }: Props) {
                   label="Building / Tower" 
                   value={watch("building")}
                   onValueChange={(v) => setValue("building", v, { shouldValidate: true })}
-                  options={watch("building") ? [{label: watch("building"), value: watch("building")}, ...filterOptions.buildings] : filterOptions.buildings}
+                  options={watch("building") ? [watch("building"), ...filterOptions.buildings] : filterOptions.buildings}
                   icon={Building2}
                   error={fieldError("building")}
                 />
