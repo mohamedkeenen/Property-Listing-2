@@ -30,6 +30,7 @@ const portalLogos: Record<string, string> = {
   "Property Finder": "https://res.cloudinary.com/devht0mp5/image/upload/v1772105511/PF_ljkahc.png",
   "Bayut": "https://res.cloudinary.com/devht0mp5/image/upload/v1772105511/bayut_gy4ev2.png",
   "Facebook": "https://upload.wikimedia.org/wikipedia/commons/b/b8/2021_Facebook_icon.svg",
+  "PropQA": "https://res.cloudinary.com/devht0mp5/image/upload/v1777361218/logo-header-white.QoQUc6PB_ao5mn9.svg",
 };
 
 const statusColors: Record<string, string> = {
@@ -39,7 +40,7 @@ const statusColors: Record<string, string> = {
   Lost: "bg-red-500/10 text-red-500 dark:text-red-400 border-red-200 dark:border-red-500/30",
 };
 
-const sourceTabs = ["All", "Property Finder", "Bayut", "Facebook", "Website"];
+const sourceTabs = ["All", "Property Finder", "Bayut", "Facebook", "Website", "PropQA"];
 const statusTabs = ["All Statuses", "New", "Contacted", "Qualified", "Lost"];
 
 import { useGetPropertiesQuery } from "@/api/redux/services/propertyApi";
@@ -128,6 +129,7 @@ export function LeadsTable({
                 Bayut: "bg-emerald-500 text-white shadow-emerald-500/20",
                 Facebook: "bg-blue-600 text-white shadow-blue-600/20",
                 Website: "bg-cyan-500 text-white shadow-cyan-500/20",
+                PropQA: "bg-purple-600 text-white shadow-purple-600/20",
               };
               const colors: Record<string, string> = {
                 All: "hover:bg-primary/10 hover:text-primary",
@@ -135,6 +137,7 @@ export function LeadsTable({
                 Bayut: "hover:bg-emerald-500/10 hover:text-emerald-500",
                 Facebook: "hover:bg-blue-600/10 hover:text-blue-600",
                 Website: "hover:bg-cyan-500/10 hover:text-cyan-500",
+                PropQA: "hover:bg-purple-600/10 hover:text-purple-600",
               };
 
               return (
@@ -312,6 +315,7 @@ export function LeadsTable({
                             l.source === "Property Finder" ? "text-orange-600" :
                             l.source === "Bayut" ? "text-emerald-600" :
                             l.source === "Facebook" ? "text-blue-700" :
+                            l.source === "PropQA" ? "text-purple-700" :
                             "text-foreground/80"
                           )}>
                             {l.source}

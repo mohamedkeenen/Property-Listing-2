@@ -117,6 +117,7 @@ export function PropertyDetailDialog({ listing, open, onClose }: Props) {
             <Badge variant={listing.portals.pf ? "default" : "secondary"}>Property Finder {listing.portals.pf ? "✓" : "✗"}</Badge>
             <Badge variant={listing.portals.bayut ? "default" : "secondary"}>Bayut {listing.portals.bayut ? "✓" : "✗"}</Badge>
             <Badge variant={listing.portals.website ? "default" : "secondary"}>Website {listing.portals.website ? "✓" : "✗"}</Badge>
+            <Badge variant={listing.portals.propqa ? "default" : "secondary"}>PropQA {listing.portals.propqa ? "✓" : "✗"}</Badge>
           </div>
         </div>
       </DialogContent>

@@ -51,6 +51,7 @@ export default function Dashboard() {
         if (filters.portal === "Bayut" && !l.portals.bayut) return false;
         if (filters.portal === "Dubizzle" && !l.portals.dubizzle) return false;
         if (filters.portal === "Website" && !l.portals.website) return false;
+        if (filters.portal === "PropQA" && !l.portals.propqa) return false;
       }
       return true;
     });

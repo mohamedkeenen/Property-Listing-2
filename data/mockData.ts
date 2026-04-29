@@ -19,6 +19,8 @@ export interface PropertyListing {
   community: string;
   subCommunity: string;
   building: string;
+  propqaLocationId?: number;
+  propqaLocationName?: string;
   unitNo: string;
   type: string;
   category: "Residential" | "Commercial";
@@ -620,7 +622,7 @@ export const filterOptions = {
     "Sobha",
     "Tecom Group"
   ],
-  portals: ["Property Finder", "Bayut", "Website", "Dubizzle"],
+  portals: ["Property Finder", "Bayut", "Website", "Dubizzle", "PropQA"],
   areaUnit: "SQ. FT",
   currencies: ["Dirham", "Egypt Pound", "US Dollar", "EURO"],
   finishingTypes: [

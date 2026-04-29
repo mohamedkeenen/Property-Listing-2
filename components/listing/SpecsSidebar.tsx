@@ -13,6 +13,7 @@ interface SpecsSidebarProps {
     pf?: boolean;
     bayut?: boolean;
     dubizzle?: boolean;
+    propqa?: boolean;
   };
 }
 
@@ -53,6 +54,7 @@ export function SpecsSidebar({ category, status, type, purpose, updatedAt, porta
               { id: 'pf', name: 'PF', active: portals?.pf, color: '#EE2D37', icon: 'https://res.cloudinary.com/devht0mp5/image/upload/v1772105511/PF_ljkahc.png' },
               { id: 'bayut', name: 'BAYUT', active: portals?.bayut, color: '#2ABB66', icon: 'https://res.cloudinary.com/devht0mp5/image/upload/v1772105511/bayut_gy4ev2.png' },
               { id: 'dubizzle', name: 'DUBIZZLE', active: portals?.dubizzle, color: '#2ABB66', icon: 'https://res.cloudinary.com/devht0mp5/image/upload/v1775823210/download_gzle7f.png' },
+              { id: 'propqa', name: 'PROPQA', active: portals?.propqa, color: '#F97316', icon: 'https://res.cloudinary.com/devht0mp5/image/upload/v1777361218/logo-header-white.QoQUc6PB_ao5mn9.svg' },
             ].map((portal) => (
               <div key={portal.id} className="flex flex-col items-center gap-2 min-w-0">
                 <div 

@@ -74,6 +74,12 @@ export const propertyApi = createApi({
       }),
       invalidatesTags: ['Property'],
     }),
+    searchPropQALocations: builder.query<any, string>({
+      query: (search) => ({
+        url: '/propqa/locations',
+        params: { search },
+      }),
+    }),
   }),
 });
 
@@ -85,4 +91,5 @@ export const {
   useDeletePropertyMutation,
   useTogglePortalMutation,
   useSyncBitrixMutation,
+  useSearchPropQALocationsQuery,
 } = propertyApi;

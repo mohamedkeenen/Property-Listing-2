@@ -91,6 +91,7 @@ export function CompletedStep({ form }: Props) {
       is_on_bayut: values.portals?.bayutEnabled || false,
       is_on_website: values.portals?.officeWebsite || false,
       is_on_dubizzle: values.portals?.dubizzleSelection || false,
+      is_on_propqa: values.portals?.propqaEnabled || false,
       // PF specific fields
       ad_issue_date: values.adIssueDate || null,
       license_no: values.licenseNo || null,
@@ -101,6 +102,8 @@ export function CompletedStep({ form }: Props) {
       floor_number: values.floorNumber ? parseInt(values.floorNumber) : null,
       number_of_floors: values.numberOfFloors ? parseInt(values.numberOfFloors) : null,
       location_id: values.locationId ? parseInt(values.locationId) : null,
+      propqa_location_id: values.propqaLocationId ? parseInt(values.propqaLocationId) : null,
+      propqa_location_name: values.propqaLocationName || null,
       has_garden: !!values.hasGarden,
       has_kitchen: !!values.hasKitchen,
       has_parking: !!values.hasParking,

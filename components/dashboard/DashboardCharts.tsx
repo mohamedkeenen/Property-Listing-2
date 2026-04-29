@@ -71,7 +71,16 @@ export function DashboardCharts({ listings }: { listings: PropertyListing[] }) {
       color: COLORS.cyan,
       breakdown: ["Apartment", "Villa", "Office", "Townhouse"].map(t => ({
         name: t,
-        value: listings.filter(l => l.portals.website && l.type === t).length
+        value: listings.filter(l => l.type === t && l.portals.website).length
+      })).filter(i => i.value > 0)
+    },
+    { 
+      name: "PropQA", 
+      value: listings.filter((l) => l.portals.propqa).length, 
+      color: COLORS.purple,
+      breakdown: ["Apartment", "Villa", "Office", "Townhouse"].map(t => ({
+        name: t,
+        value: listings.filter(l => l.portals.propqa && l.type === t).length
       })).filter(i => i.value > 0)
     }
   ];
@@ -112,7 +121,7 @@ export function DashboardCharts({ listings }: { listings: PropertyListing[] }) {
       name: "Call", 
       value: leads.filter((l: any) => (l.sub_source || l.subSource) === "Call").length, 
       color: COLORS.orange,
-      breakdown: ["Property Finder", "Bayut", "Facebook", "Skyloov", "Website"].map(p => ({
+      breakdown: ["Property Finder", "Bayut", "Facebook", "Skyloov", "Website", "PropQA"].map(p => ({
         name: p,
         value: leads.filter((l: any) => (l.sub_source || l.subSource) === "Call" && l.source === p).length
       })).filter(i => i.value > 0)
@@ -134,6 +143,7 @@ export function DashboardCharts({ listings }: { listings: PropertyListing[] }) {
   const portalLogos: Record<string, string> = {
     "Property Finder": "https://res.cloudinary.com/devht0mp5/image/upload/v1772105511/PF_ljkahc.png",
     "Bayut": "https://res.cloudinary.com/devht0mp5/image/upload/v1772105511/bayut_gy4ev2.png",
+    "PropQA": "https://res.cloudinary.com/devht0mp5/image/upload/v1777361218/logo-header-white.QoQUc6PB_ao5mn9.svg",
   };
 
   const channelIcons: Record<string, any> = {

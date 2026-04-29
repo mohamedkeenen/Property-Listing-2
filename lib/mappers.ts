@@ -78,6 +78,8 @@ export const mapBackendPropertyToFrontend = (p: any): PropertyListing => {
       propqa: p.is_on_propqa || false,
       bitrix: p.is_on_bitrix || true,
     },
+    propqaLocationId: p.propqa_location_id || p.location_id || 0,
+    propqaLocationName: p.propqa_location_name || "",
     uaeEmirate: p.uae_emirate || "",
     pfStatus: p.pf_status || null,
     propqa_status: p.propqa_status || null,
@@ -207,6 +209,9 @@ export const mapBackendPropertyToFormValues = (p: any): any => {
       dubizzleSelection: !!p.is_on_dubizzle,
       officeWebsite: !!p.is_on_website,
       primeZamWebsite: false,
-    }
+      propqaEnabled: !!p.is_on_propqa,
+    },
+    propqaLocationId: p.propqa_location_id || p.location_id || "",
+    propqaLocationName: p.propqa_location_name || "",
   };
 };

@@ -88,6 +88,20 @@ export function StatsCards({ listings }: Props) {
       barBg: "bg-cyan-500/15",
       borderColor: "border-r-cyan-500",
     },
+    {
+      label: "PropQA",
+      total: listings.filter((l) => l.portals.propqa).length,
+      residential: listings.filter((l) => l.portals.propqa && l.category === "Residential").length,
+      commercial: listings.filter((l) => l.portals.propqa && l.category === "Commercial").length,
+      image: "https://res.cloudinary.com/devht0mp5/image/upload/v1777361218/logo-header-white.QoQUc6PB_ao5mn9.svg",
+      color: "#8b5cf6", // Purple
+      bgColor: "bg-purple-500/10",
+      iconColor: "text-purple-500",
+      dotColor: "bg-purple-500",
+      barColor: "bg-purple-600",
+      barBg: "bg-purple-500/15",
+      borderColor: "border-r-purple-500",
+    },
   ];
 
   return (
